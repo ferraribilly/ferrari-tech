@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify, render_template, redirect, session
 from flask_socketio import SocketIO, join_room, emit
 import requests
 import mercadopago
+import hmac
+import hashlib
 from io import BytesIO
 import base64
 import qrcode
@@ -377,46 +379,62 @@ def pagamento_pix(id):
 
 
 
-# ===========================================  
-# WEBHOOK MERCADO PAGO  
-# ===========================================  
-# ===========================================  
-# WEBHOOK MERCADO PAGO  
-# ===========================================  
-@app.route("/notificacoes", methods=["POST"])  
-def handle_webhook():  
-    data = request.json  
-    if not data:  
-        return "", 200  
-  
-    payment_id = None  
-    if "data" in data and "id" in data["data"]:  
-        payment_id = data["data"]["id"]  
-    elif "id" in data:  
-        payment_id = data["id"]  
-  
-    if not payment_id:  
-        return "", 200  
-  
-    payment_details = get_payment_details(payment_id)  
-    if not payment_details:  
-        return "", 200  
-  
-    status = payment_details.get("status")  
-    usuario_id = payment_details.get("external_reference")  
 
-    # 🔥 Emite para todos conectados ao pagamento
-    socketio.emit(  
-        "payment_update",  
-        {  
-            "status": status,  
-            "payment_id": str(payment_id),  
-            "usuario_id": usuario_id  
-        },  
-        room=str(payment_id)  
-    )  
+# ===========================================  
+# WEBHOOK MERCADO PAGO  
+# ===========================================  
+import hmac
+import hashlib
+
+ASSINATURA_SECRETA = os.getenv("ASSINATURA_SECRETA")
+
+@app.route("/notificacoes", methods=["POST"])
+def handle_webhook():
+    raw_body = request.get_data()  # corpo bruto da requisição
+    signature_header = request.headers.get("X-Hub-Signature")  # Mercado Pago envia isso
+
+    if not signature_header:
+        return "Missing signature", 400
+
+    # Calcula HMAC com a chave secreta
+    expected_signature = hmac.new(
+        ASSINATURA_SECRETA.encode(),
+        raw_body,
+        hashlib.sha256
+    ).hexdigest()
+
+    # Compara assinatura recebida com a calculada
+    if not hmac.compare_digest(expected_signature, signature_header):
+        return "Invalid signature", 403
+
+    # Se passou na validação, processa normalmente
+    data = request.json
+    if not data:
+        return "", 200
+
+    payment_id = data.get("data", {}).get("id") or data.get("id")
+    if not payment_id:
+        return "", 200
+
+    payment_details = get_payment_details(payment_id)
+    if not payment_details:
+        return "", 200
+
+    status = payment_details.get("status")
+    usuario_id = payment_details.get("external_reference")
+
+    socketio.emit(
+        "payment_update",
+        {
+            "status": status,
+            "payment_id": str(payment_id),
+            "usuario_id": usuario_id
+        },
+        room=str(payment_id)
+    )
+
+    return "", 200
   
-    return "", 200  
 
 
 def get_payment_details(payment_id):
