@@ -318,13 +318,15 @@ def pagamento_pix(id):
         "payer": {
             "email": email,
             "first_name": nome,
+            "last_name": "Cliente",
             "identification": {
                 "type": "CPF",
                 "number": cpf
             }
         },
         "external_reference": usuario_id,
-        "notification_url": "https://ferrari-tech.onrender.com/notificacoes"
+        "notification_url": "https://ferrari-tech.onrender.com/notificacoes",
+        "statement_descriptor": "FerrariTech"
     }
 
     try:
@@ -377,14 +379,85 @@ def pagamento_pix(id):
         return f"ERRO GERAL: {str(e)}", 500
 
 
+# PAGAMENTO MERCADO PAGO PREFERENCE
+@app.route("/compra/preference/pagamento_pix/<id>")
+def pagamento_preference(id):
+
+    usuario_id = id
+    nome = request.args.get("nome") or ""
+    email = request.args.get("email") or ""
+    cpf = request.args.get("cpf") or ""
+    quantidade = int(request.args.get("quantidade") or 0)
+
+    valor_total = quantidade * 1
+
+    # preference gerar_link_pagamento()
+    payment_data = {
+        "items": [
+            {
+                "id": str(uuid.uuid4()), # código único do item
+                "title": "Assinatura Análise de Dados",
+                "description": "Acesso ao sistema para gerar relatórios por 5 horas",
+                "quantity": 1,
+                "currency_id": "BRL",
+                "unit_price": 1,
+                "category_id": "services"
+            }
+        ],
+        "payer": {
+            "email": email,
+            "first_name": nome,
+            "identification": {
+                "type": "CPF",
+                "number": cpf
+            }
+        },
+        "external_reference": usuario_id,
+
+        "back_urls": {
+            "success": "https://ferrari-tech.onrender.com/sucesso",
+            "failure": "https://ferrari-tech.onrender.com/recusada",
+        },
+        
+
+        "notification_url": "https://ferrari-tech.onrender.com/notificacoes",
+        "statement_descriptor": "FerrariTech",
+        "payment_methods": {
+            "excluded_payment_types": [
+                {"id": "credit_card"}
+            ]
+        }
+    }
+
+    result = sdk.preference().create(payment_data)
+    mp = result.get("response", {})
+
+    if "id" not in mp:
+        return f"ERRO NO MERCADO PAGO:<br><br>{mp}", 500
+
+    payment_id = mp["id"]
+    status = "pending"
+
+    documento = criar_documento_pagamento(
+        payment_id=str(payment_id),
+        status=status,
+        valor=valor_total,
+        usuario_id=usuario_id,
+        email_user=email
+    )
+
+    PagamentoModel().create_pagamento(documento)
+
+    
+    link_pagamento = mp.get("init_point", "")
+    return redirect(link_pagamento)
 
 
 
 # ===========================================  
 # WEBHOOK MERCADO PAGO  
 # ===========================================  
-import hmac
-import hashlib
+
 
 ASSINATURA_SECRETA = os.getenv("ASSINATURA_SECRETA")
 
