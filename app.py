@@ -18,7 +18,7 @@ import os
 import cloudinary
 import cloudinary.uploader
 from bson.objectid import ObjectId
-from models import criar_usuario, users_collection, pagamentos_collection, criar_documento_pagamento, PagamentoModel
+from models import criar_usuario, users_collection, pagamentos_collection, criar_documento_pagamento, PagamentoModel, NumeroModel
 from flask_cors import CORS
 from datetime import datetime, timezone
 import uuid
@@ -33,6 +33,7 @@ client = MongoClient(os.getenv("MONGO_URI"))
 db = client["rifa"]
 colecao = db["participantes"]
 pagamento_model = PagamentoModel()
+numero_model = NumeroModel()
 socketio = SocketIO(app, cors_allowed_origins="*")
 app.secret_key = os.getenv("APP_SECRET_KEY")  
 chave_pix = os.getenv("CHAVE_PIX")
@@ -117,6 +118,38 @@ def numeros(id):
         usuario_id=id
 
     )
+
+def limpar_cpf(cpf):
+    if not cpf:
+        return None
+    return ''.join(filter(str.isdigit, cpf))
+
+
+@app.route("/numeros", methods=["POST"])
+def salvar_numero():
+    data = request.json
+
+    doc = {
+        "nome": data.get("nome"),
+        "cpf": limpar_cpf(data.get("cpf")),
+        "email": data.get("email"),
+        "numero": data.get("numero"),
+        "status": "A PAGAR",
+        "criado_em": datetime.now(timezone.utc)
+    }
+
+    _id = numero_model.create_numero(doc)
+
+    return jsonify({"id": _id})
+
+@app.route("/numeros", methods=["GET"])
+def listar_numeros():
+    numeros = numero_model.get_all_numeros()
+
+    for n in numeros:
+        n["_id"] = str(n["_id"])
+
+    return jsonify(numeros)    
 
 
 
@@ -391,14 +424,13 @@ def pagamento_preference(id):
 
     valor_total = quantidade * 1
 
-    # preference gerar_link_pagamento()
     payment_data = {
         "items": [
             {
-                "id": str(uuid.uuid4()), # código único do item
+                "id": str(uuid.uuid4()),
                 "title": "Assinatura Análise de Dados",
                 "description": "Acesso ao sistema para gerar relatórios por 5 horas",
-                "quantity": 1,
+                "quantity": quantidade,
                 "currency_id": "BRL",
                 "unit_price": 1,
                 "category_id": "services"
@@ -418,15 +450,16 @@ def pagamento_preference(id):
             "success": "https://ferrari-tech.onrender.com/sucesso",
             "failure": "https://ferrari-tech.onrender.com/recusada",
         },
+        "auto_return": "approved",
         
 
         "notification_url": "https://ferrari-tech.onrender.com/notificacoes",
         "statement_descriptor": "FerrariTech",
+
         "payment_methods": {
-            "excluded_payment_types": [
-                {"id": "credit_card"}
-            ]
+            "installments": 12
         }
+        
     }
 
     result = sdk.preference().create(payment_data)
@@ -448,10 +481,12 @@ def pagamento_preference(id):
 
     PagamentoModel().create_pagamento(documento)
 
-    
     link_pagamento = mp.get("init_point", "")
     return redirect(link_pagamento)
 
+@app.route("/success")
+def sucesso():
+    return render_template("aprovado.html")
 
 
 # ===========================================  

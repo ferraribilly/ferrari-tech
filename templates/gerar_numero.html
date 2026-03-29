@@ -179,7 +179,7 @@
   </footer>
 
   <script>
-    let quantidade = 0;
+let quantidade = 0;
 let valorUnitario = 0.05;
 
 function gerarBilhete() {
@@ -205,24 +205,52 @@ function gerarBilhete() {
   const total = quantidade * valorUnitario;
   document.getElementById("total").innerText = total.toFixed(2);
 
+  // DADOS DO USUÁRIO
+  const nome = document.getElementById("nome").innerText;
+  const cpf = document.getElementById("cpf").innerText;
+  const email = document.getElementById("email").innerText;
+
+  // SALVAR NO BACKEND
+  fetch("/numeros", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      nome: nome,
+      cpf: cpf,
+      email: email,
+      numero: numero
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log("Salvo:", data);
+  })
+  .catch(err => {
+    console.error("Erro ao salvar:", err);
+  });
+
   input.value = '';
 }
 
 
 
-    // Carregar lista de números 
-    async function carregarNumeros() {
-        const res = await fetch("/numeros");
-        const data = await res.json();
-        const lista = document.getElementById("listaNumeros");
-        lista.innerHTML = "";
-        data.forEach(item => {
-            const li = document.createElement("li");
-            li.className = "list-group-item";
-            li.textContent = `Número: ${String(item.numero).padStart(3, '0')} - Valor: R$ ${item.valor.toFixed(2)} - Comprovante: ${item.url_comprovante}`;
-            lista.appendChild(li);
-        });
-    }
+// Carregar lista de números 
+async function carregarNumeros() {
+    const res = await fetch("/numeros");
+    const data = await res.json();
+    const lista = document.getElementById("listaNumeros");
+    lista.innerHTML = "";
+    data.forEach(item => {
+        const li = document.createElement("li");
+        li.className = "list-group-item";
+        li.textContent = `Número: ${String(item.numero).padStart(3, '0')} - Valor: R$ ${item.valor.toFixed(2)} - Comprovante: ${item.url_comprovante}`;
+        lista.appendChild(li);
+    });
+}
+
+
 
 // PAGAMENTO QRCODE PIX
 document.getElementById("btn-pagar").onclick = () => {
@@ -255,6 +283,6 @@ document.getElementById("btn-preference").onclick = () => {
 
     window.location.href = url;
 };
-  </script>
+</script>
 </body>
 </html>

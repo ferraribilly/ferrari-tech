@@ -20,6 +20,7 @@ db = client[DB_NAME]
 
 # Coleções
 PAGAMENTOS_COLLECTION_NAME = "pagamentos"
+COMPRA_COLLECTION_NAME = "compra"
 users_collection = db["users"]
 
 
@@ -131,3 +132,36 @@ class PagamentoModel:
         except Exception as e:
             print("ERRO DELETE:", e)
             return 0
+
+
+
+# =========================
+# COLLECTION NUMEROS
+# =========================
+NUMEROS_COLLECTION_NAME = "numeros"
+numeros_collection = db[NUMEROS_COLLECTION_NAME]
+
+
+class NumeroModel:
+    def __init__(self):
+        self.collection = numeros_collection
+
+    def create_numero(self, data):
+        try:
+            result = self.collection.insert_one(data)
+            return str(result.inserted_id)
+        except Exception as e:
+            print("ERRO INSERT NUMERO:", e)
+            return None
+
+    def get_all_numeros(self):
+        docs = list(self.collection.find())
+        for d in docs:
+            d["_id"] = str(d["_id"])
+        return docs
+
+    def get_numeros_by_usuario(self, usuario_id):
+        docs = list(self.collection.find({"usuario_id": str(usuario_id)}))
+        for d in docs:
+            d["_id"] = str(d["_id"])
+        return docs
