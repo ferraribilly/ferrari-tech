@@ -291,49 +291,6 @@ def resetar_banco():
 #===========================================================              
 MP_ACCESS_TOKEN = os.environ.get("MP_ACCESS_TOKEN")              
 sdk = mercadopago.SDK(MP_ACCESS_TOKEN)          
-# ===========================================  
-# WEBHOOK MERCADO PAGO  
-# ===========================================  
-@app.route("/notificacoes", methods=["POST"])  
-def handle_webhook():  
-    data = request.json  
-    if not data:  
-        return "", 200  
-  
-    payment_id = None  
-  
-    if "data" in data and "id" in data["data"]:  
-        payment_id = data["data"]["id"]  
-    elif "id" in data:  
-        payment_id = data["id"]  
-  
-    if not payment_id:  
-        return "", 200  
-  
-    payment_details = get_payment_details(payment_id)  
-    if not payment_details:  
-        return "", 200  
-  
-    status = payment_details.get("status")  
-  
-    
-  
-    socketio.emit(  
-        "payment_update",  
-        {  
-            "status": status,  
-            "payment_id": str(payment_id)  
-        },  
-        room=str(payment_id)  
-    )  
-  
-    return "", 200  
-  
-def get_payment_details(payment_id):
-    url = f"https://api.mercadopago.com/v1/payments/{payment_id}"
-    headers = {"Authorization": f"Bearer {MP_ACCESS_TOKEN}"}
-    r = requests.get(url, headers=headers, timeout=10)
-    return r.json() if r.status_code == 200 else None  
 
 # ===========================================
 # GERAR QR CODE PIX
@@ -350,11 +307,11 @@ def pagamento_pix(id):
     email = request.args.get("email") or ""
     quantidade = int(request.args.get("quantidade") or 0)
 
-    valor_total = quantidade * 1.00
+    valor_total = quantidade * 0.05
 
     payment_data = {
         "transaction_amount": float(valor_total),
-        "description": "Assinatura Portifolio",
+        "description": "Testar pg Producao",
         "payment_method_id": "pix",
         "payer": {
             "email": email,
@@ -365,7 +322,7 @@ def pagamento_pix(id):
             }
         },
         "external_reference": usuario_id,
-        "notification_url": "https://ferrari-games-itech-io.onrender.com/notificacoes"
+        "notification_url": "https://ferrari-tech.onrender.com/notificacoes"
     }
 
     try:
@@ -417,23 +374,61 @@ def pagamento_pix(id):
         print("ERRO GERAL:", e)
         return f"ERRO GERAL: {str(e)}", 500
 
-    
+
+
+
+# ===========================================  
+# WEBHOOK MERCADO PAGO  
+# ===========================================  
+# ===========================================  
+# WEBHOOK MERCADO PAGO  
+# ===========================================  
+@app.route("/notificacoes", methods=["POST"])  
+def handle_webhook():  
+    data = request.json  
+    if not data:  
+        return "", 200  
+  
+    payment_id = None  
+    if "data" in data and "id" in data["data"]:  
+        payment_id = data["data"]["id"]  
+    elif "id" in data:  
+        payment_id = data["id"]  
+  
+    if not payment_id:  
+        return "", 200  
+  
+    payment_details = get_payment_details(payment_id)  
+    if not payment_details:  
+        return "", 200  
+  
+    status = payment_details.get("status")  
+    usuario_id = payment_details.get("external_reference")  
+
+    # 🔥 Emite para todos conectados ao pagamento
+    socketio.emit(  
+        "payment_update",  
+        {  
+            "status": status,  
+            "payment_id": str(payment_id),  
+            "usuario_id": usuario_id  
+        },  
+        room=str(payment_id)  
+    )  
+  
+    return "", 200  
+
+
+def get_payment_details(payment_id):
+    url = f"https://api.mercadopago.com/v1/payments/{payment_id}"
+    headers = {"Authorization": f"Bearer {MP_ACCESS_TOKEN}"}
+    r = requests.get(url, headers=headers, timeout=10)
+    return r.json() if r.status_code == 200 else None  
+
+
 @socketio.on("join_payment")
 def join_payment_room(data):
     join_room(data["payment_id"]) 
-
-
-# ================================================
-# UPLOADS DE IMAGENS PARA CLOUDINARY
-# ================================================
-@app.route('/api/save-comprovante-pagamento', methods=['POST'])
-def save_comprovante_pagamento():
-    data = request.get_json()
-    comprovante_pagamento = data.get('comprovante')
-    if comprovante_pagamento:
-        print(f"URL: {comprovante}")
-        return jsonify({"message": "URL salva com sucesso"}), 200
-    return jsonify({"error": "URL não fornecida"}), 400
 
 
 # =========================
@@ -518,6 +513,18 @@ def delete_pagamento(pagamento_id):
     else:
         return jsonify({"erro": "Pagamento não encontrado"}), 404
 
+
+# ================================================
+# UPLOADS DE IMAGENS PARA CLOUDINARY
+# ================================================
+@app.route('/api/save-comprovante-pagamento', methods=['POST'])
+def save_comprovante_pagamento():
+    data = request.get_json()
+    comprovante_pagamento = data.get('comprovante')
+    if comprovante_pagamento:
+        print(f"URL: {comprovante}")
+        return jsonify({"message": "URL salva com sucesso"}), 200
+    return jsonify({"error": "URL não fornecida"}), 400
 #===========================================
 # -Run
 #===========================================

@@ -388,7 +388,6 @@ function copyText() {
     });
 }
 
-// ===== SOCKET.IO =====
 var paymentId = "{{ payment_id }}";
 var usuario_Id = "{{ usuario_id }}";
 var socket = io(window.location.origin);
@@ -424,6 +423,7 @@ socket.on("payment_update", function (data) {
         }, 3000);
     }
 });
+
 </script>
 
 </body>
