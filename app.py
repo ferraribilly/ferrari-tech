@@ -463,22 +463,22 @@ ASSINATURA_SECRETA = os.getenv("ASSINATURA_SECRETA")
 
 @app.route("/notificacoes", methods=["POST"])
 def handle_webhook():
-    raw_body = request.get_data()  # corpo bruto da requisição
-    signature_header = request.headers.get("X-Hub-Signature")  # Mercado Pago envia isso
+    # raw_body = request.get_data()  # corpo bruto da requisição
+    # signature_header = request.headers.get("X-Hub-Signature")  # Mercado Pago envia isso
 
-    if not signature_header:
-        return "Missing signature", 400
+    # if not signature_header:
+    #     return "Missing signature", 400
 
-    # Calcula HMAC com a chave secreta
-    expected_signature = hmac.new(
-        ASSINATURA_SECRETA.encode(),
-        raw_body,
-        hashlib.sha256
-    ).hexdigest()
+    # # Calcula HMAC com a chave secreta
+    # expected_signature = hmac.new(
+    #     ASSINATURA_SECRETA.encode(),
+    #     raw_body,
+    #     hashlib.sha256
+    # ).hexdigest()
 
-    # Compara assinatura recebida com a calculada
-    if not hmac.compare_digest(expected_signature, signature_header):
-        return "Invalid signature", 403
+    # # Compara assinatura recebida com a calculada
+    # if not hmac.compare_digest(expected_signature, signature_header):
+    #     return "Invalid signature", 403
 
     # Se passou na validação, processa normalmente
     data = request.json
