@@ -103,7 +103,7 @@ def index():
 
         
 
-#
+
 @app.route("/gerar_numero/<id>")
 def numeros(id):
     usuario = users_collection.find_one({"_id": ObjectId(id)})
@@ -439,6 +439,7 @@ def pagamento_preference(id):
         "payer": {
             "email": email,
             "first_name": nome,
+
             "identification": {
                 "type": "CPF",
                 "number": cpf
@@ -488,7 +489,39 @@ def pagamento_preference(id):
 def sucesso():
     return render_template("aprovado.html")
 
+@app.route("/recusado")
+def recusados():
+    return render_template("recusado.html")
 
+
+@app.route("/aprovado/<id>")
+def aprovados(id):
+    usuario = users_collection.find_one({"_id": ObjectId(id)})
+
+    if not usuario:
+        return "Usuário não encontrado", 404
+
+    return render_template(
+        "aprovado.html",
+        usuario=usuario,
+        nome=nome,
+        usuario_id=id
+
+    )
+
+@app.route("/recusados/<id>")
+def desaprovados(id):
+    usuario = users_collection.find_one({"_id": ObjectId(id)})
+
+    if not usuario:
+        return "Usuário não encontrado", 404
+
+    return render_template(
+        "recusado.html",
+        usuario=usuario,
+        usuario_id=id
+
+    )   
 # ===========================================  
 # WEBHOOK MERCADO PAGO  
 # ===========================================  
