@@ -178,6 +178,8 @@
     <button class="purchase" id="btn-preference">PREFERENÇIA</button>
   </footer>
 
+    <!-- SOCKET.IO CDN -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
 let quantidade = 0;
 let valorUnitario = 0.05;
@@ -283,6 +285,41 @@ document.getElementById("btn-preference").onclick = () => {
 
     window.location.href = url;
 };
+
+
+var usuario_Id = "{{ usuario_id }}";
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js')
+        .then(() => console.log('Service Worker registrado'))
+        .catch(err => console.error('Erro ao registrar SW:', err));
+}
+
+var socket = io(window.location.origin);
+
+socket.on('connect', function() {
+    console.log('Conectado');
+});
+
+socket.on('nova_mensagem', function(msg) {
+    showNotification(msg.data);
+    console.log('Mensagem:', msg.data);
+});
+
+function showNotification(body) {
+    if (Notification.permission === "granted") {
+        navigator.serviceWorker.ready.then(function(registration) {
+            registration.showNotification("Chat App", {
+                body: body,
+                icon: '../static/w.png'
+            });
+        });
+    } else {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") showNotification(body);
+        });
+    }
+}
 </script>
 </body>
 </html>

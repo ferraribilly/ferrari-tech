@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template, redirect, session
 from flask_socketio import SocketIO, join_room, emit
+from threading import Thread
 import requests
 import mercadopago
 import hmac
@@ -21,6 +22,7 @@ from bson.objectid import ObjectId
 from models import criar_usuario, users_collection, pagamentos_collection, criar_documento_pagamento, PagamentoModel, NumeroModel
 from flask_cors import CORS
 from datetime import datetime, timezone
+import time
 import uuid
 
 
@@ -412,7 +414,10 @@ def pagamento_pix(id):
         return f"ERRO GERAL: {str(e)}", 500
 
 
+
+
 # PAGAMENTO MERCADO PAGO PREFERENCE
+
 @app.route("/compra/preference/pagamento_pix/<id>")
 def pagamento_preference(id):
 
@@ -436,31 +441,13 @@ def pagamento_preference(id):
                 "category_id": "services"
             }
         ],
-        "payer": {
-            "email": email,
-            "first_name": nome,
-
-            "identification": {
-                "type": "CPF",
-                "number": cpf
-            }
-        },
         "external_reference": usuario_id,
-
         "back_urls": {
             "success": "https://ferrari-tech.onrender.com/sucesso",
             "failure": "https://ferrari-tech.onrender.com/recusada",
         },
         "auto_return": "approved",
-        
-
-        "notification_url": "https://ferrari-tech.onrender.com/notificacoes",
-        "statement_descriptor": "FerrariTech",
-
-        "payment_methods": {
-            "installments": 12
-        }
-        
+        "notification_url": "https://ferrari-tech.onrender.com/notificacoes"
     }
 
     result = sdk.preference().create(payment_data)
@@ -484,6 +471,7 @@ def pagamento_preference(id):
 
     link_pagamento = mp.get("init_point", "")
     return redirect(link_pagamento)
+
 
 @app.route("/success")
 def sucesso():
@@ -531,24 +519,6 @@ ASSINATURA_SECRETA = os.getenv("ASSINATURA_SECRETA")
 
 @app.route("/notificacoes", methods=["POST"])
 def handle_webhook():
-    # raw_body = request.get_data()  # corpo bruto da requisição
-    # signature_header = request.headers.get("X-Hub-Signature")  # Mercado Pago envia isso
-
-    # if not signature_header:
-    #     return "Missing signature", 400
-
-    # # Calcula HMAC com a chave secreta
-    # expected_signature = hmac.new(
-    #     ASSINATURA_SECRETA.encode(),
-    #     raw_body,
-    #     hashlib.sha256
-    # ).hexdigest()
-
-    # # Compara assinatura recebida com a calculada
-    # if not hmac.compare_digest(expected_signature, signature_header):
-    #     return "Invalid signature", 403
-
-    # Se passou na validação, processa normalmente
     data = request.json
     if not data:
         return "", 200
@@ -589,6 +559,23 @@ def get_payment_details(payment_id):
 def join_payment_room(data):
     join_room(data["payment_id"]) 
 
+
+@socketio.on('connect')
+def test_connect():
+    print('Cliente conectado')
+
+
+
+def background_tasks():
+    while True:
+        time.sleep(10)
+        socketio.emit('nova_mensagem', {'data': 'Nova mensagem recebida!'}, namespace='/')
+        print("Mensagem emitida")
+
+# Rodar em thread separada
+thread = Thread(target=background_tasks)
+thread.daemon = True
+thread.start()
 
 # =========================
 # CREATE
@@ -689,6 +676,7 @@ def save_comprovante_pagamento():
 #===========================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
+    socketio.start_background_task(background_tasks)
     socketio.run(
         app,
         host="0.0.0.0",

@@ -366,7 +366,6 @@ main {
 
 
 <script>
-// ===== COPIAR PIX =====
 document.getElementById('copy').addEventListener('click', copyText);
 document.getElementById('copy-mobile').addEventListener('click', copyText);
 
@@ -375,6 +374,7 @@ function copyText() {
     var copiedCodeBox = document.getElementById('copied-code');
 
     navigator.clipboard.writeText(qrcodeText.textContent).then(function () {
+        // Efeito de blur e mostrar mensagem
         qrcodeText.style.filter = 'blur(1px)';
         copiedCodeBox.style.visibility = 'visible';
         copiedCodeBox.style.opacity = '0.9';
@@ -385,6 +385,10 @@ function copyText() {
             copiedCodeBox.style.visibility = '';
             copiedCodeBox.style.opacity = '';
         }, 1000);
+
+        // Redirecionar após copiar
+        var id = qrcodeText.dataset.id; // Se você tiver o ID armazenado no data-id
+        window.location.href = '/pendente/{{ usuario_id }}'
     });
 }
 
@@ -423,6 +427,36 @@ socket.on("payment_update", function (data) {
         }, 3000);
     }
 });
+
+
+
+    socket.on('connect', function() {
+        console.log('Conectado');
+    });
+
+    socket.on('nova_mensagem', function(msg) {
+        // Se a página não estiver focada, exibe notificação
+        if (document.hidden) {
+            showNotification(msg.data);
+        } else {
+            console.log('Mensagem:', msg.data);
+            // Atualiza a tela normalmente
+        }
+    });
+
+    function showNotification(body) {
+        if (Notification.permission === "granted") {
+            navigator.serviceWorker.ready.then(function(registration) {
+                registration.showNotification("Chat App", {
+                    body: body,
+                    icon: '../static/w.png'
+                });
+            });
+        }
+    }
+    
+    // Solicitar permissão de notificação
+    Notification.requestPermission();
 
 </script>
 
