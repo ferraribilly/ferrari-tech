@@ -56,9 +56,6 @@ def criar_usuario(nome: str, cpf: str, email: str) -> dict:
     usuario["_id"] = str(result.inserted_id)
     return usuario
 
-
-
-
 pagamentos_collection = db[PAGAMENTOS_COLLECTION_NAME]
 
 def criar_documento_pagamento(payment_id, status, valor, usuario_id, email_user, data_criacao=None):
@@ -140,8 +137,6 @@ class PagamentoModel:
 # =========================
 NUMEROS_COLLECTION_NAME = "numeros"
 numeros_collection = db[NUMEROS_COLLECTION_NAME]
-
-
 class NumeroModel:
     def __init__(self):
         self.collection = numeros_collection
@@ -165,3 +160,22 @@ class NumeroModel:
         for d in docs:
             d["_id"] = str(d["_id"])
         return docs
+
+    def atualizar_status(self, numero_id, novo_status):
+        try:
+            result = self.collection.update_one(
+                {"_id": ObjectId(numero_id)},
+                {"$set": {"status": novo_status}}
+            )
+            return result.matched_count
+        except Exception as e:
+            print("ERRO AO ATUALIZAR STATUS:", e)
+            return 0
+
+    def delete_numero(id):
+        try:
+            result = db.numeros.delete_one({"_id": ObjectId(id)})
+            return result.deleted_count > 0
+        except Exception as e:
+                print("ERRO AO DELETAR:", e)  
+                return False              

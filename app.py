@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template, redirect, session
 from flask_socketio import SocketIO, join_room, emit
+import matplotlib.pyplot as plt
 from threading import Thread
 import requests
 import mercadopago
@@ -15,7 +16,6 @@ import pytesseract
 from PIL import Image
 from pymongo import MongoClient
 from dotenv import load_dotenv
-import os
 import cloudinary
 import cloudinary.uploader
 from bson.objectid import ObjectId
@@ -24,7 +24,10 @@ from flask_cors import CORS
 from datetime import datetime, timezone
 import time
 import uuid
+# import eventlet
 
+# # Necessário para WebSockets funcionarem bem no Flask
+# eventlet.monkey_patch()
 
 load_dotenv()
 
@@ -126,17 +129,21 @@ def limpar_cpf(cpf):
         return None
     return ''.join(filter(str.isdigit, cpf))
 
-
+# Rota Salvar Numeros
 @app.route("/numeros", methods=["POST"])
 def salvar_numero():
     data = request.json
+    data_sort_str = data.get("dataSort", "10/05/2026")
 
     doc = {
         "nome": data.get("nome"),
         "cpf": limpar_cpf(data.get("cpf")),
         "email": data.get("email"),
         "numero": data.get("numero"),
-        "status": "A PAGAR",
+        "paymentId": data.get("paymentId", "aguardando gerar payment"),
+        "valor": float(data.get("valor", 1.00)), 
+        "dataSort": datetime.strptime(data_sort_str, "%d/%m/%Y"),
+        "status": "pending",
         "criado_em": datetime.now(timezone.utc)
     }
 
@@ -144,14 +151,58 @@ def salvar_numero():
 
     return jsonify({"id": _id})
 
+#DELETE NUMEROS USUARIO PELO ID
+# app.py
+@app.route("/numeros/<id>", methods=["DELETE"])
+def deletar_numero(id):
+    try:
+        deletado = numero_model.delete_numero(id)
+
+        if not deletado:
+            return jsonify({"erro": "Número não encontrado"}), 404
+
+        return jsonify({"msg": "Número deletado com sucesso"}), 200
+
+    except Exception as e:
+        print("ERRO DELETE:", e)
+        return jsonify({"erro": str(e)}), 500
+
+
+# Aqui Lista os Numeros e soma total 
 @app.route("/numeros", methods=["GET"])
 def listar_numeros():
     numeros = numero_model.get_all_numeros()
-
+    
+    # Converte ObjectId para string
     for n in numeros:
         n["_id"] = str(n["_id"])
 
-    return jsonify(numeros)    
+    # Contadores de status
+    total_a_pagar = sum(1 for n in numeros if n.get("status") == "pending")
+    total_ok = sum(1 for n in numeros if n.get("status") == "approved")
+
+    return jsonify({
+        "numeros": numeros,
+        "resumo": {
+            "pending": total_a_pagar,
+            "approved": total_ok
+        }
+    })
+
+@app.route("/numeros/atualizar_status/<numero_id>", methods=["POST"])
+def atualizar_status_rota(numero_id):
+    data = request.json
+    novo_status = data.get("status")
+    
+    if not novo_status:
+        return jsonify({"error": "Status não fornecido"}), 400
+
+    atualizado = numero_model.atualizar_status(numero_id, novo_status)
+
+    if atualizado == 0:
+        return jsonify({"error": "Número não encontrado ou erro"}), 404
+
+    return jsonify({"mensagem": "Status atualizado com sucesso"})
 
 
 
@@ -191,8 +242,6 @@ def extrair_valor(texto):
         if valores_float:
             return max(valores_float)
     return 0.0
-
-
 
 NOME_DESTINATARIO = os.getenv("NOME_DESTINATARIO")
 BANCO_PERMITIDO = os.getenv("BANCO_PERMITIDO")
@@ -297,7 +346,6 @@ def editar_usuario(usuario_id):
         return jsonify({"status": "erro", "mensagem": str(e)}), 400
 
 
-
 # RESETAR
 @app.route("/resetar_banco", methods=["GET"])
 def resetar_banco():
@@ -317,9 +365,6 @@ def resetar_banco():
 
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
-
-
-
 
 
 
@@ -376,6 +421,7 @@ def pagamento_pix(id):
         payment_id = str(mp["id"])
         status = mp.get("status", "pending")
 
+       # Aqui salva o pagamento gerados...... Mercado pago
         documento = criar_documento_pagamento(
             payment_id=payment_id,
             status=status,
@@ -384,13 +430,13 @@ def pagamento_pix(id):
             email_user=email
         )
 
-        # 🔥 NÃO deixa quebrar aqui
+       
         try:
             PagamentoModel().create_pagamento(documento)
         except Exception as e:
             print("ERRO AO SALVAR:", e)
 
-        # 🔥 NÃO quebra aqui também
+        
         tx = mp.get("point_of_interaction", {}).get("transaction_data", {})
 
         qr_base64 = tx.get("qr_code_base64")
@@ -412,8 +458,6 @@ def pagamento_pix(id):
     except Exception as e:
         print("ERRO GERAL:", e)
         return f"ERRO GERAL: {str(e)}", 500
-
-
 
 
 # PAGAMENTO MERCADO PAGO PREFERENCE
@@ -445,6 +489,7 @@ def pagamento_preference(id):
         "back_urls": {
             "success": "https://ferrari-tech.onrender.com/sucesso",
             "failure": "https://ferrari-tech.onrender.com/recusada",
+            "pending": "https://ferrari-tech.onrender.com/pendente",
         },
         "auto_return": "approved",
         "notification_url": "https://ferrari-tech.onrender.com/notificacoes"
@@ -481,6 +526,10 @@ def sucesso():
 def recusados():
     return render_template("recusado.html")
 
+@app.route("/pendente")
+def pending():
+    return render_template("pendente.html")
+
 
 @app.route("/aprovado/<id>")
 def aprovados(id):
@@ -513,9 +562,33 @@ def desaprovados(id):
 # ===========================================  
 # WEBHOOK MERCADO PAGO  
 # ===========================================  
+# @app.route("/notificacoes", methods=["POST"])
+# def handle_webhook():
+#     data = request.json
+#     if not data:
+#         return "", 200
 
+#     payment_id = data.get("data", {}).get("id") or data.get("id")
+#     if not payment_id:
+#         return "", 200
 
-ASSINATURA_SECRETA = os.getenv("ASSINATURA_SECRETA")
+#     payment_details = get_payment_details(payment_id)
+#     if not payment_details:
+#         return "", 200
+
+#     status = payment_details.get("status")
+#     usuario_id = payment_details.get("external_reference")
+    
+#     socketio.emit(
+#         "payment_update",
+#         {
+#             "status": status,
+#             "payment_id": str(payment_id),
+#             "usuario_id": usuario_id
+#         },
+#         room=str(payment_id)
+#     )
+#     return "", 200
 
 @app.route("/notificacoes", methods=["POST"])
 def handle_webhook():
@@ -533,7 +606,8 @@ def handle_webhook():
 
     status = payment_details.get("status")
     usuario_id = payment_details.get("external_reference")
-
+    
+    # Emite atualização via socket
     socketio.emit(
         "payment_update",
         {
@@ -541,8 +615,13 @@ def handle_webhook():
             "payment_id": str(payment_id),
             "usuario_id": usuario_id
         },
-        room=str(payment_id)
+        room=str(payment_id)  # ou room=str(usuario_id), dependendo da lógica do front
     )
+
+    # Atualiza no banco
+    pagamento_model.update_pagamento(payment_id, {"status": status})
+    
+    
 
     return "", 200
   
@@ -565,6 +644,15 @@ def test_connect():
     print('Cliente conectado')
 
 
+@socketio.on("join")
+def on_join(data):
+    usuario_id = data.get("usuario_id")
+    if usuario_id:
+        # Adiciona o cliente a uma "sala" específica
+        from flask_socketio import join_room
+        join_room(str(usuario_id))
+        emit("joined", {"room": usuario_id})
+
 
 def background_tasks():
     while True:
@@ -576,6 +664,7 @@ def background_tasks():
 thread = Thread(target=background_tasks)
 thread.daemon = True
 thread.start()
+
 
 # =========================
 # CREATE

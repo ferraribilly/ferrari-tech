@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pagamento Pendente</title>
+<style>
+    /* Reset básico */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .card {
+        background: #4f1e1e;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        max-width: 400px;
+        width: 100%;
+        padding: 30px;
+        text-align: center;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .icon {
+        width: 80px;
+        height: 80px;
+        background: #fff3cd;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto 20px;
+        font-size: 40px;
+        color: #856404;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+        font-size: 1.6rem;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    p {
+        font-size: 1rem;
+        color: #555;
+        margin-bottom: 25px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 12px 20px;
+        background: #ffc107;
+        color: #212529;
+        font-weight: bold;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+        background: #e0a800;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsividade */
+    @media (max-width: 480px) {
+        .card {
+            padding: 20px;
+        }
+        h1 {
+            font-size: 1.4rem;
+        }
+        p {
+            font-size: 0.95rem;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="card">
+    <div class="icon">⏳</div>
+    <h1>Pagamento Pendente</h1>
+    <p>Seu pagamento ainda não foi confirmado. Assim que for aprovado, você receberá um e-mail de confirmação.</p>
+    <a href="" class="btn">Tentar Novamente</a>
+</div>
+   <!-- SOCKET.IO CDN -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+var paymentId = "{{ payment_id }}";
+var usuario_Id = "{{ usuario_id }}";
+var socket = io(window.location.origin);
+
+socket.on("connect", function () {
+    socket.emit("join_payment", { payment_id: paymentId });
+});
+
+socket.on("payment_update", function (data) {
+    if (data.payment_id !== paymentId) return;
+
+    var div = document.getElementById("notifications");
+    var p = document.createElement("p");
+
+    if (data.status === "approved") {
+        p.style.color = "green";
+        p.innerText = "✅ Pagamento aprovado com sucesso!";
+        div.innerHTML = "";
+        div.appendChild(p);
+
+        setTimeout(function () {
+            
+            window.location.href = `/aprovado?id=${usuario_Id}`;
+        }, 3000);
+
+    } else {
+        p.style.color = "red";
+        p.innerText = "❌ Pagamento recusado!";
+        div.innerHTML = "";
+        div.appendChild(p);
+
+        setTimeout(function () {
+            window.location.href = `/recusado?id=${usuario_Id}`;
+        }, 3000);
+    }
+});
+
+</script>
+
+</body>
+</html>

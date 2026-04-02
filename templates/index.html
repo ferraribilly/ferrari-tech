@@ -83,6 +83,11 @@ input {
     height: auto;
     margin-bottom: 10px;
 }
+
+#numeros { margin-bottom: 20px; }
+        .numero { padding: 5px; border-bottom: 1px solid #ccc; }
+        #contagens { margin-bottom: 20px; }
+        #grafico { width: 400px; height: 400px; }
  
 
 </style>
@@ -194,9 +199,14 @@ input {
     📈Meta atingida
 </dt>
     <dd style="background-color: #000;" class="faq-answer">
-        <div>
-            <h2>📊 Progresso da Rifa</h2>
+      <h2>📊 Progresso da Rifa</h2>
   <div class="pizza-chart" id="chart">0%</div>
+  <p>
+    A PAGAR: <span id="a_pagar">0</span> |
+    OK: <span id="ok">0</span>
+  </p>
+  
+  
 
   <h2>⏳ Prazo para Sorteio</h2>
   <div class="time-chart" id="timeChart">0 dias</div>
@@ -234,6 +244,7 @@ input {
   <script src="../static/js/participantes.js"></script>
   <script src="../static/js/numeros.js"></script>
   <script>
+    
     
   </script>
     </body>
