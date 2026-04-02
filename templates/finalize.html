@@ -16,6 +16,8 @@
 body {
     background-color: #fafafa;
     overflow: hidden;
+    transform: scale(0.9);
+    transform-origin: top center;
     
 }
 
@@ -39,16 +41,24 @@ header {
 main {
     display: flex;
     justify-content: center;
+    align-items: center;
+    height: 100vh;
+    box-sizing: border-box;
 }
 
 .pix-container {
+    width: 100%;
+    max-height: 100vh;
     display: flex;
     justify-content: center;
-    padding: 1px;
-    
+    align-items: center;
 }
 
+
+
 .payment {
+    max-height: 95vh;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -58,7 +68,7 @@ main {
     box-shadow: 0 0 17px -6px #00000026;
     text-align: center;
     text-align: -webkit-center;
-    padding: 46px 49p;
+    padding: 46px 49px;
     
 }
 
@@ -232,14 +242,7 @@ main {
 
 <body>
 
-<header>
-    <div class="logo">
-        <a href="#">
-      <!-- <img src="https://res.cloudinary.com/doik0qtfr/image/upload/v1765756283/file_000000001b0071f58bcbc51e9c9d664d_rnlva3.png" alt="Logo do sistema"> -->
 
-        </a>
-    </div>
-</header>
 
 <main>
     <div class="pix-container">
@@ -283,73 +286,12 @@ main {
     </div>
 </main>
 
-
+<script src="../static/js/script.js"></script>
 <script>
-document.getElementById('copy').addEventListener('click', copyText);
-document.getElementById('copy-mobile').addEventListener('click', copyText);
-
-function copyText() {
-    var qrcodeText = document.getElementById('qrcode-text');
-    var copiedCodeBox = document.getElementById('copied-code');
-
-    navigator.clipboard.writeText(qrcodeText.textContent).then(function () {
-        // Efeito de blur e mostrar mensagem
-        qrcodeText.style.filter = 'blur(1px)';
-        copiedCodeBox.style.visibility = 'visible';
-        copiedCodeBox.style.opacity = '0.9';
-        copiedCodeBox.style.transition = 'all 0.3s';
-
-        setTimeout(function () {
-            qrcodeText.style.filter = '';
-            copiedCodeBox.style.visibility = '';
-            copiedCodeBox.style.opacity = '';
-        }, 5000);
-
-        // Redirecionar após copiar
-        var id = qrcodeText.dataset.id; // Se você tiver o ID armazenado no data-id
-        window.location.href = '/pendente/{{ usuario_id }}'
-    });
-}
-
-var paymentId = "{{ payment_id }}";
-var usuario_Id = "{{ usuario_id }}";
-var socket = io(window.location.origin);
-
-socket.on("connect", function () {
-    socket.emit("join_payment", { payment_id: paymentId });
-});
-
-socket.on("payment_update", function (data) {
-    if (data.payment_id !== paymentId) return;
-
-    var div = document.getElementById("notifications");
-    var p = document.createElement("p");
-
-    if (data.status === "approved") {
-        p.style.color = "green";
-        p.innerText = "✅ Pagamento aprovado com sucesso!";
-        div.innerHTML = "";
-        div.appendChild(p);
-
-        setTimeout(function () {
-            
-            window.location.href = `/aprovado?id=${usuario_Id}`;
-        }, 3000);
-
-    } else {
-        p.style.color = "red";
-        p.innerText = "❌ Pagamento recusado!";
-        div.innerHTML = "";
-        div.appendChild(p);
-
-        setTimeout(function () {
-            window.location.href = `/recusado?id=${usuario_Id}`;
-        }, 3000);
-    }
-});
 
 
-// Atualizar 
+
+
 
 
 
