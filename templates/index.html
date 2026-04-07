@@ -4,93 +4,52 @@
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <meta name="theme-color" content="#36a2eb">
         <title>Passatempo Pix Dia das Maes</title>
         <link rel="apple-touch-icon" href="{{ url_for('static', filename='w.png') }}">
         <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/style1.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
         <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
     </head>
     <style>
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-    gap: 8px;
-    padding: 10px;
-}
-
-.item {
-    background: white;
-    color: black;
-    border-radius: 5px;
-    padding: 10px;
-    text-align: center;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.item:hover {
-    background: #e0f7fa;
-}
-
-/* MODAL */
-.modal {
-    z-index: 99999;
-    display: ;
-    position: fixed;
-    top: 0;
-    left: 0;
+/* Container que faz a mágica da responsividade */
+.table-container {
     width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
-    justify-content: center;
-    align-items: center;
-}
-input {
-    width: 95%;
-    margin-top: 8px;
-    padding: 8px;
-}
-.btn {
-    padding: 10px 15px;
-    margin: 5px;
-    border: none;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 5px;
+    overflow-x: auto; /* Adiciona rolagem horizontal apenas se necessário */
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Opcional: melhora visualização */
+    border-radius: 3px;
 }
 
-.btn.copiar {
-    background-color: #3498db; /* Azul */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 300px; /* Impede que a tabela encolha demais e fique ilegível */
+    background-color: rgb(254, 254, 254);
+    font-family: monospace;
+    
 }
 
-.btn.upload {
-    background-color: #e67e22; /* Laranja */
-}
-.qrcode {
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centraliza horizontalmente */
-    justify-content: center; /* Centraliza verticalmente */
+th, td {
+    background-color: #10385f;
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    white-space: nowrap; /* Impede que o texto quebre linhas, mantendo a colunas organizadas */
     text-align: center;
-    margin-top: 20px;
-}
-.qrcode img {
-    max-width: 220px; /* Ajusta o tamanho se precisar */
-    height: auto;
-    margin-bottom: 10px;
+    
+   
 }
 
-#numeros { margin-bottom: 20px; }
-        .numero { padding: 5px; border-bottom: 1px solid #ccc; }
-        #contagens { margin-bottom: 20px; }
-        #grafico { width: 400px; height: 400px; }
- 
+thead {
+    background-color: #145290;
+}
 
-</style>
+
+    </style>
+  
 
     <body>
 <!-- Botão WhatsApp -->
@@ -107,7 +66,7 @@ input {
   <div class="main-child">
 
     <!-- Card de Premiação -->
-    <div style="max-width:400px; margin:20px auto; padding:20px; border-radius:10px; 
+    <div style="max-width:450px; margin:20px auto; padding:20px; border-radius:10px; 
                 background:linear-gradient(135deg, #0000008e, #3804046c); 
                 box-shadow:0 4px 10px rgba(0,0,0,0.2); text-align:center; font-family:Arial, sans-serif;">
       
@@ -116,7 +75,7 @@ input {
 <!-- Botão de CTA -->
 <form class="form-cta" style="margin-top:20px;">
   <a style="border-radius:5px; height:40px; text-align:center; font-weight:bold; 
-            margin:0; color:#fff; background-color:rgb(58, 58, 247); 
+            margin:0; color:#fff; background-color:rgba(224, 25, 177, 0.627); 
             display:inline-block; line-height:40px; padding:0 20px; text-decoration:none;"
      href="/gerar_numero/{{ usuario_id }}" target="_blank">
     Participar Agora
@@ -134,117 +93,167 @@ input {
  <footer class="footer">
 
 <section class="faq">
-<!-- <dt class="faq-question" style="color:#2c3e50; font-weight:bold; font-size:20px;">
-    Comprar Bilhete
-</dt>
-<dd class="faq-answer" style="font-family:Arial, sans-serif; overflow: auto; line-height:1.6; color:#7e7a7a;">
-    <div>
-<h2>Selecione seu Numero <br> Boa Sorte</h2>
-<div class="grid" id="grid"></div>
-        <h3>Número: <span id="numeroEscolhido"></span></h3> 
+
+</section>
+
+<div class="table-container">
+  <h2>Meus Bilhetes</h2>
+
+  <table border="1">
+    <thead>
+      <tr>
+        <th>N° BILHETE</th>
+        <th>VALOR N°</th>
+        <th>DT SORTEIO</th>
+        <th>PREMIAÇÃO</th>
+        <th>STATUS PAGTO</th>
+        <th>BAIXAR</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in numeros %}
+      <tr>
+        <td>{{ u.numero }}</td>
+        <td>{{ "%.2f"|format(u.valor) }}</td>
+        <td>{{ u.dataSort.strftime("%d-%m-%Y") }}</td>
+        <td>{{ "%.2f"|format(u.premio) }}</td>
+        <td>{{ u.status }}</td>
+        <td>
+          <button onclick="baixarBilhete('{{u._id}}')">
+            <img src="../static/img/baixar.svg">
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 
-</div>
-    </div>
-</dd> -->
-
-
-               <!-- <dl class="faq-list">
-  <dt class="faq-question" style="color:#2c3e50; font-weight:bold; font-size:20px;">
-    Regras / Regulamento
-</dt>
-<dd class="faq-answer" style="font-family:Arial, sans-serif; line-height:1.6; color:#7e7a7a;">
-    <div>
-        <p style="color:#e74c3c; font-weight:bold;">
-            ✔ Ao clicar em "Aceitar", você concorda com todas as regras e normas desta plataforma.
-        </p>
-
-        <p>
-            Você declara ciência de que poderão ocorrer <span style="color:#2980b9; font-weight:bold;">mudanças</span> 
-            caso a meta não seja atingida. Nesses casos, poderá haver <span style="color:#27ae60; font-weight:bold;">reembolso automático</span> 
-            a todos os participantes, sem prejuízo aos usuários. Todo reembolso será ajustado com correções monetárias, 
-            conforme previsto em <strong>Lei Federal (Código de Defesa do Consumidor – Lei nº 8.078/1990)</strong>.
-        </p>
-
-        <p>
-            A plataforma possui uma <span style="color:#f39c12; font-weight:bold;">meta mínima de 85%</span> até 10 dias antes do sorteio. 
-            Caso não seja atingida, poderá ocorrer alteração na premiação ou reembolso integral, conforme a legislação vigente.
-        </p>
-
-        <p>
-            Os sorteios são realizados de forma <span style="color:#16a085; font-weight:bold;">transparente</span>, 
-            garantindo legitimidade e segurança. Serão considerados os 3 últimos números da extração da 
-            <strong>Loteria Federal</strong>, sendo:
-        </p>
-        <ul style="margin-left:20px;">
-            <li><strong>1º Lugar:</strong> 1º sorteio</li>
-            <li><strong>2º Lugar:</strong> 2º sorteio</li>
-            <li><strong>3º Lugar:</strong> 3º sorteio</li>
-        </ul>
-
-        <p>
-            Caso não haja ganhadores, o prêmio não será acumulado. Será realizado um novo sorteio ao vivo 
-            pelas redes sociais oficiais, com link e comprovante compartilhados publicamente.
-        </p>
-
-        <p style="color:#c0392b; font-weight:bold;">
-            ⚠ É proibido o uso de comprovantes que não pertençam ao titular da conta cadastrada. 
-            O participante será desclassificado e poderá ser enquadrado no <strong>Código Penal</strong> 
-            por crime de falsidade ideológica (Art. 299 do Código Penal).
-        </p>
-    </div>
-</dd> -->
-               <dl class="faq-list">
-     <dt class="faq-question" style="color:#cdfa04; text-align: center; font-weight:bold; font-size:20px;">
-    📈Meta atingida
-</dt>
-    <dd style="background-color: #000;" class="faq-answer">
-      <h2>📊 Progresso da Rifa</h2>
+  <h2>📊 Progresso da Rifa</h2>
   <div class="pizza-chart" id="chart">0%</div>
-  <p>
-    A PAGAR: <span id="a_pagar">0</span> |
-    OK: <span id="ok">0</span>
-  </p>
-  
-  
+  <div style="display: none;">
+  <div  id="total_a_pagar">{{total_a_pagar}}</div>
+  <div id="total_ok">{{total_ok}}</div>
 
-  <h2>⏳ Prazo para Sorteio</h2>
-  <div class="time-chart" id="timeChart">0 dias</div>
-
-  <div style="text-align:center; margin-top:20px;">
-    <label for="vendidos">Números vendidos:</label>
-    <input type="number" id="vendidos" value="0" min="0" max="1000">
-    <button onclick="atualizar()">Atualizar</button>
   </div>
 
+
+
+<div class="table-container">
+    <h2>Participantes</h2>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th style="color: #ffffff; font-weight: bold;">Usuarios Participantes</th>
+                <th style="color: #ffffff; font-weight: bold;">3 ultimos n° CPF</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for u in usuarios %}
+            <tr>
+                <td style="color: #0864b5; font-weight: bold;">
+                    {{ u.nome }}
+                </td>
+                                <td style="color: #12ec8e; font-weight: bold;">
+                    {{ u.cpf }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+  
+ 
+  <h2>⏳ Prazo para Sorteio</h2>
+  <div class="time-chart" id="timeChart">0 dias</div>
+  <div style="text-align:center; margin-top:20px;">
+
+  </div>
+  <div class="table-container">
+  <h2>Ganhadores</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th style="color: #ffffff; font-weight: bold;">N° BILHETE</th>
+                <th style="color: #ffffff; font-weight: bold;">CONCURSO</th>
+                <th style="color: #ffffff; font-weight: bold;">DATA</th>
+                <th style="color: #ffffff; font-weight: bold;">GANHADOR</th>
+                <th style="color: #ffffff; font-weight: bold;">CPF</th>
+                <th style="color: #ffffff; font-weight: bold;">PREMIO</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="color: #f5f108; font-weight: bold; ">{{bilhete}}</td>
+                <td style="color: #265ddc; font-weight: bold; ">{{concurso}}</td>
+                <td style="color: #a0da0ee5; font-weight: bold; ">{{dtSort}}</td>
+                <td style="color: #0bb9db; font-weight: bold; ">{{ganhador}}</td>
+                <td style="color: #0bb9db; font-weight: bold; ">{{final_cpf}}</td>
+                <td style="color: #52b204; font-weight: bold; ">{{premiacao1}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<dl class="faq-list">
+     <dt class="faq-question" style="color:#cdfa04; text-align: center; font-weight:bold; font-size:20px;">
+    Comprovante Premiação
+</dt>
+<dd style="background-color: #000;" class="faq-answer">
+ 
   <div class="info-box" id="mediaDiaria">Média diária necessária: 0</div>
           </div>
-           </dd>
+         </dd>
 
-             <dt class="faq-question" style="color:#0377eb; text-align: center; font-weight:bold; font-size:20px;">
-    Colaboradores Evento
-</dt>
-<dd class="faq-answer" style="font-family:Arial, sans-serif; line-height:1.6; color:#7e7a7a;">
-    <div>
-            <strong></strong>
-        </p>
-        <ul style="margin-left:20px;">
-            <li><strong>Supermecado Paulao</strong></li>
-            <li><strong>W tecnologias web mobile</strong></li>
-            <li><strong>W software contabil</strong></li>
-        </ul>
-        <p style="color:#c0392b; font-weight:bold;">
-        </p>
-    </div>
-</dd>            
-</section>
-  <p>Copyright © 2026 Marca Brasil todos os direitos reservados</p>
+
+  <p>Copyright © 2026 "W" Marca Brasil todos os direitos reservados</p>
         </footer>
   <script src="../static/js/script.js"></script>
-  <script src="../static/js/participantes.js"></script>
-  <script src="../static/js/numeros.js"></script>
-  <script>
-    
+  <script src="../static/js/meta_atingir.js"></script>
+ 
+<script>
+
+  const chart = document.getElementById("chart");
+
+  const total_a_pagar = {{ total_a_pagar|int }};
+  const meta = 1000;
+
+  const porcentagem = Math.round((total_a_pagar / meta) * 100);
+
+  chart.innerText = porcentagem + "%";
+  
+  chart.style.background = `conic-gradient(
+    #00ff00 ${porcentagem * 3.6}deg,
+    #e0e0e0 ${porcentagem * 3.6}deg
+  )`;
+
+
+
+function baixarBilhete(id) {
+  fetch("/imprimir/baixar_bilhete/" + id)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Erro ao gerar bilhete");
+      }
+      return res.blob();
+    })
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "bilhete.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    })
+    .catch(err => console.error("Erro ao baixar:", err));
+}
+
+
+</script>
     
   </script>
     </body>

@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pagamento Pendente</title>
+<link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
+<title>Pagamento Pendente </title>
 <style>
     /* Reset básico */
     * {
@@ -109,38 +110,10 @@ var paymentId = "{{ payment_id }}";
 var usuario_Id = "{{ usuario_id }}";
 var socket = io(window.location.origin);
 
-socket.on("connect", function () {
-    socket.emit("join_payment", { payment_id: paymentId });
+socket.on('connect', function() {
+    console.log('Conectado ao servidor de WebSocket');
 });
 
-socket.on("payment_update", function (data) {
-    if (data.payment_id !== paymentId) return;
-
-    var div = document.getElementById("notifications");
-    var p = document.createElement("p");
-
-    if (data.status === "approved") {
-        p.style.color = "green";
-        p.innerText = "✅ Pagamento aprovado com sucesso!";
-        div.innerHTML = "";
-        div.appendChild(p);
-
-        setTimeout(function () {
-            
-            window.location.href = `/aprovado?id=${usuario_Id}`;
-        }, 3000);
-
-    } else {
-        p.style.color = "red";
-        p.innerText = "❌ Pagamento recusado!";
-        div.innerHTML = "";
-        div.appendChild(p);
-
-        setTimeout(function () {
-            window.location.href = `/recusado?id=${usuario_Id}`;
-        }, 3000);
-    }
-});
 
 </script>
 

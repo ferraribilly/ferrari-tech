@@ -179,3 +179,22 @@ class NumeroModel:
         except Exception as e:
                 print("ERRO AO DELETAR:", e)  
                 return False              
+
+
+
+
+# Faturamento Anterior
+# quantidade_usuarios_anterior = 1.000
+# quantidade_vendas_anterior = 1.000 
+# total_pagamento_approved_anterior = "pix": 500.00, "cartao_credito": 500.00
+# total_pagamento_pending_anterior = 0.00
+
+
+
+# Faturamento Atual
+# quantidade_usuarios_atual = 2.000
+# quantidade_vendas_atual = 2.000 
+# total_pagamento_approved_atual = 2.000  "pix": 1000.00, "cartao_credito": 1000.00
+# total_pagamento_pending_atual = 0.00
+
+
