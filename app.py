@@ -40,8 +40,6 @@ pagamento_model = PagamentoModel()
 numero_model = NumeroModel()
 socketio = SocketIO(app, cors_allowed_origins="*")
 app.secret_key = os.getenv("APP_SECRET_KEY")  
-chave_pix = os.getenv("CHAVE_PIX")
-qrCode = os.getenv("QR_CODE")
 premiacao1 = os.getenv("PREMIACAO1")
 dt_sort = os.getenv("SORTEIO")
 
@@ -184,7 +182,7 @@ def salvar_numero():
         "email": data.get("email"),
         "numero": data.get("numero"),
         "paymentId": data.get("paymentId", "aguardando gerar payment"),
-        "valor": float(data.get("valor", 1.00)),
+        "valor": float(data.get("valor", 0.05)),
         "dataSort": datetime.strptime(data_sort_str, "%d/%m/%Y"),
         "premio": float(data.get("premio", 150.00)),
         "status": "pending",
@@ -678,9 +676,6 @@ def check_status():
         return jsonify({"status": "pending"})
 
 
-
-
-
 # PAGAMENTO MERCADO PAGO 
 @app.route("/compra/preference/pagamento_pix/<id>")
 def pagamento_preference(id):
@@ -775,40 +770,7 @@ def negada(id):
     )   
 
 
-# @app.route("/notificacoes", methods=["POST"])
-# def handle_webhook():
-#     data = request.json
-#     if not data:
-#         return "", 200
 
-#     payment_id = data.get("data", {}).get("id") or data.get("id")
-#     if not payment_id:
-#         return "", 200
-
-#     payment_details = get_payment_details(payment_id)
-#     if not payment_details:
-#         return "", 200
-
-#     status = payment_details.get("status")
-#     usuario_id = payment_details.get("external_reference")
-    
-#     # Emite atualização via socket
-#     socketio.emit(
-#         "payment_update",
-#         {
-#             "status": status,
-#             "payment_id": str(payment_id),
-#             "usuario_id": usuario_id
-#         },
-#         room=str(payment_id)  # ou room=str(usuario_id), dependendo da lógica do front
-#     )
-
-#     # Atualiza no banco
-#     pagamento_model.update_pagamento(payment_id, {"status": status})
-#     # Calcular o total de numeros e status = "pending" for igual = ao valor pagamento approved atualiza o payment_id dos numeros e status = "approved" conforme valor approved 
-#     # atualizado = numero_model.atualizar_status(numero_id, novo_status)
-    
-    
 
 #     return "", 200
 @app.route("/notificacoes", methods=["POST"])
@@ -925,10 +887,6 @@ def save_comprovante_pagamento():
     return jsonify({"error": "URL não fornecida"}), 400
 
 
-
-
-
-
 # =======================================================
 # READ (1)
 # =======================================================
@@ -942,7 +900,16 @@ def get_pagamento(pagamento_id):
         return jsonify({"erro": "Pagamento não encontrado"}), 404
 
 
+@app.route('/pagamentos', methods=['GET'])
+def get_pagamentos():
+    pagamentos = pagamento_model.get_all_pagamentos()
 
+    if pagamentos:
+        return jsonify(pagamentos), 200
+    else:
+        return jsonify({"erro": "Pagamentos não encontrado"}), 404
+
+# 
 # ================================================
 # CREATE
 # ================================================
@@ -970,9 +937,6 @@ def criar_pagamento():
 
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
-
-
-
 
 
 # =========================================================
@@ -1040,4 +1004,37 @@ if __name__ == "__main__":
     )
 
 
+    # @app.route("/notificacoes", methods=["POST"])
+# def handle_webhook():
+#     data = request.json
+#     if not data:
+#         return "", 200
+
+#     payment_id = data.get("data", {}).get("id") or data.get("id")
+#     if not payment_id:
+#         return "", 200
+
+#     payment_details = get_payment_details(payment_id)
+#     if not payment_details:
+#         return "", 200
+
+#     status = payment_details.get("status")
+#     usuario_id = payment_details.get("external_reference")
+    
+#     # Emite atualização via socket
+#     socketio.emit(
+#         "payment_update",
+#         {
+#             "status": status,
+#             "payment_id": str(payment_id),
+#             "usuario_id": usuario_id
+#         },
+#         room=str(payment_id)  # ou room=str(usuario_id), dependendo da lógica do front
+#     )
+
+#     # Atualiza no banco
+#     pagamento_model.update_pagamento(payment_id, {"status": status})
+#     # Calcular o total de numeros e status = "pending" for igual = ao valor pagamento approved atualiza o payment_id dos numeros e status = "approved" conforme valor approved 
+#     # atualizado = numero_model.atualizar_status(numero_id, novo_status)
+    
     
