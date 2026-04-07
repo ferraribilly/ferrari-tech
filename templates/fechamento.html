@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Resumo Financeiro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background: #1e1e2f;
+            color: #ecf0f1;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            color: #00aaff;
+        }
+        .cards {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: #2a2a3d;
+            padding: 20px;
+            border-radius: 12px;
+            width: 28%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+        .card h2 {
+            margin: 0;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+        .card p {
+            font-size: 1.6rem;
+            font-weight: bold;
+        }
+        .faturamento { border-top: 5px solid #27ae60; }
+        .usuarios { border-top: 5px solid #2980b9; }
+        .numeros { border-top: 5px solid #8e44ad; }
+        .graficos {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        .grafico-container {
+            background: #2a2a3d;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            margin: 10px;
+            text-align: center;
+            width: 45%;
+        }
+        canvas {
+            max-width: 350px;
+            max-height: 350px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>📊 Dashboard Financeiro</h1>
+
+    <div class="cards">
+        <div class="card faturamento">
+            <h2>Faturamento</h2>
+            <p>R$ {{ "%.2f"|format(resumo.faturamento) }}</p>
+        </div>
+        <div class="card usuarios">
+            <h2>Usuários</h2>
+            <p>{{ resumo.usuarios }}</p>
+        </div>
+        <div class="card numeros">
+            <h2>Vendas</h2>
+            <p>Total: R$ {{ "%.2f"|format(resumo.numeros.total) }}</p>
+        </div>
+    </div>
+
+    <div class="graficos">
+        <div class="grafico-container">
+            <h3>Pagamentos</h3>
+            <canvas id="pagamentosChart"></canvas>
+        </div>
+        <div class="grafico-container">
+            <h3>Números</h3>
+            <canvas id="numerosChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const pagamentosData = {
+            labels: ["Pendente", "Aprovado", "Cancelado"],
+            datasets: [{
+                data: [
+                    {{ resumo.pagamentos.pending }},
+                    {{ resumo.pagamentos.approved }},
+                    {{ resumo.pagamentos.cancelled }}
+                ],
+                backgroundColor: ["#f39c12", "#27ae60", "#e74c3c"]
+            }]
+        };
+
+        const numerosData = {
+            labels: ["Pendente", "Aprovado", "Cancelado"],
+            datasets: [{
+                data: [
+                    {{ resumo.numeros.pending }},
+                    {{ resumo.numeros.approved }},
+                    {{ resumo.numeros.cancelled }}
+                ],
+                backgroundColor: ["#f1c40f", "#2980b9", "#8e44ad"]
+            }]
+        };
+
+        new Chart(document.getElementById("pagamentosChart"), {
+            type: "bar",
+            data: pagamentosData,
+            options: {
+                plugins: {
+                    legend: { labels: { color: "#ecf0f1" }, position: "bottom" },
+                    datalabels: {
+                        color: "#ecf0f1",
+                        anchor: "end",
+                        align: "top",
+                        formatter: (value, ctx) => {
+                            let total = ctx.chart.data.datasets[0].data.reduce((a,b) => a+b, 0);
+                            let percent = (value/total*100).toFixed(1);
+                            return "R$ " + value.toFixed(2) + " (" + percent + "%)";
+                        }
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: "#ecf0f1" } },
+                    y: { ticks: { color: "#ecf0f1" }, beginAtZero: true }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+
+        new Chart(document.getElementById("numerosChart"), {
+            type: "pie",
+            data: numerosData,
+            options: {
+                plugins: {
+                    legend: { labels: { color: "#ecf0f1" }, position: "right" },
+                    datalabels: {
+                        color: "#fff",
+                        formatter: (value, ctx) => {
+                            let total = ctx.chart.data.datasets[0].data.reduce((a,b) => a+b, 0);
+                            let percent = (value/total*100).toFixed(1);
+                            return "R$ " + value.toFixed(2) + " (" + percent + "%)";
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    </script>
+</body>
+</html>

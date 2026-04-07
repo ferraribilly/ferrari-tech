@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfico Faturamento e Impostos</title>
+    <!-- Importando a biblioteca Chart.js via CDN -->
+    <script src="https://jsdelivr.net"></script>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f9; }
+        .chart-container { width: 80%; max-width: 800px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+
+<div class="chart-container">
+    <canvas id="meuGrafico"></canvas>
+</div>
+
+<script>
+    // 1. Dados para o gráfico (exemplo)
+    const ctx = document.getElementById('meuGrafico').getContext('2d');
+    
+    const data = {
+        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+        datasets: [
+            {
+                label: 'Faturamento Bruto (R$)',
+                data: [10000, 15000, 12000, 18000, 20000, 25000],
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Impostos (R$)',
+                data: [1500, 2250, 1800, 2700, 3000, 3750],
+                backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }
+        ]
+    };
+
+    // 2. Configurações do gráfico
+    const config = {
+        type: 'bar', // Tipo: barra (bar), linha (line), etc.
+        data: data,
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Demonstrativo de Faturamento x Impostos' },
+                legend: { position: 'top' }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    };
+
+    // 3. Renderizar o gráfico
+    new Chart(ctx, config);
+</script>
+
+</body>
+</html>
