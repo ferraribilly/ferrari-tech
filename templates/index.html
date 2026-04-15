@@ -6,47 +6,16 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <meta name="theme-color" content="#36a2eb">
-        <title>Passatempo Pix Dia das Maes</title>
+        <title>{{usuario_id}}</title>
         <link rel="apple-touch-icon" href="{{ url_for('static', filename='w.png') }}">
         <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
         <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
+        
+
+
     </head>
     <style>
-
-/* Container que faz a mágica da responsividade */
-.table-container {
-    width: 100%;
-    overflow-x: auto; /* Adiciona rolagem horizontal apenas se necessário */
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Opcional: melhora visualização */
-    border-radius: 3px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 300px; /* Impede que a tabela encolha demais e fique ilegível */
-    background-color: rgb(254, 254, 254);
-    font-family: monospace;
-    
-}
-
-th, td {
-    background-color: #10385f;
-    text-align: left;
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-    white-space: nowrap; /* Impede que o texto quebre linhas, mantendo a colunas organizadas */
-    text-align: center;
-    
-   
-}
-
-thead {
-    background-color: #145290;
-}
-
 
     </style>
   
@@ -64,24 +33,15 @@ thead {
         
     <main class="main">
   <div class="main-child">
-
-    <!-- Card de Premiação -->
-    <div style="max-width:450px; margin:20px auto; padding:20px; border-radius:10px; 
-                background:linear-gradient(135deg, #0000008e, #3804046c); 
-                box-shadow:0 4px 10px rgba(0,0,0,0.2); text-align:center; font-family:Arial, sans-serif;">
-      
-      <h3 style="color:rgb(9, 121, 233); margin-bottom:10px;">🗓️ Data do Sorteio: <span style="color:#e74c3c;">18/05/2026</span></h3>
-      
 <!-- Botão de CTA -->
 <form class="form-cta" style="margin-top:20px;">
   <a style="border-radius:5px; height:40px; text-align:center; font-weight:bold; 
             margin:0; color:#fff; background-color:rgba(224, 25, 177, 0.627); 
             display:inline-block; line-height:40px; padding:0 20px; text-decoration:none;"
      href="/gerar_numero/{{ usuario_id }}" target="_blank">
-    Participar Agora
+    Participar Agora 
   </a>
 </form>
-
     </div>
 
   </div>
@@ -97,29 +57,21 @@ thead {
 </section>
 
 <div class="table-container">
-  <h2>Meus Bilhetes</h2>
+  <h2 style="text-decoration: underline; margin:20px;">Meus Bilhetes</h2>
 
   <table border="1">
     <thead>
       <tr>
-        <th>N° BILHETE</th>
-        <th>VALOR N°</th>
-        <th>DT SORTEIO</th>
-        <th>PREMIAÇÃO</th>
-        <th>STATUS PAGTO</th>
-        <th>BAIXAR</th>
+        <th>N° BILHETES</th>
+        <th>Compartilhar</th>
       </tr>
     </thead>
     <tbody>
-      {% for u in numeros %}
+      {% for u in pagamentos %}
       <tr>
-        <td>{{ u.numero }}</td>
-        <td>{{ "%.2f"|format(u.valor) }}</td>
-        <td>{{ u.dataSort.strftime("%d-%m-%Y") }}</td>
-        <td>{{ "%.2f"|format(u.premio) }}</td>
-        <td>{{ u.status }}</td>
+        <td>{{ u.lista_numeros }}</td>
         <td>
-          <button onclick="baixarBilhete('{{u._id}}')">
+          <button onclick="baixarBilhete('{{ u._id }}')">
             <img src="../static/img/baixar.svg">
           </button>
         </td>
@@ -128,36 +80,42 @@ thead {
     </tbody>
   </table>
 </div>
+</div>
 
-  <h2>📊 Progresso da Rifa</h2>
+  <h2 style="text-decoration: underline; margin:20px;">📊 Progresso da Rifa</h2>
+  <span>{{ resumo.numeros_aprovados }}</span>
+   <div class="info-box" id="mediaDiaria">Média diária necessária: 0</div>
   <div class="pizza-chart" id="chart">0%</div>
-  <div style="display: none;">
-  <div  id="total_a_pagar">{{total_a_pagar}}</div>
-  <div id="total_ok">{{total_ok}}</div>
 
-  </div>
+  
+
+
+    
+
+
+
 
 
 
 <div class="table-container">
-    <h2>Participantes</h2>
+    <h2 style="text-decoration: underline; margin:20px;">USUARIOS CONCORRENDO</h2>
 
     <table border="1">
         <thead>
             <tr>
-                <th style="color: #ffffff; font-weight: bold;">Usuarios Participantes</th>
-                <th style="color: #ffffff; font-weight: bold;">3 ultimos n° CPF</th>
+                <th style="color: #ffffff; font-weight: bold;">PARTICIPANTES</th>
+                <th style="color: #ed06d2; font-weight: bold;">VENDEDORES</th>
             </tr>
         </thead>
 
         <tbody>
             {% for u in usuarios %}
             <tr>
-                <td style="color: #0864b5; font-weight: bold;">
+                <td style="color: #ccde01; font-weight: bold;">
                     {{ u.nome }}
                 </td>
                                 <td style="color: #12ec8e; font-weight: bold;">
-                    {{ u.cpf }}
+                    {{ u.vendedor }}
                 </td>
             </tr>
             {% endfor %}
@@ -166,61 +124,69 @@ thead {
 </div>
   
  
-  <h2>⏳ Prazo para Sorteio</h2>
+  <h2 style="text-decoration: underline; margin:20px;">⏳ Prazo para Sorteio</h2>
   <div class="time-chart" id="timeChart">0 dias</div>
   <div style="text-align:center; margin-top:20px;">
 
   </div>
   <div class="table-container">
-  <h2>Ganhadores</h2>
+  <h2 style="text-decoration: underline; margin:20px;">Sorteios</h2>
     <table border="1">
         <thead>
             <tr>
-                <th style="color: #ffffff; font-weight: bold;">N° BILHETE</th>
+                <th style="color: #ffffff; font-weight: bold;">Dia</th>
+                <th style="color: #ffffff; font-weight: bold;">Data</th>
                 <th style="color: #ffffff; font-weight: bold;">CONCURSO</th>
-                <th style="color: #ffffff; font-weight: bold;">DATA</th>
-                <th style="color: #ffffff; font-weight: bold;">GANHADOR</th>
-                <th style="color: #ffffff; font-weight: bold;">CPF</th>
-                <th style="color: #ffffff; font-weight: bold;">PREMIO</th>
+                <th style="color: #ffffff; font-weight: bold;">RESULTADO LOTERIA</th>
+               
+                
+
 
             </tr>
         </thead>
+            {% for u in sorteio %}
         <tbody>
             <tr>
-                <td style="color: #f5f108; font-weight: bold; ">{{bilhete}}</td>
-                <td style="color: #265ddc; font-weight: bold; ">{{concurso}}</td>
-                <td style="color: #a0da0ee5; font-weight: bold; ">{{dtSort}}</td>
-                <td style="color: #0bb9db; font-weight: bold; ">{{ganhador}}</td>
-                <td style="color: #0bb9db; font-weight: bold; ">{{final_cpf}}</td>
-                <td style="color: #52b204; font-weight: bold; ">{{premiacao1}}</td>
+                <td style="color: #f5f108; font-weight: bold; ">{{u.dia}}</td>
+                <td style="color: #265ddc; font-weight: bold; ">{{u.data}}</td>
+                <td style="color: #265ddc; font-weight: bold; ">{{u.concurso}}</td>
+                <td style="color: #a0da0ee5; font-weight: bold; ">{{u.resultado}}</td>
+ 
             </tr>
         </tbody>
+        {% endfor %}
     </table>
 </div>
-<dl class="faq-list">
+<!-- <dl class="faq-list">
      <dt class="faq-question" style="color:#cdfa04; text-align: center; font-weight:bold; font-size:20px;">
     Comprovante Premiação
 </dt>
 <dd style="background-color: #000;" class="faq-answer">
  
-  <div class="info-box" id="mediaDiaria">Média diária necessária: 0</div>
+ 
           </div>
-         </dd>
+         </dd> -->
 
 
   <p>Copyright © 2026 "W" Marca Brasil todos os direitos reservados</p>
         </footer>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>         
   <script src="../static/js/script.js"></script>
   <script src="../static/js/meta_atingir.js"></script>
- 
+  
+
 <script>
+
+
 
   const chart = document.getElementById("chart");
 
-  const total_a_pagar = {{ total_a_pagar|int }};
-  const meta = 1000;
+  const resumo = {
+    numeros_aprovados: {{ resumo.numeros_aprovados|int }}
+  };
+  const meta = 1000; // Meta de 100 bilhetes vendidos
 
-  const porcentagem = Math.round((total_a_pagar / meta) * 100);
+  const porcentagem = Math.round((resumo.numeros_aprovados / meta) * 100);
 
   chart.innerText = porcentagem + "%";
   
@@ -228,33 +194,9 @@ thead {
     #00ff00 ${porcentagem * 3.6}deg,
     #e0e0e0 ${porcentagem * 3.6}deg
   )`;
+   
 
 
-
-function baixarBilhete(id) {
-  fetch("/imprimir/baixar_bilhete/" + id)
-    .then(res => {
-      if (!res.ok) {
-        throw new Error("Erro ao gerar bilhete");
-      }
-      return res.blob();
-    })
-    .then(blob => {
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "bilhete.png";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-    })
-    .catch(err => console.error("Erro ao baixar:", err));
-}
-
-
-</script>
-    
   </script>
     </body>
 </html>

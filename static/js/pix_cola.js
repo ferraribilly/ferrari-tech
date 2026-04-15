@@ -18,8 +18,7 @@ function copyText() {
             copiedCodeBox.style.opacity = '';
         }, 5000);
 
-        // Redirecionar após copiar
-        var id = qrcodeText.dataset.id; // Se você tiver o ID armazenado no data-id
-        window.location.href = '/pendente?id=' + usuario_Id;
+    }, function (err) {
+        console.error('Erro ao copiar: ', err);
     });
 }

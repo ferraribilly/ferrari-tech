@@ -1,15 +1,18 @@
-// PAGAMENTO QRCODE PIX
 document.getElementById("btn-pagar").onclick = () => {
 
     const nome = document.getElementById("nome").innerText;
+    const sobrenome = document.getElementById("sobrenome").innerText;
     const cpf = document.getElementById("cpf").innerText;
     const email = document.getElementById("email").innerText;
+    
 
     const url = `/payment_qrcode_pix/pagamento_pix/{{ usuario_id }}`
         + `?nome=${encodeURIComponent(nome)}`
+        + `&sobrenome=${encodeURIComponent(sobrenome)}`
         + `&cpf=${encodeURIComponent(cpf)}`
         + `&email=${encodeURIComponent(email)}`
-        + `&quantidade=${quantidade}`;
+        + `&quantidade=${quantidade}`
+        + `&lista_numeros=${encodeURIComponent(JSON.stringify(numerosSelecionados))}`;
 
     window.location.href = url;
 };
@@ -18,14 +21,19 @@ document.getElementById("btn-pagar").onclick = () => {
 document.getElementById("btn-preference").onclick = () => {
 
     const nome = document.getElementById("nome").innerText;
+    const sobrenome = document.getElementById("sobrenome").innerText;
     const cpf = document.getElementById("cpf").innerText;
     const email = document.getElementById("email").innerText;
+    const vendedor = document.getElementById("vendedor").innerText;
 
     const url = `/compra/preference/pagamento_pix/{{ usuario_id }}`
         + `?nome=${encodeURIComponent(nome)}`
+        + `?sobrenome=${encodeURIComponent(sobrenome)}`
         + `&cpf=${encodeURIComponent(cpf)}`
         + `&email=${encodeURIComponent(email)}`
-        + `&quantidade=${quantidade}`;
+        + `&vendedor=${encodeURIComponent(vendedor)}`
+        + `&quantidade=${quantidade}`
+        + `&lista_numeros=${encodeURIComponent(JSON.stringify(numerosSelecionados))}`;
 
     window.location.href = url;
 };
@@ -56,7 +64,7 @@ socket.on("payment_update", function (data) {
 
         setTimeout(function () {
             
-            window.location.href = `/aprovado?id=${usuario_Id}`;
+            window.location.href = `/success`;
         }, 3000);
 
     } else {
@@ -66,7 +74,7 @@ socket.on("payment_update", function (data) {
         div.appendChild(p);
 
         setTimeout(function () {
-            window.location.href = `/recusado?id=${usuario_Id}`;
+            window.location.href = `/recusado`;
         }, 3000);
     }
 });

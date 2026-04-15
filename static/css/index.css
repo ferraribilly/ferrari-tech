@@ -36,7 +36,7 @@ img{
 .main{
     padding-top: 4rem;
     height: 785px;
-    background: url(../img/card_maes.png) center;
+    background: url(../img/image.jpg) center;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -323,6 +323,42 @@ input {
       color:#2c3e50;
     }
 
+
+    /* Container que faz a mágica da responsividade */
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* Adiciona rolagem horizontal apenas se necessário */
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Opcional: melhora visualização */
+    border-radius: 3px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 300px; /* Impede que a tabela encolha demais e fique ilegível */
+    background-color: rgb(254, 254, 254);
+    font-family: monospace;
+    
+}
+
+th, td {
+    background-color: #10385f;
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    white-space: nowrap; /* Impede que o texto quebre linhas, mantendo a colunas organizadas */
+    text-align: center;
+    
+   
+}
+
+thead {
+    background-color: #145290;
+}
+
+
+
 /* Responsivo */
 
 @media (max-width: 800px) {
@@ -335,7 +371,7 @@ body{
     overflow-x: hidden;
 }
 
-    .header {
+.header {
     padding: 0 15px;
 }
 

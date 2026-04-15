@@ -1,93 +1,95 @@
 let quantidade = 0;
 let valorUnitario = 0.05;
-
-
-
 let numerosSelecionados = [];
 
-function gerarBilhete() {
-  const input = document.querySelector('.input-numero');
-  const numero = input.value || '000';
+async function gerarBilhete() {
 
-  const cards = document.getElementById('cards');
+    const input = document.querySelector('.input-numero');
+    const numero = input.value || '0000';
 
-  const card = document.createElement('div');
-  card.className = 'card';
-  card.innerHTML = `
-    <div class="card-content">
-      <h3 style="color:#fff; font-family:monospace; border:1px solid #fff; border-radius: 3px; background: #555;">
-        NUMERO:<span style="color:blue; background: #fff; border-radius:5px;">${numero}</span>
-      </h3>
-    </div>
-  `;
+    quantidade++;
+    numerosSelecionados.push(numero);
 
-  cards.appendChild(card);
+    const total = quantidade * valorUnitario;
+    document.getElementById("total").innerText = total.toFixed(2);
 
-  quantidade++;
-  numerosSelecionados.push(numero);
+    const usuario_id = document.getElementById("usuario_id").innerText;
+    const nome = document.getElementById("nome").innerText;
+    const cpf = document.getElementById("cpf").innerText;
+    const email = document.getElementById("email").innerText;
 
-  const total = quantidade * valorUnitario;
-  document.getElementById("total").innerText = total.toFixed(2);
+    const paymentId = document.getElementById("payment_id")?.innerText || "aguardando";
+    const valor = document.getElementById("valor")?.innerText || "0.05";
+    const dataSort = document.getElementById("dataSort")?.innerText || "10/05/2026";
 
-  const usuario_id = document.getElementById("usuario_id").innerText;
-  const nome = document.getElementById("nome").innerText;
-  const cpf = document.getElementById("cpf").innerText;
-  const email = document.getElementById("email").innerText;
-  const paymentId = document.getElementById("payment_id")?.innerText || "aguardando gerar payment_id Mercado Pago";
-  const valor = document.getElementById("valor")?.innerText || "1.00";
-  const dataSort = document.getElementById("dataSort")?.innerText || "10/05/2026";
 
-  fetch("/numeros", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      usuario_id: usuario_id,
-      nome: nome,
-      cpf: cpf,
-      email: email,
-      numero: numero,
-      paymentId: paymentId,
-      valor: parseFloat(valor),
-      dataSort: dataSort
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    console.log("Salvo:", data);
-  })
-  .catch(err => {
-    console.error("Erro ao salvar:", err);
+    // GERA IMAGEM
+    const res = await fetch("/gerar-bilhete", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            numero,
+            nome,
+            email,
+            cpf
+        })
+    });
+
+    const data = await res.json();
+
+
+
+
+    
+
+    const container = document.getElementById("cards");
+
+    const card = document.createElement("div");
+    card.style.background = "#111";
+    card.style.padding = "10px";
+    card.style.borderRadius = "10px";
+    card.style.marginTop = "10px";
+
+    const img = document.createElement("img");
+    img.src = data.img + "?t=" + new Date().getTime();
+    img.style.width = "100%";
+    img.style.borderRadius = "8px";
+
+    card.appendChild(img);
+    container.prepend(card);
+
+    input.value = '';
+
+
+const lista = document.getElementById("lista-numeros");
+
+// limpa antes de renderizar
+lista.innerHTML = "";
+
+// adiciona todos os números gerados
+numerosSelecionados.forEach(num => {
+    const item = document.createElement("div");
+    item.innerText = num;
+    item.style.color = "#f1eeee";
+    item.style.fontWeight = "bold";
+    lista.appendChild(item);
+});
+}
+
+
+  const modal = document.getElementById('modal');
+  const confirmBtn = document.getElementById('confirmBtn');
+ 
+
+  confirmBtn.addEventListener('click', () => modal.style.display = 'flex');
+  cancelBtn.addEventListener('click', () => modal.style.display = 'none');
+  
+  // Fecha modal ao clicar fora
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) modal.style.display = 'none';
   });
 
-  input.value = '';
-}
 
 
-//DELETAR NUMEROS
-function deletarNumero(id) {
-  fetch(`/numeros/${id}`, {
-    method: "DELETE"
-  })
-  .then(res => res.json())
-  .then(data => {
-    console.log(data);
-  })
-  .catch(err => console.error(err));
-}
-
-
-// // Carregar lista de números 
-async function carregarNumeros() {
-    const res = await fetch("/numeros");
-    const data = await res.json();
-    const lista = document.getElementById("listaNumeros");
-    lista.innerHTML = "";
-    data.forEach(item => {
-        const li = document.createElement("li");
-        li.className = "list-group-item";
-        li.textContent = `Número: ${String(item.numero).padStart(3, '0')} - Valor: R$ ${item.valor.toFixed(2)} - Comprovante: ${item.url_comprovante}`;
-        lista.appendChild(li);
-    });
-}

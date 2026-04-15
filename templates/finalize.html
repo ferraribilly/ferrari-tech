@@ -31,6 +31,7 @@
 
             <p>Abra seu aplicativo de pagamento e escolha <b>Ler QR Code</b></p>
             <span>Aponte a câmera do seu celular</span>
+            <span id="status-pagamento">{{status}}</span>
 
             <div class="qrcode-info">
                 <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1764290948/cellphone-icon_remhjc.svg" draggable="false">
@@ -39,6 +40,11 @@
             <div class="qrcode">
                 <img src="{{ qrcode }}" alt="QR CODE">
             </div>
+
+            <div class="pix-value">
+                <span style="font-family: monospace; font-weight: bold;">ID transação:</span>
+                <strong id="verificar-pagamento" style="color: brown; font-weight: bold;">{{ payment_id }}</strong>
+            </div>            
 
             <div class="pix-value">
                 <strong>Dia das Mães</strong>
@@ -65,9 +71,45 @@
     </div>
 </main>
 
-<script src="../static/js/script.js"></script>
-<script src="../static/js/pix_cola.js"></script>
-<script src="../static/js/pagamento.js"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script src="{{ url_for('static', filename='js/pix_cola.js') }}"></script>
+<script src="{{ url_for('static', filename='js/pagamento.js') }}"></script>
+
+
+<script>
+const paymentId = document.getElementById("verificar-pagamento").innerText.trim();
+
+function verificarStatus() {
+    if (!paymentId) return;
+
+    // Faz a chamada para a rota que criamos acima
+    fetch(`/pagamentos/${paymentId}`)
+        .then(response => response.json())
+        .then(data => {
+            const statusSpan = document.getElementById("status-pagamento");
+
+            if (data.status === "approved" || data.status === "pago") {
+                statusSpan.innerText = "Pagamento aprovado ✅";
+                statusSpan.style.color = "green";
+                
+                // Redireciona após 1.5 segundos para o usuário ver o check verde
+                setTimeout(() => {
+                    window.location.href = "/dia_das_maes";
+                }, 1500);
+            } else {
+                statusSpan.innerText = "Aguardando pagamento...";
+            }
+        })
+        .catch(error => {
+            console.error("Erro ao verificar status:", error);
+        });
+}
+
+// Verifica a cada 5 segundos
+setInterval(verificarStatus, 5000);
+</script>
+
+
 
 </body>
 </html>

@@ -5,6 +5,7 @@
     <title>Resumo Financeiro</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/graficos.css') }}">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -76,14 +77,18 @@
             <h2>Faturamento</h2>
             <p>R$ {{ "%.2f"|format(resumo.faturamento) }}</p>
         </div>
+
         <div class="card usuarios">
             <h2>Usuários</h2>
             <p>{{ resumo.usuarios }}</p>
         </div>
-        <div class="card numeros">
-            <h2>Vendas</h2>
-            <p>Total: R$ {{ "%.2f"|format(resumo.numeros.total) }}</p>
-        </div>
+
+   
+<div class="card numeros">
+    <h2>Números</h2>
+    <p>Total: {{ resumo.numeros_aprovados }}</p>
+</div>
+
     </div>
 
     <div class="graficos">
@@ -91,80 +96,104 @@
             <h3>Pagamentos</h3>
             <canvas id="pagamentosChart"></canvas>
         </div>
+
         <div class="grafico-container">
             <h3>Números</h3>
             <canvas id="numerosChart"></canvas>
         </div>
+            <div class="chart-container">
+        <h2>Desempenho de Vendas - Polar Area</h2>
+        <canvas id="vendedoresChart"></canvas>
+        <h2>Produtos Mais Vendidos</h2>
+        <canvas id="myDoughnutChart"></canvas>
+        <h2>Despesas Mensais 2026</h2>
+        <!-- O Canvas é onde o Chart.js desenha -->
+        <canvas id="despesasChart"></canvas>
+        <h2>Faturamento Mensal 2026</h2>
+        <canvas id="faturamentoChart"></canvas>
+        <h2>Impostos - Polar Area</h2>
+        <canvas id="impostosChart"></canvas>
     </div>
+    </div>
+    
 
-    <script>
-        const pagamentosData = {
-            labels: ["Pendente", "Aprovado", "Cancelado"],
-            datasets: [{
-                data: [
-                    {{ resumo.pagamentos.pending }},
-                    {{ resumo.pagamentos.approved }},
-                    {{ resumo.pagamentos.cancelled }}
-                ],
-                backgroundColor: ["#f39c12", "#27ae60", "#e74c3c"]
-            }]
-        };
 
-        const numerosData = {
-            labels: ["Pendente", "Aprovado", "Cancelado"],
-            datasets: [{
-                data: [
-                    {{ resumo.numeros.pending }},
-                    {{ resumo.numeros.approved }},
-                    {{ resumo.numeros.cancelled }}
-                ],
-                backgroundColor: ["#f1c40f", "#2980b9", "#8e44ad"]
-            }]
-        };
+ <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>      
+  <script src="../static/js/graficos/grafico_despesas_mensal.js"></script>   
+  <script src="../static/js/graficos/grafico_faturamento_mensal.js"></script>
+  <script src="../static/js/graficos/grafico_impostos.js"></script>
+  <script src="../static/js/graficos/grafico_mais_produtos_mais_vendidos.js"></script>
+  <script src="../static/js/graficos/grafico_vendas_vendedores.js"></script>
+  
+  
+<script>
+    const pagamentosData = {
+        labels: ["Pendente", "Aprovado", "Cancelado"],
+        datasets: [{
+            data: [
+                {{ resumo.pagamentos.pending }},
+                {{ resumo.pagamentos.approved }},
+                {{ resumo.pagamentos.cancelled }}
+            ],
+            backgroundColor: ["#f39c12", "#27ae60", "#e74c3c"]
+        }]
+    };
 
-        new Chart(document.getElementById("pagamentosChart"), {
-            type: "bar",
-            data: pagamentosData,
-            options: {
-                plugins: {
-                    legend: { labels: { color: "#ecf0f1" }, position: "bottom" },
-                    datalabels: {
-                        color: "#ecf0f1",
-                        anchor: "end",
-                        align: "top",
-                        formatter: (value, ctx) => {
-                            let total = ctx.chart.data.datasets[0].data.reduce((a,b) => a+b, 0);
-                            let percent = (value/total*100).toFixed(1);
-                            return "R$ " + value.toFixed(2) + " (" + percent + "%)";
-                        }
-                    }
-                },
-                scales: {
-                    x: { ticks: { color: "#ecf0f1" } },
-                    y: { ticks: { color: "#ecf0f1" }, beginAtZero: true }
-                }
-            },
-            plugins: [ChartDataLabels]
-        });
 
-        new Chart(document.getElementById("numerosChart"), {
-            type: "pie",
-            data: numerosData,
-            options: {
-                plugins: {
-                    legend: { labels: { color: "#ecf0f1" }, position: "right" },
-                    datalabels: {
-                        color: "#fff",
-                        formatter: (value, ctx) => {
-                            let total = ctx.chart.data.datasets[0].data.reduce((a,b) => a+b, 0);
-                            let percent = (value/total*100).toFixed(1);
-                            return "R$ " + value.toFixed(2) + " (" + percent + "%)";
-                        }
+const numerosData = {
+        labels: ["Números Aprovados"],
+        datasets: [{
+            data: [{{ resumo.numeros_aprovados }}],
+            backgroundColor: ["#8e44ad"]
+        }]
+    };
+
+    new Chart(document.getElementById("numerosChart"), {
+        type: "pie",
+        data: numerosData,
+        options: {
+            plugins: {
+                legend: { labels: { color: "#ecf0f1" }, position: "right" },
+                datalabels: {
+                    color: "#fff",
+                    formatter: (value, ctx) => {
+                        let total = ctx.chart.data.datasets[0].data.reduce((a,b) => a+b, 0);
+                        let percent = (value/total*100).toFixed(1);
+                        return value + " (" + percent + "%)";
                     }
                 }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+   
+
+    new Chart(document.getElementById("pagamentosChart"), {
+        type: "bar",
+        data: pagamentosData,
+        options: {
+            plugins: {
+                legend: { labels: { color: "#ecf0f1" }, position: "bottom" },
+                datalabels: {
+                    color: "#ecf0f1",
+                    anchor: "end",
+                    align: "top",
+                    formatter: (value, ctx) => {
+                        let total = ctx.chart.data.datasets[0].data.reduce((a,b) => a+b, 0);
+                        let percent = (value/total*100).toFixed(1);
+                        return "R$ " + value.toFixed(2) + " (" + percent + "%)";
+                    }
+                }
             },
-            plugins: [ChartDataLabels]
-        });
-    </script>
+            scales: {
+                x: { ticks: { color: "#ecf0f1" } },
+                y: { ticks: { color: "#ecf0f1" }, beginAtZero: true }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+
+   
+</script>
 </body>
 </html>

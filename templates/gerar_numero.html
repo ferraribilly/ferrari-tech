@@ -12,52 +12,87 @@
 
 </head>
 <body>
-  <header style="font-family: monospace; font-weight: bold;">GERAR NUMEROS</header>
+  <header style="font-family: monospace; font-weight: bold;">
+    
+  </header>
   <div  class="container">
-    <div style="opacity: 0%;">
-     <p style="color:#fff; font-weight: bold; font-family: monospace;">
-      ID:
-      <span id="usuario_id" style="color: #4a90e2;" >{{ usuario_id }}</span>
-    </p>
-    <p style="color:#fff; font-weight: bold; font-family: monospace;">
-      Nome:
-      <span id="nome" style="color: #4a90e2;" >{{ usuario.nome }}</span>
-    </p>
-    <p style="color:#fff; font-weight: bold; font-family: monospace;">
-      CPF:
-       <span id="cpf" style="color: #4a90e2;" >{{usuario.cpf }}</span>
-      </p>
-    <p style="color:#fff; font-weight: bold; font-family: monospace;">
-      email:
-      <span  id="email" style="color: #4a90e2;" >{{ usuario.email }}</span>
-    </p>
-    </div>
-    <h3 style="color:#fff;">Total: R$ <span id="total">0.00</span></h3>
-    <input id="formCompra" type="text" class="input-numero" maxlength="3" placeholder="(ex:001)">
-    <button class="btn-generate" onclick="gerarBilhete()">Gerar Bilhete</button>
+
+    <h3 style="color:#abe900; font-family: monospace;">TOTAL A PAGAR: R$ <span style="color: darkorange; font-family: monospace; font-size:22px; font-weight: bold;" id="total">0.00</span></h3>
+    <input id="formCompra" type="text" class="input-numero" maxlength="4" placeholder="(exemplo:0001)">
+    <button style="font-family: monospace;" class="btn-generate" onclick="gerarBilhete()">Gerar Bilhete</button>
+    
 
   
     <div class="cards" id="cards"></div>
   </div>
 
 <footer style="display: flex; gap: 10px; margin: 10px; padding: 10px; font-family: monospace;">
-  <button class="purchase" id="btn-pagar">PIX RAPIDO</button>
-  <button class="purchase" id="btn-preference">PREFERENCE MERCADO PAGO</button>
+  <button id="confirmBtn">Confirmar</button>
+  <!-- 
+   -->
 </footer>
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h2>Confirmação dados</h2>
+    
+     <p style="color:#0e0000; font-weight: bold; font-family: monospace;">
+      ID:
+      <span id="usuario_id" style="color: #4a90e2;" >{{ usuario_id }}</span>
+    </p>
+
+    <p style="color:#0e0000; font-weight: bold; font-family: monospace;">
+      Nome:
+      <span id="nome" style="color: #4a90e2;" >{{ usuario.nome }}</span>
+    </p>
+
+     <p style="color:#0e0000; font-weight: bold; font-family: monospace;">
+      Sobrenome
+      <span id="sobrenome" style="color: #4a90e2;" >{{ usuario.sobrenome }}</span>
+    </p>
+    
+    <p style="color:#0e0000; font-weight: bold; font-family: monospace;">
+      CPF:
+       <span id="cpf" style="color: #4a90e2;" >{{usuario.cpf }}</span>
+      </p>
+
+    <p style="color:#0e0000; font-weight: bold; font-family: monospace;">
+      email:
+      <span  id="email" style="color: #4a90e2;" >{{ usuario.email }}</span>
+    </p>
+    
+    <p style="color:#0e0000; font-weight: bold; font-family: monospace;">
+      vendedor:
+      <span  id="vendedor" style="color: #4a90e2;" >{{ usuario.vendedor }}</span>
+    </p>
+
+    <p style="color:#0e0000; font-weight: bold; font-family: monospace;">
+    NUMEROS:
+</p>
+
+<div id="lista-numeros">
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+
+    <h2>Metodos Pagamentos</h2>
+    <div class="modal-buttons">
+      <button  class="purchase" id="btn-pagar">Metodo Pix Rapido</button>
+      <button class="purchase" id="btn-preference">Outros/mercado pago</button>
+      <button class="btn-cancel" id="cancelBtn">Cancelar</button>
+    </div>
+    
+  </div>
+</div>
+
+
 
     <!-- SOCKET.IO CDN -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script src="../static/js/script.js"></script>
-    <script src="../static/js/numeros.js"></script>
-    <script src="../static/js/pagamento.js"></script>
-  <script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/pagamento.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/numeros.js') }}"></script>
+    
 
-
-
-
-
-
-
-</script>
 </body>
 </html>
