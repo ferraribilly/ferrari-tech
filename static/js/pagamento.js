@@ -24,14 +24,12 @@ document.getElementById("btn-preference").onclick = () => {
     const sobrenome = document.getElementById("sobrenome").innerText;
     const cpf = document.getElementById("cpf").innerText;
     const email = document.getElementById("email").innerText;
-    const vendedor = document.getElementById("vendedor").innerText;
 
     const url = `/compra/preference/pagamento_pix/{{ usuario_id }}`
         + `?nome=${encodeURIComponent(nome)}`
-        + `?sobrenome=${encodeURIComponent(sobrenome)}`
+        + `&sobrenome=${encodeURIComponent(sobrenome)}`
         + `&cpf=${encodeURIComponent(cpf)}`
         + `&email=${encodeURIComponent(email)}`
-        + `&vendedor=${encodeURIComponent(vendedor)}`
         + `&quantidade=${quantidade}`
         + `&lista_numeros=${encodeURIComponent(JSON.stringify(numerosSelecionados))}`;
 
@@ -49,6 +47,8 @@ var socket = io(window.location.origin);
 socket.on("connect", function () {
     socket.emit("join_payment", { payment_id: paymentId });
 });
+
+
 
 socket.on("payment_update", function (data) {
     if (data.payment_id !== paymentId) return;

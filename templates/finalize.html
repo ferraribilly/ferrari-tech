@@ -13,7 +13,7 @@
     </style>
 
     <!-- SOCKET.IO CDN -->
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+   
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -27,12 +27,9 @@
     <div class="pix-container">
         <div class="payment">
 
-            <div id="notifications"></div>
-
             <p>Abra seu aplicativo de pagamento e escolha <b>Ler QR Code</b></p>
             <span>Aponte a câmera do seu celular</span>
-            <span id="status-pagamento">{{status}}</span>
-
+            
             <div class="qrcode-info">
                 <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1764290948/cellphone-icon_remhjc.svg" draggable="false">
             </div>
@@ -43,7 +40,7 @@
 
             <div class="pix-value">
                 <span style="font-family: monospace; font-weight: bold;">ID transação:</span>
-                <strong id="verificar-pagamento" style="color: brown; font-weight: bold;">{{ payment_id }}</strong>
+                <strong id="id-payment" style="color: brown; font-weight: bold;">{{ payment_id | default('') }}</strong>
             </div>            
 
             <div class="pix-value">
@@ -54,6 +51,8 @@
                 <span style="font-family: monospace; font-weight: bold;">Valor Pagamento:</span>
                 <strong style="color: brown; font-weight: bold;">{{ valor }}</strong>
             </div>
+            <div id="notifications"></div>
+            <span id="status">{{status}}</span>
 
             <div id="copy-mobile" class="pix-copy-mobile">
                 <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1764290949/copy-icon_z8ur77.svg" draggable="false">
@@ -70,46 +69,14 @@
         </div>
     </div>
 </main>
-
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 <script src="{{ url_for('static', filename='js/pix_cola.js') }}"></script>
 <script src="{{ url_for('static', filename='js/pagamento.js') }}"></script>
 
-
 <script>
-const paymentId = document.getElementById("verificar-pagamento").innerText.trim();
-
-function verificarStatus() {
-    if (!paymentId) return;
-
-    // Faz a chamada para a rota que criamos acima
-    fetch(`/pagamentos/${paymentId}`)
-        .then(response => response.json())
-        .then(data => {
-            const statusSpan = document.getElementById("status-pagamento");
-
-            if (data.status === "approved" || data.status === "pago") {
-                statusSpan.innerText = "Pagamento aprovado ✅";
-                statusSpan.style.color = "green";
-                
-                // Redireciona após 1.5 segundos para o usuário ver o check verde
-                setTimeout(() => {
-                    window.location.href = "/dia_das_maes";
-                }, 1500);
-            } else {
-                statusSpan.innerText = "Aguardando pagamento...";
-            }
-        })
-        .catch(error => {
-            console.error("Erro ao verificar status:", error);
-        });
-}
-
-// Verifica a cada 5 segundos
-setInterval(verificarStatus, 5000);
+    
 </script>
-
-
 
 </body>
 </html>

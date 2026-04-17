@@ -40,9 +40,10 @@ CORS(app)
 # ---------------- MONGODB ----------------
 client = MongoClient(os.getenv("MONGO_URI"))
 pagamento_model = PagamentoModel()
-bilhete = BilheteModel()
+bilhete_model = BilheteModel()
 socketio = SocketIO(app, cors_allowed_origins="*")
-app.secret_key = os.getenv("APP_SECRET_KEY")  
+app.secret_key = os.getenv("APP_SECRET_KEY")
+notification_url = os.getenv("NOTIFICATION_URL")
 premiacao1 = os.getenv("PREMIACAO1")
 dt_sort = os.getenv("SORTEIO")
    
@@ -332,11 +333,11 @@ def get_pagamento_by_id(self, id):
     return self.collection.find_one({"_id": id})
 
 #=============================================================================================================================================================================
+
 W, H = 900, 450
 
 @app.route("/gerar-bilhete", methods=["POST"])
 def gerar_bilhete():
-
     data = request.json
 
     numero_bilhete = f"Nº {data['numero']}"
@@ -373,10 +374,10 @@ def gerar_bilhete():
     draw = ImageDraw.Draw(img)
 
     try:
-        f_titulo = ImageFont.truetype("arialbd.ttf", 36)
-        f_texto = ImageFont.truetype("arial.ttf", 24)
-        f_label = ImageFont.truetype("arialbd.ttf", 20)
-        f_num = ImageFont.truetype("arialbd.ttf", 28)
+        f_titulo = ImageFont.truetype("static/fonts/NK57 Monospace Sc Bk.otf", 36)
+        f_texto  = ImageFont.truetype("static/fonts/NK57 Monospace Sc Bk.otf", 24)
+        f_label  = ImageFont.truetype("static/fonts/NK57 Monospace Sc Bk.otf", 20)
+        f_num    = ImageFont.truetype("static/fonts/NK57 Monospace Sc Bk.otf", 28)
     except:
         f_titulo = f_texto = f_label = f_num = ImageFont.load_default()
 
@@ -576,6 +577,7 @@ def resetar_banco():
 # rota sucesso 
 @app.route("/success")
 def pagamento_sucesso():
+
     return render_template("aprovado.html")
 
 # rora recusado
@@ -617,6 +619,7 @@ def pagamento_pix(usuario_id):
         lista_numeros = []
 
     usuario_id = usuario_id or request.args.get("usuario_id")
+
     if not usuario_id:
         return jsonify({"erro": "usuario_id não informado"}), 400
 
@@ -624,11 +627,9 @@ def pagamento_pix(usuario_id):
     sobrenome = request.args.get("sobrenome") or ""
     cpf = request.args.get("cpf") or ""
     email = request.args.get("email") or ""
-    lista_numeros = request.args.get("lista_numeros") or ""
     quantidade = int(request.args.get("quantidade") or 0)
 
     valor_total = round(quantidade * 0.05, 2)
-
 
     payment_data = {
         "transaction_amount": float(valor_total),
@@ -644,7 +645,7 @@ def pagamento_pix(usuario_id):
             }
         },
         "external_reference": email,
-        "notification_url": "https://ferrari-tech.onrender.com/notificacoes",
+        "notification_url": notification_url,
         "statement_descriptor": "FerrariTech"
     }
 
@@ -652,28 +653,11 @@ def pagamento_pix(usuario_id):
         response = sdk.payment().create(payment_data)
         mp = response.get("response", {})
 
-        print("MP RESPONSE:", mp)
-
         if "id" not in mp:
             return f"ERRO MP: {mp}", 500
 
         payment_id = str(mp["id"])
         status = mp.get("status", "pending")
-
-        # salva pagamento Mercado Pago
-        documento = criar_documento_pagamento(
-            payment_id=payment_id,
-            status=status,
-            valor=valor_total,
-            cpf=cpf,
-            email_user=email,
-            lista_numeros=lista_numeros
-        )
-
-        try:
-            PagamentoModel().create_pagamento(documento)
-        except Exception as e:
-            print("ERRO AO SALVAR:", e)
 
         tx = mp.get("point_of_interaction", {}).get("transaction_data", {})
 
@@ -683,11 +667,36 @@ def pagamento_pix(usuario_id):
         if not qr_base64 or not qr_code:
             return f"ERRO QR: {tx}", 500
 
+        image_bytes = base64.b64decode(qr_base64)
+        image_file = BytesIO(image_bytes)
 
+        upload_result = cloudinary.uploader.upload(
+            image_file,
+            folder="qrcodes_pix",
+            public_id=f"qr_{payment_id}"
+        )
+
+        qr_image_url = upload_result.get("secure_url")
+
+        documento = criar_documento_pagamento(
+            payment_id=payment_id,
+            status=status,
+            valor=valor_total,
+            cpf=cpf,
+            email_user=email,
+            lista_numeros=lista_numeros,
+            qr_code=qr_code,
+            qr_image_url=qr_image_url
+        )
+
+        try:
+            PagamentoModel().create_pagamento(documento)
+        except Exception as e:
+            print("ERRO AO SALVAR:", e)
 
         return render_template(
             "finalize.html",
-            qrcode=f"data:image/png;base64,{qr_base64}",
+            qrcode=qr_image_url,
             valor=f"R$ {valor_total:.2f}",
             qr_code_cola=qr_code,
             status=status,
@@ -698,28 +707,108 @@ def pagamento_pix(usuario_id):
     except Exception as e:
         print("ERRO GERAL:", e)
         return f"ERRO GERAL: {str(e)}", 500
+#=============================================================================================
 
 
-# # Thread para monitorar pagamentos
-# def monitorar_pagamento(payment_id):
+
+#=============================================================================================
+#----------------------------------------------------------------------------------------------
+
+
+
+
+#=============================================================================================
+#=============================================================================================
+#=============================================================================================
+@app.route('/aguardando_pagamento/<pagamento_id>', methods=['GET'])
+def aguardando_confirmacao(pagamento_id):
+
+    pagamento = pagamento_model.get_pagamento(pagamento_id)
+
+    if not pagamento:
+        return "Pagamento não encontrado", 404
+
+    # tenta mapear corretamente os nomes reais do banco
+    qr_image_url = (
+        pagamento.get("qrcode") or
+        pagamento.get("qr_image_url") or
+        pagamento.get("qr_code_base64")
+    )
+
+    qr_code_cola = (
+        pagamento.get("qr_code_cola") or
+        pagamento.get("qr_code") or
+        pagamento.get("copia_cola")
+    )
+
+    valor = pagamento.get("valor", 0)
+    status = pagamento.get("status", "aguardando")
+    cpf = pagamento.get("cpf", "")
+    usuario_id = pagamento.get("usuario_id", "")
+
+    return render_template(
+        "finalize1.html",
+        qrcode=qr_image_url,
+        valor=f"R$ {float(valor):.2f}",
+        qr_code_cola=qr_code_cola,
+        status=status,
+        payment_id=pagamento_id,
+        cpf=cpf,
+        usuario_id=usuario_id
+    )
+#=============================================================================================
+# Thread para monitorar status
+# def monitor_pagamento(pagamento_id):
+#     model = PagamentoModel()
+
 #     while True:
-#         try:
-#             doc = pagamentos_collection.find_one({"_id": str(payment_id)})
-#             if doc and doc.get("status") == "approved":
-#                 socketio.emit("pagamento_aprovado", {"payment_id": payment_id})
-#                 break
-#         except Exception as e:
-#             print(f"Erro ao consultar MongoDB: {e}")
-#         time.sleep(2)  # Evita sobrecarga no banco
+#         pagamento = model.get_pagamento(pagamento_id)
 
-# # Evento WebSocket para iniciar monitoramento
-# @socketio.on("monitorar_pagamento")
-# def handle_monitorar_pagamento(data):
-#     payment_id = data.get("payment_id")
-#     if not payment_id:
-#         emit("erro", {"mensagem": "payment_id não fornecido"})
+#         if not pagamento:
+#             return
+
+#         status = pagamento.get("status")
+
+#         if status == "approved":
+#             socketio.emit(
+#                 "pagamento_aprovado",
+#                 {"id": pagamento_id}
+#             )
+#             return
+
+#         time.sleep(2)
+# #=============================================================================================
+# threads_ativos = set()
+
+# @socketio.on("iniciar_monitoramento")
+# def iniciar_monitoramento(data):
+#     pagamento_id = data.get("pagamento_id")
+
+#     if not pagamento_id:
 #         return
-#     threading.Thread(target=monitorar_pagamento, args=(payment_id,), daemon=True).start()
+
+#     if pagamento_id in threads_ativos:
+#         emit("monitorando", {"id": pagamento_id})
+#         return
+
+#     threads_ativos.add(pagamento_id)
+
+#     def wrapper():
+#         try:
+#             monitor_pagamento(pagamento_id)
+#         finally:
+#             threads_ativos.discard(pagamento_id)
+
+#     threading.Thread(
+#         target=wrapper,
+#         daemon=True
+#     ).start()
+
+#     emit("monitorando", {"id": pagamento_id})
+#=============================================================================================
+#=============================================================================================
+
+
 #=============================================================================================
 # -PAGAMENTO PREFERENCE MERCADO PAGO => funçoes - GERAR QRCODE E PIX COLA SALVA PAGAMENTO E
 # ATUALIZA PAYMENT_ID NUMERO DO USUARIO "TESTADO (OK)"" 
@@ -848,22 +937,13 @@ def join_payment_room(data):
     join_room(data["payment_id"]) 
 #-----------------------------------------------------------------------------------------------
 # ================================================
-# UPLOADS DE IMAGENS PARA CLOUDINARY
-# ================================================
-# @app.route('/api/save-comprovante-pagamento', methods=['POST'])
-# def save_comprovante_pagamento():
-#     data = request.get_json()
-#     comprovante_pagamento = data.get('comprovante')
-#     if comprovante_pagamento:
-#         print(f"URL: {comprovante}")
-#         return jsonify({"message": "URL salva com sucesso"}), 200
-#     return jsonify({"error": "URL não fornecida"}), 400
+
 
 
 # =======================================================
 # READ (1)
 # =======================================================
-@app.route('/pagamentos/<pagamento_id>', methods=['GET'])
+@app.route('/pagamentos/completo/<pagamento_id>', methods=['GET'])
 def get_pagamento(pagamento_id):
     pagamentos = pagamento_model.get_pagamento(pagamento_id)
 
@@ -873,19 +953,55 @@ def get_pagamento(pagamento_id):
         return jsonify({"erro": "Pagamento não encontrado"}), 404
 
 
-
+# =======================================================
+# READ (2)
+# =======================================================
 @app.route('/pagamentos/<payment_id>', methods=['GET'])
 def verificar_status_pagamento(payment_id):
-    # Aqui buscamos o pagamento específico no seu model
     pagamento = pagamento_model.get_pagamento_by_id(payment_id)
 
     if pagamento:
-        # Verifica se o status no banco é 'approved' ou 'pago'
-        # Ajuste 'status' conforme o nome da coluna no seu banco
-        return jsonify({"status": pagamento.get('status')}), 200
-    else:
-        return jsonify({"status": "not_found"}), 404
+        # Forçamos a conversão para string e pegamos o valor real
+        # Se for um objeto, usamos pagamento.status. Se dicionário, pagamento.get
+        status_raw = getattr(pagamento, 'status', None) or pagamento.get('status')
+        return jsonify({"status": str(status_raw).lower().strip()}), 200
+    
+    return jsonify({"status": "not_found"}), 404
+
       
+# =======================================================
+# READ (3)
+# =======================================================
+@app.route("/listar_pagamentos")
+def listar_pagamentos():
+
+    pagamentos = pagamento_model.get_all_pagamentos()
+     # Converte ObjectId para string
+    for n in pagamentos:
+        n["_id"] = str(n["_id"])
+
+
+    return jsonify({
+        "pagamentos": pagamentos,
+       
+    })
+
+
+# =======================================================
+#BILHETES
+# =======================================================
+@app.route("/cupons")
+def listar_bilhetes():
+
+    bilhetes = bilhete_model.get_all_bilhetes()
+     # Converte ObjectId para string
+    for n in bilhetes:
+        n["_id"] = str(n["_id"])
+
+
+    return jsonify({
+        "bilhetes": bilhetes, 
+    })
 
 
 # ================================================
@@ -952,24 +1068,9 @@ def delete_pagamento(pagamento_id):
 
 
 
-#DELETE NUMEROS USUARIO PELO ID
-# app.py
-@app.route("/numeros/<id>", methods=["DELETE"])
-def deletar_numero(id):
-    try:
-        deletado = numero_model.delete_numero(id)
-
-        if not deletado:
-            return jsonify({"erro": "Número não encontrado"}), 404
-
-        return jsonify({"msg": "Número deletado com sucesso"}), 200
-
-    except Exception as e:
-        print("ERRO DELETE:", e)
-        return jsonify({"erro": str(e)}), 500    
-
-
-
+# =======================================================
+# VENDEDORES
+# =======================================================
 @app.route("/vendedores", methods=["GET"])
 def listar_vendedor():
     try:
@@ -999,7 +1100,6 @@ def interface_login_vendedor():
 #===========================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    # socketio.start_background_task(background_tasks)
     socketio.run(
         app,
         host="0.0.0.0",
@@ -1009,160 +1109,18 @@ if __name__ == "__main__":
     )
 
 
-#@app.route("/notificacoes", methods=["POST"])
-# def handle_webhook():
-#     data = request.json
-#     if not data:
-#         return "", 200
-
-#     payment_id = data.get("data", {}).get("id") or data.get("id")
-#     if not payment_id:
-#         return "", 200
-
-#     payment_details = get_payment_details(payment_id)
-#     if not payment_details:
-#         return "", 200
-
-#     status = payment_details.get("status")
-#     usuario_id = payment_details.get("external_reference")
-    
-#     # Emite atualização via socket
-#     socketio.emit(
-#         "payment_update",
-#         {
-#             "status": status,
-#             "payment_id": str(payment_id),
-#             "usuario_id": usuario_id
-#         },
-#         room=str(payment_id)  # ou room=str(usuario_id), dependendo da lógica do front
-#     )
-
-#     # Atualiza no banco
-#     pagamento_model.update_pagamento(payment_id, {"status": status})
-#     # Calcular o total de numeros e status = "pending" for igual = ao valor pagamento approved atualiza o payment_id dos numeros e status = "approved" conforme valor approved 
-#     # atualizado = numero_model.atualizar_status(numero_id, novo_status)
-    
-    
 
 
-# @app.route("/payment_qrcode_pix/pagamento_pix/<id>")
-# def pagamento_pix(id):
-
-#     usuario_id = id
-
-#     nome = request.args.get("nome") or ""
-#     cpf = request.args.get("cpf") or ""
-#     email = request.args.get("email") or ""
-#     quantidade = int(request.args.get("quantidade") or 0)
-
-#     valor_total = round(quantidade * 0.05, 2)
-
-#     payment_data = {
-#         "transaction_amount": float(valor_total),
-#         "description": "Testar pg Producao",
-#         "payment_method_id": "pix",
-#         "payer": {
-#             "email": email,
-#             "first_name": nome,
-#             "last_name": "Cliente",
-#             "identification": {
-#                 "type": "CPF",
-#                 "number": cpf
-#             }
-#         },
-#         "external_reference": usuario_id,
-#         "notification_url": "https://ferrari-tech.onrender.com/notificacoes",
-#         "statement_descriptor": "FerrariTech"
-#     }
-
-#     try:
-#         response = sdk.payment().create(payment_data)
-#         mp = response.get("response", {})
-
-#         print("MP RESPONSE:", mp)
-
-#         if "id" not in mp:
-#             return f"ERRO MP: {mp}", 500
-
-#         payment_id = str(mp["id"])
-#         status = mp.get("status", "pending")
-
-#        # Aqui salva o pagamento gerados...... Mercado pago
-#         documento = criar_documento_pagamento(
-#             payment_id=payment_id,
-#             status=status,
-#             valor=valor_total,
-#             usuario_id=usuario_id,
-#             email_user=email
-#         )
-
-       
-#         try:
-#             PagamentoModel().create_pagamento(documento)
-#         except Exception as e:
-#             print("ERRO AO SALVAR:", e)
-
-        
-#         tx = mp.get("point_of_interaction", {}).get("transaction_data", {})
-
-#         qr_base64 = tx.get("qr_code_base64")
-#         qr_code = tx.get("qr_code")
-
-#         if not qr_base64 or not qr_code:
-#             return f"ERRO QR: {tx}", 500
-
-#         # Aqui vai atualizar numero.model o campo payment_id = ""    de todos com status = "pending" com a criacao do mesmo dia 
-
-
-#         return render_template(
-#             "finalize.html",
-#             qrcode=f"data:image/png;base64,{qr_base64}",
-#             valor=f"R$ {valor_total:.2f}",
-#             qr_code_cola=qr_code,
-#             status=status,
-#             payment_id=payment_id,
-#             usuario_id=usuario_id
-#         )
-
-#     except Exception as e:
-#         print("ERRO GERAL:", e)
-#         return f"ERRO GERAL: {str(e)}", 500
 
     
 
 
 
 
-# @socketio.on('connect')
-# def test_connect():
-#     print('Cliente conectado')
-
-
-# @socketio.on("join")
-# def on_join(data):
-#     usuario_id = data.get("usuario_id")
-#     if usuario_id:
-#         # Adiciona o cliente a uma "sala" específica
-#         from flask_socketio import join_room
-#         join_room(str(usuario_id))
-#         emit("joined", {"room": usuario_id})
-
-
-# def background_tasks():
-#     while True:
-#         time.sleep(10)
-#         socketio.emit('nova_mensagem', {'data': 'Nova mensagem recebida!'}, namespace='/')
-#         print("Mensagem emitida")
-
-# # Rodar em thread separada
-# thread = Thread(target=background_tasks)
-# thread.daemon = True
-# thread.start()    
 
 
 
 
-# Aqui Lista os Numeros e soma total 
 # @app.route("/numeros", methods=["GET"])
 # def listar_numeros():
 #     numeros = numero_model.get_all_numeros()
@@ -1184,45 +1142,101 @@ if __name__ == "__main__":
 #     })
 
 
-#==============================================================================
-# # SALVAR NUMEROS MONGODB 
-# @app.route("/numeros", methods=["POST"])
-# def salvar_numero():
-#     data = request.json or {}
-#     data_sort_str = data.get("dataSort", "10/05/2026")
 
-#     # pega da URL OU do body
-#     usuario_id = request.args.get("id") or data.get("usuario_id")
 
+
+
+
+# @app.route("/payment_qrcode_pix/pagamento_pix/<usuario_id>")
+# def pagamento_pix(usuario_id):
+
+#     import json
+
+#     lista_numeros = request.args.get("lista_numeros")
+
+#     if lista_numeros:
+#         lista_numeros = json.loads(lista_numeros)
+#     else:
+#         lista_numeros = []
+
+#     usuario_id = usuario_id or request.args.get("usuario_id")
 #     if not usuario_id:
 #         return jsonify({"erro": "usuario_id não informado"}), 400
 
-#     doc = {
-#         "usuario_id": str(usuario_id),
-#         "nome": data.get("nome"),
-#         "cpf": limpar_cpf(data.get("cpf")),
-#         "email": data.get("email"),
-#         "numero": data.get("numero"),
-#         "paymentId": data.get("paymentId", "aguardando gerar payment"),
-#         "valor": float(data.get("valor", 0.05)),
-#         "dataSort": datetime.strptime(data_sort_str, "%d/%m/%Y"),
-#         "premio": float(data.get("premio", 150.00)),
-#         "status": "pending",
-#         "criado_em": datetime.now(timezone.utc)
+#     nome = request.args.get("nome") or ""
+#     sobrenome = request.args.get("sobrenome") or ""
+#     cpf = request.args.get("cpf") or ""
+#     email = request.args.get("email") or ""
+#     lista_numeros = request.args.get("lista_numeros") or ""
+#     quantidade = int(request.args.get("quantidade") or 0)
+
+#     valor_total = round(quantidade * 0.05, 2)
+
+
+#     payment_data = {
+#         "transaction_amount": float(valor_total),
+#         "description": "Testar pg Producao",
+#         "payment_method_id": "pix",
+#         "payer": {
+#             "email": email,
+#             "first_name": nome,
+#             "last_name": sobrenome,
+#             "identification": {
+#                 "type": "CPF",
+#                 "number": cpf
+#             }
+#         },
+#         "external_reference": email,
+#         "notification_url": "https://ferrari-tech.onrender.com/notificacoes",
+#         "statement_descriptor": "FerrariTech"
 #     }
 
-#     _id = numero_model.create_numero(doc)
+#     try:
+#         response = sdk.payment().create(payment_data)
+#         mp = response.get("response", {})
 
-#     return jsonify({"id": _id})
+#         print("MP RESPONSE:", mp)
+
+#         if "id" not in mp:
+#             return f"ERRO MP: {mp}", 500
+
+#         payment_id = str(mp["id"])
+#         status = mp.get("status", "pending")
+
+#         # salva pagamento Mercado Pago
+#         documento = criar_documento_pagamento(
+#             payment_id=payment_id,
+#             status=status,
+#             valor=valor_total,
+#             cpf=cpf,
+#             email_user=email,
+#             lista_numeros=lista_numeros
+#         )
+
+#         try:
+#             PagamentoModel().create_pagamento(documento)
+#         except Exception as e:
+#             print("ERRO AO SALVAR:", e)
+
+#         tx = mp.get("point_of_interaction", {}).get("transaction_data", {})
+
+#         qr_base64 = tx.get("qr_code_base64")
+#         qr_code = tx.get("qr_code")
+
+#         if not qr_base64 or not qr_code:
+#             return f"ERRO QR: {tx}", 500
 
 
-        # ===============================================
-        # ATUALIZA TODOS NUMEROS PENDING DO MESMO USUARIO
-        # ===============================================
-        # try:
-        #     NumeroModel().atualizar_payment_em_lote(
-        #         cpf=cpf,
-        #         payment_id=payment_id
-        #     )
-        # except Exception as e:
-        #     print("ERRO AO ATUALIZAR NUMEROS:", e)
+#         return render_template(
+#             "finalize.html",
+#             qrcode=f"data:image/png;base64,{qr_base64}",
+#             valor=f"R$ {valor_total:.2f}",
+#             qr_code_cola=qr_code,
+#             status=status,
+#             payment_id=payment_id,
+#             cpf=cpf,
+#         )
+
+#     except Exception as e:
+#         print("ERRO GERAL:", e)
+#         return f"ERRO GERAL: {str(e)}", 500

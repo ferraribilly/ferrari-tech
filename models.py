@@ -23,7 +23,7 @@ PAGAMENTOS_COLLECTION_NAME = "pagamentos"
 BILHETES_COLLECTION_NAME = "bilhetes"
 users_collection = db["users"]
 vendedores_collection = db["vendedores"]
-bilhetes_collection = db["bilhetes"]
+
 
 
 
@@ -103,10 +103,17 @@ def criar_vendedor(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, emai
 
 #--------------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------------
-# PAGAMENTOS 
+# models.py trecho relacionado pagamentos 
+#  PAGAMENTOS 
+
 pagamentos_collection = db[PAGAMENTOS_COLLECTION_NAME]
 
-def criar_documento_pagamento(payment_id, status, valor, cpf, email_user, lista_numeros=None, data_criacao=None):
+
+def criar_documento_pagamento(payment_id, status, valor, cpf, email_user,
+                              lista_numeros=None,
+                              qr_code=None,
+                              qr_image_url=None,
+                              data_criacao=None):
 
     if data_criacao is None:
         data_criacao = datetime.now(timezone.utc)
@@ -117,18 +124,21 @@ def criar_documento_pagamento(payment_id, status, valor, cpf, email_user, lista_
         "valor": float(valor),
         "cpf": cpf,
         "email_usuario": email_user,
+        "qr_code": qr_code,
+        "qr_image_url": qr_image_url,
         "data_criacao": data_criacao,
         "data_atualizacao": None,
         "lista_numeros": lista_numeros or []
     }
 
+
 class PagamentoModel:
+
     def __init__(self):
         self.collection = pagamentos_collection
 
     def create_pagamento(self, data):
         try:
-            # 👇 evita erro de duplicado (_id já existe)
             existente = self.collection.find_one({"_id": data["_id"]})
             if existente:
                 return data["_id"]
@@ -169,14 +179,11 @@ class PagamentoModel:
             print("ERRO UPDATE:", e)
             return 0
 
-
     def get_pagamentos_by_usuario(self, usuario_id):
         docs = list(self.collection.find({"usuario_id": ObjectId(usuario_id)}))
         for d in docs:
             d["_id"] = str(d["_id"])
         return docs
-
-    
 
     def delete_pagamento(self, pagamento_id):
         try:

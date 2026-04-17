@@ -119,24 +119,10 @@
     <h1>Pagamento Aprovado!</h1>
     <p>Seu pagamento foi processado com sucesso. Obrigado pela sua compra!</p>
     <p>{{ id }}</p>
-    <a href="/dia_das_maes/{{ usuario_id}}" class="btn">Voltar à Loja</a>
+    <a href="/gerar_numeros/{{id}}" class="btn">Voltar à Loja</a>
 </div>
 
- <script>
-setTimeout(async () => {
-    await fetch("/pagamento_atualizado/{{ usuario_id }}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            status: "{{ valor }}"
-        })
-    });
-
-    window.location.href = "/dia_das_maes/{{ usuario_id }}";
-}, 5000);
-</script>
+ 
 
 </body>
 </html>

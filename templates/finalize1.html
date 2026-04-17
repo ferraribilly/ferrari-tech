@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">   
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/finalize.css') }}"> 
+    <title>Pagamento via Pix | </title>
+</head>
+<body>
+<main>
+    <div class="pix-container">
+        <div class="payment">
+            <p>Abra seu aplicativo de pagamento e escolha <b>Ler QR Code</b></p>
+            <span>Aponte a câmera do seu celular</span>
+            
+            <div class="qrcode-info">
+                <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1764290948/cellphone-icon_remhjc.svg" draggable="false">
+            </div>
+
+            <div class="qrcode">
+                <img src="{{ qrcode }}" alt="QR CODE">
+            </div>
+
+            <div class="pix-value">
+                <span style="font-family: monospace; font-weight: bold;">ID transação:</span>
+                <strong id="payment_id" style="color: brown; font-weight: bold;">{{ payment_id | default('') }}</strong>
+            </div>            
+
+            <div class="pix-value">
+                 <strong style="color: brown; font-weight: bold;">Dia das Maes</strong>
+            </div>
+           
+            <div class="pix-value">
+                <span style="font-family: monospace; font-weight: bold;">Valor Pagamento:</span>
+                <strong style="color: brown; font-weight: bold;">{{ valor }}</strong>
+            </div>
+
+             <strong id="status" style="color: brown; font-weight: bold;">{{ status }}</strong>
+            <div class="pix-copy-and-past">
+                <span>Você também pode pagar usando <b>Pix Copia e Cola</b>. Copie o código abaixo:</span>
+                <div class="qrcode-text">
+                    <img id="copy" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1764290949/copy-icon_z8ur77.svg" draggable="false">
+                    <div id="copied-code">Código copiado.</div>
+                    <p id="qrcode-text" data-usuario-id="{{ usuario_id }}">{{ qr_code_cola }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+
+ // Função para verificar o status
+  function verificarStatus() {
+    const statusEl = document.getElementById("status");
+    if (statusEl && statusEl.textContent.trim().toLowerCase() === "approved") {
+      window.location.href = "/success";
+    }
+  }
+
+  // Verifica imediatamente e a cada 1 segundo
+  verificarStatus();
+  setInterval(verificarStatus, 2000);
+
+// // Monitoramento Pagamento
+// const socket = io();
+
+// const pagamentoId = document.getElementById("payment_id")?.innerText?.trim();
+
+// if (pagamentoId) {
+//     socket.emit("iniciar_monitoramento", {
+//         pagamento_id: pagamentoId
+//     });
+
+//     socket.on("monitorando", (data) => {
+//         console.log("Monitorando pagamento:", data.id);
+//     });
+
+//     socket.on("pagamento_aprovado", (data) => {
+//         window.location.href = "/success";
+//     });
+// }
+
+
+document.getElementById('copy').addEventListener('click', copyText);
+// document.getElementById('copy-mobile').addEventListener('click', copyText);
+
+function copyText() {
+    var qrcodeText = document.getElementById('qrcode-text');
+    var copiedCodeBox = document.getElementById('copied-code');
+
+    navigator.clipboard.writeText(qrcodeText.textContent).then(function () {
+        // Efeito de blur e mostrar mensagem
+        qrcodeText.style.filter = 'blur(1px)';
+        copiedCodeBox.style.visibility = 'visible';
+        copiedCodeBox.style.opacity = '0.9';
+        copiedCodeBox.style.transition = 'all 0.3s';
+
+        setTimeout(function () {
+            qrcodeText.style.filter = '';
+            copiedCodeBox.style.visibility = '';
+            copiedCodeBox.style.opacity = '';
+        }, 5000);
+
+    }, function (err) {
+        console.error('Erro ao copiar: ', err);
+    });
+}
+
+
+</script>
+</body>
+</html>
