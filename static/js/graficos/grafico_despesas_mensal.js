@@ -1,21 +1,82 @@
-const ctx1 = document.getElementById('despesasChart').getContext('2d');
+const ctx1 = document.getElementById('resumoFerrariTech').getContext('2d');
 
-// Dados simulados de despesas
 const data = {
-    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'], // Eixo X: Data/Mês
-    datasets: [{
-        label: 'Despesas (R$)',
-        data: [1200, 1500, 900, 2100, 0, 0, 0, 0, 0, 0, 0, 0], // Eixo Y: Valores
-        borderColor: 'rgb(75, 192, 192)',
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        tension: 0.3, // Suavidade da linha
-        fill: true,
-        pointBackgroundColor: 'rgb(75, 192, 192)',
-        pointRadius: 5
-    }]
+    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+
+    datasets: [
+
+        {
+            label: 'MONGODB (R$ 285)',
+            data: [0, 0, 0, 285, 0, 0, 0, 0, 0, 0, 0, 0],
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            tension: 0.3,
+            fill: true,
+            pointRadius: 5
+        },
+
+        {
+            label: 'CLOUDINARY (R$ 145)',
+            data: [0, 0, 0, 145, 0, 0, 0, 0, 0, 0, 0, 0],
+            borderColor: 'rgb(54, 162, 235)',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            tension: 0.3,
+            fill: true,
+            pointRadius: 5
+        },
+
+        // {
+        //     label: 'TAXA MP 0.99%',
+        //     data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        //     borderColor: 'rgb(75, 192, 192)',
+        //     backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        //     tension: 0.3,
+        //     fill: true
+        // },
+
+        // {
+        //     label: 'VENDEDORES 30%',
+        //     data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        //     borderColor: 'rgb(153, 102, 255)',
+        //     backgroundColor: 'rgba(153, 102, 255, 0.2)',
+        //     tension: 0.3,
+        //     fill: true
+        // },
+
+        {
+            label: 'RENDER',
+            data: [0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0],
+            borderColor: 'rgb(255, 206, 86)',
+            backgroundColor: 'rgba(255, 206, 86, 0.2)',
+            tension: 0.3,
+            fill: true
+        },
+
+
+
+        // {
+        //     label: 'IBS/CBS',
+        //     data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        //     borderColor: 'rgb(255, 87, 34)',
+        //     backgroundColor: 'rgba(255, 87, 34, 0.2)',
+        //     tension: 0.3,
+        //     fill: true
+        // },
+
+        // // 🔥 NOVO: INVESTIMENTO PREMIAÇÃO
+        // {
+        //     label: 'INVESTIMENTO PREMIAÇÃO',
+        //     data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        //     borderColor: 'rgb(233, 30, 99)',
+        //     backgroundColor: 'rgba(233, 30, 99, 0.2)',
+        //     tension: 0.3,
+        //     fill: true,
+        //     pointRadius: 5
+        // }
+
+    ]
 };
 
-// Configurações do gráfico
 const config = {
     type: 'line',
     data: data,
@@ -34,5 +95,4 @@ const config = {
     }
 };
 
-// Renderizar o gráfico
 const despesasChart = new Chart(ctx1, config);

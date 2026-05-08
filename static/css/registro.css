@@ -1,16 +1,27 @@
+html, body {
+    overscroll-behavior-y: none;
+}
+  
     body {
         margin: 0;
         top: 0;
-        background:#000 ;
+        background-image:url('../img/Screenshot_20260420_181140_Instagram.jpg');
         background-repeat: no-repeat;
         background-size: cover;
         overflow-y: auto;
         background-position: center;
-        height: 100dvh;
-        width: 100vw;
     }
 
-     /* Fundo escurecido */
+   #estado {
+    height: 38px; /* Altura padrão do Bootstrap */
+    border-radius: 5px; /* Ajuste para combinar com seus inputs */
+    color: #6c757d; /* Cor do texto placeholder */
+}
+
+#estado option {
+    color: #000; /* Cor das opções após abrir */
+}
+
   .overlay {
     position: fixed;
     top: 0; left: 0;

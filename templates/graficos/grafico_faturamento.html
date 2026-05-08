@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="theme-color" content="#36a2eb">    
+    <title>Resumo Financeiro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/graficos.css') }}">
+    <style>
+
+    </style>
+</head>
+
+<body>
+                  <!-- Botão flutuante -->
+        <a href="/销售">
+            <button class="help-btn" id="helpBtn">⬅️</button>
+        </a>
+        <h1 style="font-family: monospace; color: chocolate;">📊 Faturamento</h1>
+
+    <div class="cards">
+        <div class="card faturamento">
+            <h2 style="font-family: monospace; color: #f5f905;">Bruto</h2>
+            <p>R$<span style="color: yellowgreen;"> {{ "%.2f"|format(resumo.faturamento) }}</span></p>
+        </div>
+    </div>
+<div class="cards">
+        <div class="chart-container">
+        <h2 style="font-family: monospace; color: #f5f905;">🚀Faturamentos</h2>
+        <canvas id="faturamentoChart"></canvas>
+        <h2 style="font-family: monospace; color: #2ef905;">🚀Pagamentos Aprovados</h2>
+       <canvas id="graficoPagamentos"></canvas>
+        </div>
+        </div>
+
+          <div class="table-container">
+  <h2 style="text-decoration: underline; margin:20px; font-family: monospace; color: #f5f108;">Planilha Acompanhamento Faturamento</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th style="color: #ffffff; font-weight: bold;">Data</th>
+                <th style="color: #ffffff; font-weight: bold;">Hora</th>
+                <th style="color: #ffffff; font-weight: bold;">Valor</th>
+                <th style="color: #ffffff; font-weight: bold;">Taxa Merc. Pago 0,99%</th>
+                <th style="color: #ffffff; font-weight: bold;">Comissão Vendedores 30%</th>
+                <th style="color: #ffffff; font-weight: bold;">Lucro</th>
+               
+                
+
+
+            </tr>
+        </thead>
+            {% for u in pagamentos %}
+        <tbody>
+            <tr>
+                <td style="color: #f5f108; font-weight: bold; "></td>
+                <td style="color: #265ddc; font-weight: bold; "></td>
+                <td style="color: #265ddc; font-weight: bold; "></td>
+                <td style="color: #f70707e5; font-weight: bold; "></td>
+                <td style="color: #f79103e5; font-weight: bold; "></td>
+                <td style="color: #f79103e5; font-weight: bold; "></td>
+ 
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+</div>
+<script>
+    const resumo = {{ resumo|tojson }};
+</script> 
+
+<script src="../../static/js/graficos/grafico_faturamento.js"></script>
+<script>
+ async function carregarGrafico() {
+            const resp = await fetch("/dados");
+            const data = await resp.json();
+
+            const ctx_pagamentos = document.getElementById("graficoPagamentos").getContext("2d");
+            new Chart(ctx_pagamentos, {
+                type: "bar",
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: "Valor (R$)",
+                        data: data.valores,
+                        backgroundColor: "rgba(75, 192, 192, 0.6)",
+                        borderColor: "rgba(75, 192, 192, 1)",
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+        carregarGrafico();
+</script>
+</body>
+</html>

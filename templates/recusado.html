@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Recusado</title>
+    <!-- Adicionando ícones do Font Awesome -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <style> 
+        /* Reset básico para garantir consistência */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f4f7f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px; /* Largura máxima do card */
+}
+
+.card-recusado {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.icone-erro {
+    font-size: 80px;
+    color: #e74c3c; /* Vermelho */
+    margin-bottom: 20px;
+}
+
+h1 {
+    color: #333;
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+
+p {
+    color: #666;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.detalhe {
+    font-weight: bold;
+    color: #444;
+    margin-bottom: 30px;
+}
+
+.acoes {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.btn {
+    text-decoration: none;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+.btn-tente {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-tente:hover {
+    background-color: #c0392b;
+}
+
+.btn-voltar {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.btn-voltar:hover {
+    background-color: #e0e0e0;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 480px) {
+    .card-recusado {
+        padding: 25px;
+    }
+    
+    h1 {
+        font-size: 24px;
+    }
+    
+    .icone-erro {
+        font-size: 60px;
+    }
+}
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card-recusado">
+            <div class="icone-erro">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <h1>Pagamento Recusado</h1>
+            <p>Infelizmente, não conseguimos processar o seu pagamento.</p>
+            <p class="detalhe">Por favor, verifique os saldo ou tente outro método de pagamento.</p>
+            
+            <div class="acoes">
+                <a href="/" class="btn btn-tente">Tentar Novamente</a>
+                
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+        <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta name="viewport" content="widhth=device-width, user-scalable=yes, initial-scale=1.0, maximum-scale=10,  minimum-scale=1.0" />
+        <meta name="theme-color" content="#fff">
+        <title>Sala Online - Ferrari Tech</title>
+        <link rel="apple-touch-icon" href="{{ url_for('static', filename='w.png') }}">
+        <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/sala_online.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/motorola-g5-536_largura_360px.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/sansung-a35.css') }}">        
+        <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
+
+</head>
+<body>
+    <!-- Botão flutuante -->
+<button class="help-btn" id="helpBtn">❔️</button>
+<div class="modal-overlay" id="helpModal">
+    
+    <!-- CARD PRINCIPAL -->
+    <div class="modal-card" id="mainCard">
+        <button class="close-btn" id="closeModal">&times;</button>
+        
+
+        <ul class="help-options">     
+
+            <!-- VIDEO -->
+            <li id="openVideo" class="item-icon video">
+                <span  style="color: #000; font-size: 22px;">Video Orientação</span>
+            </li>
+
+            <!-- WHATSAPP -->
+            <li class="item-icon whatsapp">
+                <a href="https://wa.me/5527998031796?text=Preciso%20de%20suporte%20Por%20Favor%20Usuario%20ID%20:%20{{usuario_id}}%20{{projetos}}" target="_blank">
+                    <span style="color: #000; font-size: 22px;">Suporte WhatsApp</span>
+                </a>
+            </li>
+            <!--  -->
+            <li class="item-icon whatsapp">
+                <a href="#" target="_blank">
+                    <span style="color: #000; font-size: 22px;">Ver Bilhetes</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- CARD VIDEO -->
+    <div class="modal-card" id="videoCard" style="display:none;">
+        <button class="close-btn" id="backToMenu">&larr;</button>
+        <h3 style="color: #000;">Orientação Sorteio</h3>
+
+    <iframe
+    src="https://player.cloudinary.com/embed/?cloud_name=dptprh0xk&public_id=projetos%2Fvideo_instrucao_ojoxqk"
+    width="640"
+    height="360" 
+    style="height: auto; width: 100%; aspect-ratio: 640 / 360;"
+    allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+    allowfullscreen
+    frameborder="0"
+    ></iframe>
+    </div>
+
+</div>
+<div class="container">
+     <div class="barra">
+        <div class="progress-bar"></div>
+    </div>
+    <span class="bingo" onclick="verificar();"></span>
+    <div>
+    <img class="img" src="/static/img/marca.png" /></a>
+        </div>
+    <span class="bola" >
+        <span class="numero_sorteado" id="mostrar_num"></span>
+    </span>
+    <input type="hidden" id="final" value="" />
+    <table border="0" class="tabela" >
+        <tr>
+            <td class="td"><span class="bolinha2" value="1"><span class="transparente">1</span></td>
+            <td class="td"><span class="bolinha2" value="2"><span class="transparente">2</span></span></td>
+            <td class="td"><span class="bolinha2" value="3"><span class="transparente">3</span></span></td>
+            <td class="td"><span class="bolinha2" value="4"><span class="transparente">4</span></span></td>
+            <td class="td"><span class="bolinha2" value="5"><span class="transparente">5</span></span></td>
+            <td class="td"><span class="bolinha2" value="6"><span class="transparente">6</span></span></td>
+            <td class="td"><span class="bolinha2" value="7"><span class="transparente">7</span></span></td>
+            <td class="td"><span class="bolinha2" value="8"><span class="transparente">8</span></span></td>
+            <td class="td"><span class="bolinha2" value="9"><span class="transparente">9</span></span></td>
+            <td class="td"><span class="bolinha" value="10"><span class="transparente">10</span></span></td>
+        </tr>
+        <tr>
+            <td class="td"><span class="bolinha" value="11"><span class="transparente">11</span></span></td>
+            <td class="td"><span class="bolinha" value="12"><span class="transparente">12</span></span></td>
+            <td class="td"><span class="bolinha" value="13"><span class="transparente">13</span></span></td>
+            <td class="td"><span class="bolinha" value="14"><span class="transparente">14</span></span></td>
+            <td class="td"><span class="bolinha" value="15"><span class="transparente">15</span></span></td>
+            <td class="td"><span class="bolinha" value="16"><span class="transparente">16</span></span></td>
+            <td class="td"><span class="bolinha" value="17"><span class="transparente">17</span></span></td>
+            <td class="td"><span class="bolinha" value="18"><span class="transparente">18</span></span></td>
+            <td class="td"><span class="bolinha" value="19"><span class="transparente">19</span></span></td>
+            <td class="td"><span class="bolinha" value="20"><span class="transparente">20</span></span></td>
+        </tr>
+        <tr>
+            <td class="td"><span class="bolinha" value="21"><span class="transparente">21</span></span></td>
+            <td class="td"><span class="bolinha" value="22"><span class="transparente">22</span></span></td>
+            <td class="td"><span class="bolinha" value="23"><span class="transparente">23</span></span></td>
+            <td class="td"><span class="bolinha" value="24"><span class="transparente">24</span></span></td>
+            <td class="td"><span class="bolinha" value="25"><span class="transparente">25</span></span></td>
+            <td class="td"><span class="bolinha" value="26"><span class="transparente">26</span></span></td>
+            <td class="td"><span class="bolinha" value="27"><span class="transparente">27</span></span></td>
+            <td class="td"><span class="bolinha" value="28"><span class="transparente">28</span></span></td>
+            <td class="td"><span class="bolinha" value="29"><span class="transparente">29</span></span></td>
+            <td class="td"><span class="bolinha" value="30"><span class="transparente">30</span></span></td>
+        </tr>
+        <tr>
+            <td class="td"><span class="bolinha" value="31"><span class="transparente">31</span></span></td>
+            <td class="td"><span class="bolinha" value="32"><span class="transparente">32</span></span></td>
+            <td class="td"><span class="bolinha" value="33"><span class="transparente">33</span></span></td>
+            <td class="td"><span class="bolinha" value="34"><span class="transparente">34</span></span></td>
+            <td class="td"><span class="bolinha" value="35"><span class="transparente">35</span></span></td>
+            <td class="td"><span class="bolinha" value="36"><span class="transparente">36</span></span></td>
+            <td class="td"><span class="bolinha" value="37"><span class="transparente">37</span></span></td>
+            <td class="td"><span class="bolinha" value="38"><span class="transparente">38</span></span></td>
+            <td class="td"><span class="bolinha" value="39"><span class="transparente">39</span></span></td>
+            <td class="td"><span class="bolinha" value="40"><span class="transparente">40</span></span></td>
+        </tr>
+        <tr>
+            <td class="td"><span class="bolinha" value="41"><span class="transparente">41</span></span></td>
+            <td class="td"><span class="bolinha" value="42"><span class="transparente">42</span></span></td>
+            <td class="td"><span class="bolinha" value="43"><span class="transparente">43</span></span></td>
+            <td class="td"><span class="bolinha" value="44"><span class="transparente">44</span></span></td>
+            <td class="td"><span class="bolinha" value="45"><span class="transparente">45</span></span></td>
+            <td class="td"><span class="bolinha" value="46"><span class="transparente">46</span></span></td>
+            <td class="td"><span class="bolinha" value="47"><span class="transparente">47</span></span></td>
+            <td class="td"><span class="bolinha" value="48"><span class="transparente">48</span></span></td>
+            <td class="td"><span class="bolinha" value="49"><span class="transparente">49</span></span></td>
+            <td class="td"><span class="bolinha" value="50"><span class="transparente">50</span></span></td>
+        </tr>
+        <tr>
+            <td class="td"><span class="bolinha" value="51"><span class="transparente">51</span></span></td>
+            <td class="td"><span class="bolinha" value="52"><span class="transparente">52</span></span></td>
+            <td class="td"><span class="bolinha" value="53"><span class="transparente">53</span></span></td>
+            <td class="td"><span class="bolinha" value="54"><span class="transparente">54</span></span></td>
+            <td class="td"><span class="bolinha" value="55"><span class="transparente">55</span></span></td>
+            <td class="td"><span class="bolinha" value="56"><span class="transparente">56</span></span></td>
+            <td class="td"><span class="bolinha" value="57"><span class="transparente">57</span></span></td>
+            <td class="td"><span class="bolinha" value="58"><span class="transparente">58</span></span></td>
+            <td class="td"><span class="bolinha" value="59"><span class="transparente">59</span></span></td>
+            <td class="td"><span class="bolinha" value="60"><span class="transparente">60</span></span></td>
+        </tr>
+
+        <tr><td colspan="10"></td></tr>
+        <tr>
+           <td colspan="10" class="texto">
+            <div>🚀bolas sorteadas</div>
+           </td>
+        </tr>
+        <tr>
+            <td class="infoBolas" colspan="2"><div class="ultimasbolas"><div class="ultimas" id="ultimo">&nbsp</div></div></td>
+            <td class="infoBolas" colspan="2"><div class="ultimasbolas2"><div class="ultimas" id="penultimo" ></div></div></td>
+            <td class="infoBolas" colspan="2"><div class="ultimasbolas3"><div class="ultimas" id="antepenultimo" ></div></div></td>
+            <td class="infoBolas" colspan="2"><div class="ultimasbolas4"><div class="ultimas" id="anteantepenultimo" ></div></div></td>
+          
+        </tr>
+        <tr>
+
+    
+    <!-- <button onclick="shoot()">Ativar 🎉</button> -->
+        <tr>
+            <td colspan="10">
+            <!-- <button id="confetti-button">🥳 Comemorar!</button> -->
+        </td>
+    </tr>
+<tr>
+    
+    <td style="background-color: rgb(0, 0, 16); padding: 0;" colspan="10" class="texto">
+    <strong style="color: chartreuse; font-size: 22px;">Participantes Entrou Sala</strong>    
+<div id="vencedor" class="chat-simulado">
+
+    {% for b in bilhetes %}
+
+    <div class="user-entry">
+
+        <img src="{{ b.lista_urls_img_bilhetes[0] }}" class="perfil"
+             onclick="abrirImagem(this.src)">
+
+        <span  class="nome">{{ b.nome_usuario }}</span>
+
+        <span  class="cidade">{{ b.payment_id}}</span>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+<div id="modalImg" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:9999;">
+  <img id="imgExpandida" style="max-width:90%; max-height:90%; border-radius:10px;">
+</div>
+    </td>
+</tr>
+        </tr>
+    </table>
+ 
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+<script>
+const socket = io('/sorteio');
+let historico = [];
+
+// --- PERSISTÊNCIA: Recupera números já salvos no banco ---
+// Convertendo explicitamente para garantir que o JS entenda como array
+const numerosIniciais = {{ projeto_principal.numeros_sorteados | tojson | safe if projeto_principal and projeto_principal.numeros_sorteados else '[]' }};
+
+function aplicarCores() {
+    document.querySelectorAll("#vencedor .user-entry").forEach((linha, index) => {
+        const cor = `hsl(${(index * 137) % 360}, 80%, 60%)`;
+        const tdNome = linha.querySelector(".nome");
+        const tdCidade = linha.querySelector(".cidade");
+        if (tdNome) {
+            tdNome.style.color = cor;
+            tdNome.style.fontWeight = "bold";
+        }
+        if (tdCidade) {
+            tdCidade.style.color = cor;
+            tdCidade.style.fontWeight = "bold";
+        }
+    });
+}
+
+// Função única para marcar a bolinha na tabela
+function marcarBolinhaNaTabela(num) {
+    // Busca pelo atributo value igual ao número (seja string ou número)
+    const bolas = document.querySelectorAll('.bolinha, .bolinha2');
+    bolas.forEach(el => {
+        if (el.getAttribute('value') == num) {
+            el.classList.remove('bolinha', 'bolinha2');
+            el.classList.add('marcado');
+        }
+    });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    aplicarCores();
+
+    if (numerosIniciais && numerosIniciais.length > 0) {
+        // Ordenamos para manter a lógica de histórico, mas marcamos todos
+        numerosIniciais.forEach(num => {
+            marcarBolinhaNaTabela(num);
+            historico.unshift(num); // Adiciona ao início do histórico
+        });
+
+        // Atualiza o visual do histórico (quadradinhos de baixo)
+        document.getElementById('ultimo').innerText = historico[0] || '';
+        document.getElementById('penultimo').innerText = historico[1] || '';
+        document.getElementById('antepenultimo').innerText = historico[2] || '';
+        document.getElementById('anteantepenultimo').innerText = historico[3] || '';
+        
+        // Mostra o último sorteado na bola grande
+        document.getElementById('mostrar_num').innerText = historico[0];
+    }
+});
+
+// Recebe novo número sorteado em tempo real
+socket.on('novo_numero', function(data) {
+    const num = data.numero;
+    document.getElementById('mostrar_num').innerText = num;
+
+    historico.unshift(num);
+    if(historico.length > 10) historico.pop();
+
+    setTimeout(() => {
+        marcarBolinhaNaTabela(num);
+
+        document.getElementById('ultimo').innerText = historico[0] || '';
+        document.getElementById('penultimo').innerText = historico[1] || '';
+        document.getElementById('antepenultimo').innerText = historico[2] || '';
+        document.getElementById('anteantepenultimo').innerText = historico[3] || '';
+    }, 1000);
+});
+
+socket.on('usuarios_atualizados', function(data) {
+    const container = document.getElementById('vencedor');
+    if(!container) return;
+    
+    container.innerHTML = '';
+    const vistos = new Set();
+    const usuariosUnicos = data.usuarios.filter(u => {
+        if (vistos.has(u.nome_usuario)) return false;
+        vistos.add(u.nome_usuario);
+        return true;
+    });
+
+    usuariosUnicos.forEach(b => {
+        const div = document.createElement('div');
+        div.classList.add('user-entry');
+        const imgUrl = (b.lista_urls_img_bilhetes && b.lista_urls_img_bilhetes.length > 0) 
+                       ? b.lista_urls_img_bilhetes[0] 
+                       : '/static/img/default-user.png';
+
+        div.innerHTML = `
+            <img src="${imgUrl}" class="perfil" onclick="abrirImagem(this.src)">
+            <span class="nome">${b.nome_usuario}</span>
+            <span class="cidade">${b.payment_id}</span>
+        `;
+        container.appendChild(div);
+    });
+    aplicarCores();
+});
+
+function abrirImagem(src) {
+    const modal = document.getElementById("modalImg");
+    const img = document.getElementById("imgExpandida");
+    if(modal && img) {
+        modal.style.display = "flex";
+        img.src = src;
+    }
+}
+
+const modalImg = document.getElementById("modalImg");
+if(modalImg) {
+    modalImg.onclick = function() { this.style.display = "none"; };
+}
+
+var audio = new Audio('/static/audio/confeite.mp3');
+var defaults = { spread: 360, ticks: 50, gravity: 0, decay: 0.94, startVelocity: 30, colors: ['FFE400','FFBD00','E89400','FFCA'] };
+
+function shoot() {
+    audio.play().catch(e => console.log("Audio esperando interação"));
+    confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+    confetti({ ...defaults, particleCount: 40, scalar: 1.2, shapes: ['star'] });
+}
+
+setTimeout(shoot, 500);
+</script>
+
+
+
+</html>
+
+
+
+
+
+
+
+
+
+

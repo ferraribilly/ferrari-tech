@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="theme-color" content="#36a2eb">
+    <title>Relatorio Bruto Vendas</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/graficos.css') }}">
+</head>
+
+<body>
+                      <!-- Botão flutuante -->
+        <a href="/fechamento">
+            <button class="help-btn" id="helpBtn">⬅️</button>
+        </a>
+        <h1 style="font-family: monospace;">🛍 Vendas</h1>
+
+        <div class="cards">
+        <div class="chart-container">
+        <h2>Desempenho de Vendas</h2>
+        <canvas id="vendedoresChart"></canvas>
+        <h2>Vendas e Comissão</h2>
+        <canvas id="financeChart"></canvas>
+        </div>
+        </div>
+
+
+  <div class="table-container">
+  <h2 style="text-decoration: underline; margin:20px; font-family: monospace; color: #540688;">Planilha Acompanhamento Vendas</h2>
+  <div class="filter-container">
+    
+  <label for="date-filter">Filtrar por Data:</label>
+  <input type="date" id="date-filter" name="date-filter" class="date-input">
+  <button type="submit" class="filter-btn">Aplicar</button>
+</div>
+    <table border="1">
+        <thead>
+            <tr>
+                <th style="color: #ffffff; font-weight: bold;">Nome</th>
+                <th style="color: #ffffff; font-weight: bold;">Total de Vendas</th>
+                <th style="color: #ffffff; font-weight: bold;"> % Comissão</th>
+                <th style="color: #ffffff; font-weight: bold;">Á Pagar</th>
+                <th style="color: #ffffff; font-weight: bold;">Pagto. Comissão</th>
+               
+                
+
+
+            </tr>
+        </thead>
+            {% for vendedor, dados in resumo.vendedores.items() %}
+        <tbody>
+            <tr>
+                <td style="color: #f5f108; font-weight: bold; ">{{ vendedor }}</td>
+                <td style="color: #02f73f; font-weight: bold; ">R$ {{ "%.2f"|format(dados.approved) }}</td>
+                <td style="color: #fefffde5; font-weight: bold; ">30%</td>
+                <td style="color: #fb0202e5; font-weight: bold; ">R$ 0.075</td>
+                <td style="color: #fb0202e5; font-weight: bold; ">
+                    <button style="border-radius: 8px;">Pagar</button>
+                </td>
+ 
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+</div>
+
+    <!-- 🔥 DADOS DIRETO DO FLASK -->
+    <script>
+        const vendedoresData = {{ resumo.vendedores | tojson }};
+    </script>
+
+<script src="../../static/js/graficos/grafico_vendas_vendedores.js"></script>
+</body>
+</html>

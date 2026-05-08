@@ -8,6 +8,38 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">   
     <link rel="stylesheet" href="{{ url_for('static', filename='css/finalize.css') }}"> 
     <title>Pagamento via Pix | </title>
+    <style> 
+       
+/* Isso centraliza o ícone dentro da div do QR Code */
+.qrcode {
+    position: relative; /* Referência para o ícone absoluto */
+    display: inline-flex; /* Ajusta o tamanho da div ao tamanho da imagem */
+    align-items: center;
+    justify-content: center;
+}
+
+.qr-icon {
+    position: absolute;
+    width: 100px; 
+    height: 100px;
+    padding: 4px;
+    border-radius: 8px;
+    
+    /* Garante a centralização exata */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Garante que a imagem do QR Code não mude de tamanho */
+.qrcode img:not(.qr-icon) {
+    display: block;
+    width: 250px; /* Ou o tamanho que você já estiver usando */
+    height: auto;
+}
+
+
+    </style>
 </head>
 <body>
 <main>
@@ -22,7 +54,13 @@
 
             <div class="qrcode">
                 <img src="{{ qrcode }}" alt="QR CODE">
+                <!-- <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778018729/mercado-pago_aycs9m.png" class="qr-icon"> -->
+                
             </div>
+            <div class="pix-value">
+                <span style="font-family: monospace; font-weight: bold;">ID transação:</span>
+                <strong id="usuario-id" style="color: brown; font-weight: bold;">{{ usuario_id }}</strong>
+            </div>                 
 
             <div class="pix-value">
                 <span style="font-family: monospace; font-weight: bold;">ID transação:</span>
@@ -51,66 +89,10 @@
     </div>
 </main>
 
-<!-- <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script> -->
+<script src="{{ url_for('static', filename='js/finalize1.js') }}"></script>
 <script>
 
- // Função para verificar o status
-  function verificarStatus() {
-    const statusEl = document.getElementById("status");
-    if (statusEl && statusEl.textContent.trim().toLowerCase() === "approved") {
-      window.location.href = "/success";
-    }
-  }
-
-  // Verifica imediatamente e a cada 1 segundo
-  verificarStatus();
-  setInterval(verificarStatus, 2000);
-
-// // Monitoramento Pagamento
-// const socket = io();
-
-// const pagamentoId = document.getElementById("payment_id")?.innerText?.trim();
-
-// if (pagamentoId) {
-//     socket.emit("iniciar_monitoramento", {
-//         pagamento_id: pagamentoId
-//     });
-
-//     socket.on("monitorando", (data) => {
-//         console.log("Monitorando pagamento:", data.id);
-//     });
-
-//     socket.on("pagamento_aprovado", (data) => {
-//         window.location.href = "/success";
-//     });
-// }
-
-
-document.getElementById('copy').addEventListener('click', copyText);
-// document.getElementById('copy-mobile').addEventListener('click', copyText);
-
-function copyText() {
-    var qrcodeText = document.getElementById('qrcode-text');
-    var copiedCodeBox = document.getElementById('copied-code');
-
-    navigator.clipboard.writeText(qrcodeText.textContent).then(function () {
-        // Efeito de blur e mostrar mensagem
-        qrcodeText.style.filter = 'blur(1px)';
-        copiedCodeBox.style.visibility = 'visible';
-        copiedCodeBox.style.opacity = '0.9';
-        copiedCodeBox.style.transition = 'all 0.3s';
-
-        setTimeout(function () {
-            qrcodeText.style.filter = '';
-            copiedCodeBox.style.visibility = '';
-            copiedCodeBox.style.opacity = '';
-        }, 5000);
-
-    }, function (err) {
-        console.error('Erro ao copiar: ', err);
-    });
-}
-
+ 
 
 </script>
 </body>

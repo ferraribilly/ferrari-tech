@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+   <meta charset="UTF-8">
+        <meta name="theme-color" content="#082c62">
+  <title>Visão Geral de Vendas - Ferrari Tech</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/grafico_geral_sistema.css') }}">
+  <style>
+
+
+  </style>
+</head>
+<body>
+  <!-- ✅ SEU HEADER (mantido) -->
+<header class="header1">
+  <a href="#" class="logo">FERRARI TECH</a>
+
+  <input type="checkbox" id="menu-bar">
+  <label for="menu-bar" class="menu-icon">&#9776;</label>
+
+  <nav class="navbar">
+    <ul>
+      <li><a style="font-weight: bold;" href="/extratos">EXTRATO</a></li>
+      <li><a style="font-weight: bold;" href="/clientes">CLIENTES</a></li>
+      <li><a style="font-weight: bold;" href="/vendedores">VENDEDORES</a></li>
+      <li><a style="font-weight: bold;" href="/controle_vendas">VENDAS</a></li>
+      <li><a style="font-weight: bold;" href="/projetos">PROJETOS</a></li>
+    </ul>
+  </nav>
+</header>
+  <header>
+    <h1>VISÃO GERAL DE SISTEMA - FERRARI TECH</h1>
+    <!-- <div class="filters">
+      <label>Ano:销售
+        <select>
+          <option>2026</option>
+          <option>2026</option>
+        </select>
+      </label>
+      <label>Mês:
+        <select>
+          <option>Jan</option><option>Fev</option><option>Mar</option>
+          <option>Abr</option><option>Mai</option><option>Jun</option>
+          <option>Jul</option><option>Ago</option><option>Set</option>
+          <option>Out</option><option>Nov</option><option>Dez</option>
+        </select>
+      </label>
+    </div> -->
+  </header>
+
+  <section class="metrics">
+    <!-- <div class="metric">
+    <h2 style="color:#fff;">Investimento</h2>
+        <p style="font-weight: bold; color: #a8ff05; font-size:18px;">
+        <span style="font-weight: bold; color:#fff; font-size:22px;">R$ </span>
+        {{ "{:,.2f}".format(resumo.investimento_premiacao).replace(",", "X").replace(".", ",").replace("X", ".") }}
+    </p>
+   </div>     -->
+
+    <div class="metric">
+      <h2 style="color:#fff;">Faturamento</h2>
+      <p style="font-weight: bold; font-size:18px;">
+        <span style="font-weight: bold; color:#fff; font-size:22px;">R$  </span>
+         {{ "%.2f"|format(resumo.faturamento) }}
+        </p>
+    </div>
+
+  
+
+    <div class="metric">
+    <h2 style="color:#fff;">Lucro</h2>
+    <p style="font-weight: bold; color: #a8ff05; font-size:18px;">
+        <span style="font-weight: bold; color:#fff; font-size:22px;">R$ </span>
+        {{ "{:,.2f}".format(resumo.lucro).replace(",", "X").replace(".", ",").replace("X", ".") }}
+    </p>
+</div>
+    <div class="metric"><h2 style="color:#fff;">Margem</h2><p id="margemValor" style="font-weight: bold; color: #ccc; font-size:22px;">0%</p></div>
+    <div class="metric"><h2 style="color:#fff;">Vendas</h2><p style="font-weight: bold; font-size:18px;"><span style="font-weight: bold; color:#fff; font-size:22px;">Qtd:</span> {{resumo.numeros_aprovados}}</p></div>
+
+  <div class="metric">
+    <h2 style="color:#fff;">Meta</h2>
+    <p style="font-weight: bold; color: #a8ff05; font-size:18px;">
+        <span style="font-weight: bold; color:#fff; font-size:22px;">Qtd:
+        {% for p in projetos %}
+        </span>
+         {{ p.quantidade }}
+    </p>
+    {% endfor %}
+</div>
+  </section>
+
+  <section class="charts">
+    <div class="chart">
+      <h3>🚀Faturamento por Mês</h3>
+      <canvas id="faturamentoMes"></canvas>
+    </div>
+    <div class="chart">
+      <h3>Margem por Mês</h3>
+      <canvas id="margemMes"></canvas>
+    </div>
+
+    
+    <div class="chart">
+      <h3>Resumo Ferrari tech</h3>
+      <canvas id="resumoFerrariTech"></canvas>
+    </div>
+    <div class="chart">
+      <h3>🚀Faturamento por Vendedores</h3>
+      <canvas id="faturamentoLoja"></canvas>
+    </div>
+    <div class="chart">
+      <h3>🚀Quantidade Vendido</h3>
+      <canvas id="faturamentoCategoria"></canvas>
+    </div>
+    <div class="chart">
+      <h3>🚀Desempenho de Vendas por Vendedores</h3>
+    <canvas id="vendedoresChart"></canvas>
+    </div>    
+
+  
+
+    <div class="chart">
+      <h3>🚀Usuarios Mais Comprou</h3>
+    <canvas id="usuariosChart"></canvas>
+    </div>         
+
+    <!-- <div class="chart">
+      <h3>🚀Usuarios Gostou ou Não Gostou </h3>
+    <canvas id="curtidasPagina"></canvas>
+    </div>             -->
+  </section>
+
+  <section class="analytics">
+
+<!-- VENDAS VENDEDORES -->
+<div class="analysis">
+  <h3>Análise de Vendas</h3>
+  <table border="1">
+    <tr>
+      <th style="background-color: rgb(14, 171, 0);">Vendedor</th>
+      <th style="background-color: rgb(14, 171, 0);">Total Vendas</th>
+    </tr>
+
+    {% for vendedor, dados in resumo.vendedores.items() %}
+      <tr>
+        <td>{{ vendedor }}</td>
+        <td>R$ {{ "%.2f"|format(dados.approved) }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+
+    
+
+<!-- COMISSAO VENDAS VENDEDORES -->
+
+<div class="analysis">
+
+  <h3>Análise de Comissão Vendas</h3>
+
+  <table border="1">
+
+    <tr>
+      <th style="background-color: rgb(0, 109, 243);">Vendedor</th>
+      <th style="background-color: rgb(0, 109, 243);">Faturamento Comissão</th>
+    </tr>
+
+    {% for vendedor, dados in resumo.vendedores.items() %}
+      <tr>
+        <td>{{ vendedor }}</td>
+        <td>R$ {{ "%.2f"|format(dados.comissao) }}</td>
+      </tr>
+    {% endfor %}
+
+  </table>
+
+</div>
+
+<!-- NUMEROS POR VENDEDOR -->
+
+<div class="analysis">
+
+  <h3>Análise Números Vendidos por Vendedor</h3>
+
+  <table border="1">
+
+    <tr>
+      <th style="background-color: rgb(255, 123, 0);">Vendedor</th>
+      <th style="background-color: rgb(255, 123, 0);">Quantidade</th>
+    </tr>
+
+    {% for vendedor, dados in resumo.vendedores.items() %}
+      <tr>
+        <td>{{ vendedor }}</td>
+        <td>{{ dados.numeros }}</td>
+      </tr>
+    {% endfor %}
+
+  </table>
+</div>
+
+<!-- USUARIOS MAIS COMPROU NUMEROS -->
+<div class="analysis">
+
+  <h3>Análise Usuário mais comprou</h3>
+
+  <table border="1">
+
+    <tr>
+      <th style="background-color: rgb(255, 123, 0);">Usuario</th>
+      <th style="background-color: rgb(255, 123, 0);">Quantidade</th>
+      <th style="background-color: rgb(255, 123, 0);">Vendedor</th>
+    </tr>
+      <tr>
+        <tr>
+    <td>{{ top_usuario.nome if top_usuario else "-" }}</td>
+    <td>{{ top_usuario.quantidade if top_usuario else 0 }}</td>
+    <td>{{ top_usuario.vendedor if top_usuario else "-" }}</td>
+    </tr>
+
+      </tr>
+  </table>
+</div>
+
+
+
+<!-- TAXAS MERCADO PAGO -->
+<div class="analysis">
+  <h3>% Taxas Mercado Pago</h3>
+  <table border="1">
+    <tr>
+      <th  style="background-color: red;">Descrição</th>
+      <th  style="background-color: red;">Total</th>
+    </tr>
+    <tr>
+      <td>Taxas (0,99%)</td>
+      <td  style="color: red;">R$ {{ "%.2f"|format(resumo.taxa_mp_total) }}</td>
+    </tr>
+  </table>
+</div>
+
+<!-- IMPOSTOS / FISCAL -->
+
+<div class="analysis">
+
+  <h3>📊 Impostos</h3>
+
+  <table border="1">
+
+    <tr>
+      <th style="background-color: red; color: #fff;">Descrição</th>
+      <th style="background-color: red; color: #fff;">Valor</th>
+    </tr>
+
+    <tr>
+      <td>Regime Atual</td>
+      <td>{{ resumo.fiscal.regime }}</td>
+    </tr>
+
+    <tr>
+      <td>CFOP (Produto Digital)</td>
+      <td>{{ resumo.fiscal.cfop_produto }}</td>
+    </tr>
+
+    <tr>
+      <td>Código Serviço</td>
+      <td>{{ resumo.fiscal.codigo_servico }}</td>
+    </tr>
+
+    <tr>
+      <td>Alíquota 2026 (Transição)</td>
+      <td>{{ "%.2f"|format(resumo.fiscal.aliquota_transicao_2026) }}%</td>
+    </tr>
+
+    <tr>
+      <td>Imposto 2026</td>
+      <td style="color: orange;">
+        R$ {{ "%.2f"|format(resumo.fiscal.imposto_transicao) }}
+      </td>
+    </tr>
+
+    <tr>
+      <td>Alíquota Futura</td>
+      <td>{{ "%.2f"|format(resumo.fiscal.aliquota_futura) }}%</td>
+    </tr>
+
+    <tr>
+      <td>Imposto Futuro (CBS + IBS)</td>
+      <td style="color: red;">
+        R$ {{ "%.2f"|format(resumo.fiscal.imposto_futuro) }}
+      </td>
+    </tr>
+
+  </table>
+</div>
+  <!-- DESPESAS INTERNAS -->
+<div class="analysis">
+
+  <h3>Análise Despesas "sujeito auteração"
+  </h3>
+
+  <table border="1">
+
+    <tr>
+      <th style="background:red;">MongoDB</th>
+      <th style="background:red;">Cloudinary</th>
+      <th style="background:red;">Render</th>
+      <th style="background:red;">Total</th>
+    </tr>
+      <tr>
+        <td>R$ 285,00</td>
+        <td>R$ 145,00</td>
+        <td>R$  35,00</td>
+        <td style="color:red; font-weight: bold;">R$ 465,00</td>
+      </tr>
+  </table>
+</div>
+
+
+
+
+<div class="analysis">
+  <h3>Resumo FERRARI TECH</h3>
+
+  <table border="1" style="width:100%; border-collapse: collapse;">
+    <tr>
+      <th style="background-color: red; color: #fff;">Descrição</th>
+      <th style="background-color: red; color: #fff; text-align: right;">Valor</th>
+    </tr>
+
+    <tr>
+      <td style="color:rgb(14, 171, 0)">+ Faturamento</td>
+      <td style="color:rgb(14, 171, 0); text-align: right; font-family: monospace;">
+        R$ {{ "{:,.2f}".format(resumo.faturamento).replace(",", "X").replace(".", ",").replace("X", ".") }}
+      </td>
+    </tr>
+
+    <tr>
+      <td>- Taxa Mercado Pago</td>
+      <td style="color: red; text-align: right; font-family: monospace;">
+        -R$ {{ "{:,.2f}".format(resumo.taxa_mp_total).replace(",", "X").replace(".", ",").replace("X", ".") }}
+      </td>
+    </tr>
+
+    <tr>
+      <td>- Comissão de Vendedores</td>
+      <td style="color: red; text-align: right; font-family: monospace;">
+        -R$ {{ "{:,.2f}".format(resumo.total_comissao if resumo.get('total_comissao') else 0).replace(",", "X").replace(".", ",").replace("X", ".") }}
+      </td>
+    </tr>
+
+    <tr>
+      <!-- <td>- Despesas</td>
+      <td style="color: red; text-align: right; font-family: monospace;">
+        -R$ 465,00
+      </td>
+    </tr> -->
+
+    <tr>
+      <td>- Investimento Premiação</td>
+      <td style="color: red; text-align: right; font-family: monospace;">
+        -R$ {{ "{:,.2f}".format(resumo.investimento_premiacao if resumo.get('investimento_premiacao') else 0).replace(",", "X").replace(".", ",").replace("X", ".") }}
+      </td>
+    </tr>
+
+    <tr>
+      <td>- Imposto Futuro (CBS + IBS)</td>
+      <td style="color: red; text-align: right; font-family: monospace;">
+        -R$ {{ "{:,.2f}".format(resumo.fiscal.imposto_futuro).replace(",", "X").replace(".", ",").replace("X", ".") }}
+      </td>
+    </tr>
+
+    <tr>
+      <td style="color:rgb(14, 171, 0)">= Lucro</td>
+      <td style="color:rgb(14, 171, 0); text-align: right; font-family: monospace;">
+        R$ {{ "{:,.2f}".format(resumo.lucro).replace(",", "X").replace(".", ",").replace("X", ".") }}
+      </td>
+    </tr>
+
+  </table>
+</div>
+    <!-- 🔥 DADOS DIRETO DO FLASK -->
+    <script>
+        const vendedoresData = {{ resumo.vendedores | tojson }};
+    </script>
+    <script>
+      const faturamentoMensal = {{ resumo.faturamento_mensal | tojson }};
+    </script>
+
+<script src="{{ url_for('static', filename='js/graficos/grafico_vendas_vendedores.js') }}"></script>
+<script src="{{ url_for('static', filename='js/graficos/grafico_despesas_mensal.js') }}"></script>
+<script src="{{ url_for('static', filename='js/graficos/grafico_usuarios_comprou.js') }}"></script>
+<script src="{{ url_for('static', filename='js/graficos/grafico_interacao_pagina.js') }}"></script>
+<script src="{{ url_for('static', filename='js/graficos/grafico_geral_sistema.js') }}"></script>
+</body>
+</html>

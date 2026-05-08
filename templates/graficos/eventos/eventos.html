@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventos da Semana</title>
+    <style> 
+        /* Estilos Gerais */
+        body { 
+            font-family: sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            top:0;
+            background: #000; 
+            color: #fff;
+        }
+
+        /* Header e Logo */
+        header {
+            width: 100%;
+            padding: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #052753;
+        }
+
+        .logo {
+            max-width: 250px; /* Ajuste o tamanho da sua logo aqui */
+            height: auto;
+        }
+
+        /* Container do Carrossel */
+        .carousel-container {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 15px;
+            padding: 20px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .carousel-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .carousel-item {
+            flex: 0 0 85%;
+            scroll-snap-align: center;
+            background-color: #080000;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            text-align: center;
+            padding: 20px;
+            /* border: 1px solid #222; */
+        }
+
+        .carousel-item img {
+            max-width: 80%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .content { padding: 15px 0; }
+
+        .btn-participar {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .btn-participar:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsividade Desktop */
+        @media (min-width: 768px) {
+            .carousel-item {
+                flex: 0 0 30%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="/static/img/marca.png" class="logo">
+</header>
+
+<div class="carousel-container">
+
+    {% for p in projetos %}
+
+    <div class="carousel-item">
+        <img src="{{ p.imagem_projeto or '' }}">
+        
+        <div class="content">
+            <h3>{{ p._id }}</h3>
+            <h3>{{ p.nome_projeto }}</h3>
+            <h3>Premiação: R$ <span style="color: rgba(246, 138, 5, 0.96);"> {{ p.valor_injetado_premiacao }}</span><strong style="color:green;"> Via Pix</strong></h3>
+
+            
+            <a href="/vitoria_visionaria/projeto-desenvolvimento-fase-teste/codigo_servico/1722/{{ usuario_id }}/{{ p._id }}" class="btn-participar">
+                Participar
+            </a>
+        </div>
+    </div>
+
+    {% endfor %}
+
+</div>

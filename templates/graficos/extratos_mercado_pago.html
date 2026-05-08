@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+   <meta charset="UTF-8">
+        <meta name="theme-color" content="#082c62">
+  <title>Visão Geral de Vendas - Ferrari Tech</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/grafico_geral_sistema.css') }}">
+  <style>
+/* --- Dropdown (Submenu) --- */
+.dropdown1 {
+    display: none;
+    position: absolute;
+    background-color: #0d0101;
+    min-width: 270px; 
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    padding: 0; 
+}
+
+.saque-btn {
+    padding: 6px 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 4px;
+    white-space: nowrap; /* 🔥 não quebra */
+}
+
+/* 🔥 botão confirmar */
+.btn-confirmar {
+    background-color: #28a745;
+    color: #fff;
+}
+
+/* 🔥 botão cancelar */
+.btn-cancelar {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* FORM */
+.form-saque {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    width: 260px;
+    background: #f0ecec;
+    border-radius: 20px;
+}
+
+.form-saque input {
+    padding: 6px;
+    border-radius: 4px;
+    border: none;
+}
+
+.form-saque button {
+    padding: 8px;
+    background: #0856a3;
+    color: rgb(255, 253, 253);
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* BOTÕES */
+.btn-modal {
+    width: 100%;
+    padding: 10px;
+    background: #222;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.analysis {
+    margin-bottom: 30px;
+}
+/* Container principal com Flexbox para responsividade */
+.filter-container {
+  display: flex;
+  flex-direction: column; /* Pilha os itens no mobile */
+  gap: 10px;
+  max-width: 300px; /* Largura máxima para desktop */
+  margin: 20px auto;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+}
+
+/* Estilização do Input de Data */
+.dados-input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  /* Garante que o input ocupe a largura total do container */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Estilização do Botão */
+.filter-btn {
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.filter-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Responsividade: Ajustes para telas maiores (Desktop) */
+@media (min-width: 600px) {
+  .filter-container {
+    flex-direction: row; /* Coloca os itens lado a lado */
+    max-width: 600px;
+    align-items: center;
+  }
+  
+  .dados-input {
+    flex-grow: 1; /* Input ocupa o espaço restante */
+  }
+}
+
+  </style>
+</head>
+<body>
+  <!-- ✅ SEU HEADER (mantido) -->
+<header class="header1">
+  <a href="#" class="logo">FERRARI TECH</a>
+
+  <input type="checkbox" id="menu-bar">
+  <label for="menu-bar" class="menu-icon">&#9776;</label>
+
+  <nav class="navbar">
+    <ul>
+      <li><a href="/graficos/resumo/sistema/detalhes">VOLTAR</a></li>
+    </ul>
+  </nav>
+</header>
+  <header>
+    
+    <h1> EXTRATO DE ENTRADAS E SAIDAS - FERRARI TECH</h1>
+
+</header>
+
+
+<div class="analysis">
+  
+    <table border="1">
+        <thead>
+            <tr>
+                <th style="color: #ffffff; font-weight: bold;"><span style="color: #0543fc;">(=)</span> Saldo anterior</th>
+                <th style="color: #ffffff; font-weight: bold;"><span style="color: #a8ff05;">(+)</span> Total Aprovado</th>
+                <th style="color: #fff7fe; font-weight: bold;"><span style="color: #fc9505;">(?)</span> Pendente</th>
+                <th style="color: #fbf8fb; font-weight: bold;"><span style="color: #ff0505;">(-)</span> Total Cancelado</th>
+                <th style="color: #f20303; font-weight: bold;"><span style="color: #ff0505;">(-)</span> Total Saques</th>
+                <th style="color: #f20303; font-weight: bold;"><span style="color: #ff0505;">(-)</span> Total Taxas</th>
+                <th style="color: #ffffff; font-weight: bold;"><span style="color: #0543fc;">(=)</span> Saldo Atual</th>
+
+            </tr>
+        </thead>
+
+        <tbody>
+           
+            <tr>
+                <td id="saldo-anterior" style="color: #ccde01; font-weight: bold;">R$ 0,00</td>
+                <td id="total-aprovado" style="color: #12ec8e; font-weight: bold;">R$ 0,00</td>
+                <td id= "total-pendente" style="color: #ccde01; font-weight: bold;">R$ 0,00</td>
+                <td id="total-cancelado" style="color:#ff0505; font-weight: bold;">R$ 0,00</td>
+                <td id="total-saques" style="color: #ff0505; font-weight: bold;">R$ 0,00</td>
+                <td id="taxa-mp" style="color: #ff0505; font-weight: bold;">R$ 0,00</td>
+                <td id="saldo-atual" style="color: #011fde; font-weight: bold;">R$ 0,00</td>                                                
+            </tr>
+           
+        </tbody>
+
+    </table>
+</div>
+
+
+  <div class="analysis">
+<div class="filter-container">
+        <label for="dados-filter">Filtrar por CPF:</label>
+        <input type="text" id="dados-filter" name="dados-filter" class="dados-input">
+        <button type="button" class="filter-btn" onclick="buscarDados()">Buscar</button>
+      </div>
+<table border="1">
+
+<thead>
+<tr>
+  <th style="background-color: #FF0000;">Identificação</th>
+  <th style="background-color: #FF0000;">Valor Saque</th>
+  <th style="background-color: #FF0000;">Descrição</th>
+  <th style="background-color: #FF0000;">Nome</th>  
+  <th style="background-color: #FF0000;">CPF</th>
+  <th style="background-color: #FF0000;">Email</th>
+  <th style="background-color: #FF0000;">Status</th>
+  <th style="background-color: #FF0000; text-align: center;">Ações</th>
+</tr>
+</thead>
+
+<tbody id="tabela-favorecido">
+<tr>
+  <td contenteditable="true"></td>
+  <td contenteditable="true"></td>
+  <td contenteditable="true"></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td>Saque</td>
+  
+<td style="text-align:center; white-space:nowrap;">
+  <button type="button" class="saque-btn btn-confirmar"  onclick="abrirModal('efetuandoSaque', this)">Confirmar</button>
+  <button type="button" class="saque-btn btn-cancelar" onclick="efetuandoSaque()">Cancelar</button>
+</td>
+  
+</tr>
+</tbody>
+</table>
+
+</div>
+
+
+
+
+    <!--EXTRATOS BANCARIO ENTRADAS E SAIDAS-->
+<div class="analysis">
+  <h3 style="text-align: center; font-family: monospace;">Movimentações Entradas e Saídas Conta Geral</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="background-color: #FF0000;">Identificação</th>
+        <th style="background-color: #FF0000;">Data</th>
+        <th style="background-color: #FF0000;">Hora</th>
+        <th style="background-color: #FF0000;">Descrição</th>
+        <th style="background-color: #FF0000;">Movimentações</th>
+        <th style="background-color: #FF0000;">Status</th>
+      </tr>
+    </thead>
+    <tbody id="extrato-body"></tbody>
+  </table>
+</div>
+</div>
+
+
+<div id="modalSenha" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+background:rgba(0,0,0,0.6); justify-content:center; align-items:center;">
+  <div style="background:#fff; padding:20px; border-radius:10px; width:300px; text-align:center;">
+    <h3>Confirmação</h3>
+    <input type="password" id="senhaInput" placeholder="Digite a senha"
+           style="width:90%; padding:8px; margin-top:10px;">
+    <button onclick="confirmarAcao()"
+            style="margin-top:10px; padding:8px 12px; background:blue; color:#fff; border:none; border-radius:5px;">
+      Confirmar
+    </button>
+    <button onclick="fecharModal()"
+            style="margin-top:10px; padding:8px 12px; background:gray; color:#fff; border:none; border-radius:5px;">
+      Cancelar
+    </button>
+  </div>
+</div>
+    <!-- 🔥 DADOS DIRETO DO FLASK -->
+
+    <!-- <script>
+      const faturamentoMensal = {{ resumo.faturamento_mensal | tojson }};
+    </script> -->
+
+<!-- <script src="../static/js/graficos/extratos_mercado_pago.js"></script>   -->
+<script src="{{ url_for('static', filename='js/graficos/extratos_mercado_pago.js') }}"></script>
+<script src="{{ url_for('static', filename='js/graficos/saques_projeto.js') }}"></script>
+
+<script>
+async function buscarDados() {
+  const cpf = document.getElementById("dados-filter").value;
+
+  if (!cpf) {
+    alert("Informe o CPF");
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/clientes/vendedores/saque?cpf=${cpf}`);
+    const dados = await response.json();
+
+    if (dados.error) {
+      alert(dados.error);
+      return;
+    }
+
+    const linha = document.querySelector("#tabela-favorecido tr");
+    const colunas = linha.querySelectorAll("td");
+
+    // 🔹 chave pix (NÃO sobrescreve mais)
+    const chavePix = dados.chavePixVendedor || dados.chavePixUsuario || "";
+    colunas[0].innerText = chavePix;
+
+    // 🔹 dados (prioridade usuário, fallback vendedor)
+    colunas[3].innerText = dados.nomeUsuario || dados.nomeVendedor || "";
+    colunas[4].innerText = dados.cpf || "";
+    colunas[5].innerText = dados.emailUsuario || dados.emailVendedor || "";
+
+    linha.setAttribute("data-pix", chavePix);
+
+  } catch (err) {
+    alert("Erro ao buscar dados do cliente.");
+  }
+}
+</script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Checkout Bricks CardPayment Integration</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Pagamentos/index.css') }}" />
+</head>
+<body>
+
+<input id="mercado-pago-public-key" value="{{ public_key }}" type="hidden"/>
+
+<main>
+
+  <!-- CART -->
+  <section class="shopping-cart dark">
+    <div class="container container__cart">
+      <div class="block-heading">
+        <h2>Carrinho de compras</h2>
+        <p>Mercado Pago Card Payment Brick Integration</p>
+      </div>
+
+      <div class="content">
+        <div class="row">
+          <div class="col-md-12 col-lg-8">
+            <div class="items">
+              {% for b in bilhetes %}
+              <div class="product">
+                <div class="info">
+                  <div class="product-details">
+                    <div class="row justify-content-md-center">
+                      <div class="col-md-3">
+                        <img class="img-fluid mx-auto d-block image"
+                             src="{{ b.lista_urls_img_bilhetes[0] if b.lista_urls_img_bilhetes else '' }}">
+                      </div>
+                      <div class="col-md-5 product-detail">
+                        <h5>{{ b.nome_produto or "Servico Digital" }}</h5>
+                        <p>
+                          <b>Número:</b> {{ b.lista_numeros[0] if b.lista_numeros else '' }}<br/>
+                          <b>Status:</b> {{ b.status }}<br/>
+                          <b>Valor:</b> <span class="unit-price">{{ b.valor }}</span>
+                        </p>
+                        <label>Qtd:</label>
+                        <input type="number" class="quantity" value="1" min="1" class="form-control" style="width:80px;" disabled>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="col-md-12 col-lg-4">
+            <div class="summary">
+              <h3>Cart</h3>
+              <div class="summary-item">
+                <span class="text">Pendentes</span>
+                <span class="price">{{ bilhetes|length }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="text">Total</span>
+                <span class="price" id="cart-total"></span>
+              </div>
+              <button class="btn btn-primary btn-lg btn-block" id="checkout-btn">
+                Checkout
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAYMENT -->
+  <section class="payment-form dark">
+    <div class="container__payment">
+      <div class="block-heading">
+        <h2>Card Payment</h2>
+        <p>Mercado Pago Card Payment Brick Integration</p>
+      </div>
+
+      <div class="form-payment">
+        <div class="products">
+          <h2 class="title">Summary</h2>
+          <div class="item">
+            <span class="price" id="summary-price"></span>
+            <p class="item-name">Preço unitário</p>
+          </div>
+          <div class="item">
+            <span class="price" id="summary-quantity"></span>
+            <p class="item-name">Quantidade</p>
+          </div>
+          <div class="total">
+            Total <span class="price" id="summary-total"></span>
+          </div>
+
+          <input type="hidden" id="amount" />
+          <input type="hidden" id="description" />
+        </div>
+
+        <div id="mercadopago-bricks-contaner__PaymentCard"></div>
+        <a id="go-back">Voltar</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="shopping-cart dark">
+    <div class="container container__result">
+      <div class="block-heading">
+        <h2>Payment Result</h2>
+      </div>
+      <div class="content">
+        <div class="items product info product-details">
+          <div class="row justify-content-md-center">
+            <div class="col-md-4 product-detail">
+              <div class="product-info">
+                <p><b>ID:</b> <span id="payment-id"></span></p>
+                <p><b>Status:</b> <span id="payment-status"></span></p>
+                <p><b>Detail:</b> <span id="payment-detail"></span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer_logo">
+    <img id="horizontal_logo"
+         src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778018729/mercado-pago_aycs9m.png" />
+  </div>
+  <div class="footer_text">
+    <p>FERRARI TECH:</p>
+    <p>
+      <a href="https://www.mercadopago.com">
+        Mercado Pago API
+      </a>
+    </p>
+  </div>
+</footer>
+<script src="{{ url_for('static', filename='js/Pagamentos/index.js') }}" defer></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+<script>
+  const usuario_id = "{{ usuario_id }}";
+</script>
+
+
+
+</body>
+</html>

@@ -3,36 +3,132 @@
 <head>
   <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <meta name="theme-color" content="#36a2eb">
-        <title>Passatempo Pix Dia das Maes</title>
+        <meta name="theme-color" content="#020c1a">
+        <title>Ferrari Tech </title>
         <link rel="apple-touch-icon" href="{{ url_for('static', filename='w.png') }}">
         <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
         <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/gerar_numero.css') }}">
+<style> 
+     
+     .ultimasbolas, .ultimasbolas2, .ultimasbolas3, .ultimasbolas4{
+        position:relative;
+        color: white;
+        margin: 0 auto;
+        width:50px;
+        height:50px;
+        /* Sombra interna (brilho) + Sombra externa (projeção) */
+        box-shadow: 
+        inset -5px -5px 10px rgba(0,0,0,0.5), 
+        3px 5px 8px rgba(0,0,0,0.4);        
+        display:flex;
+        flex-flow: column;
+        align-items: center;
+        justify-content: center;
+        border:1px solid #ccc;
+        border-radius:100%;
+        font-family: sans, serif;
+        text-align: center;
+        font-weight: bold;
+        background: radial-gradient(circle at 30% 30%, #ff5722, #b71c1c); /* Efeito 3D na cor */
+        left:0px;
+        }
 
+     .input-numero{
+       padding:5px;
+       margin-top:8px;
+       border-radius:5px;
+     }
+
+     .td{
+        padding:3px;
+     }
+
+
+        /* Estilo do Botão Fechar */
+ .close-btn {
+  width: 32px;
+  height:32px;
+  font-size: 32px;
+  font-weight: bold;
+  background: none;
+  cursor: pointer;
+  color: #080000;
+  line-height: 1;
+  text-align: center;
+ }
+
+ .close-btn:hover {
+  color: #f00; /* Muda a cor para vermelho ao passar o mouse */
+ }
+
+      
+</style>
 </head>
 <body>
+  <button class="carrinho-btn" id="confirmBtn"></button>
+
   <header style="font-family: monospace; font-weight: bold;">
-    
+    <!-- O botão voltar aqui -->
+        <a href="javascript:history.back()" class="btn-voltar"></a>
+        
   </header>
   <div  class="container">
+    <h3 style="color:#fff; font-family: sans, serif; text-align: center;">GERADOR BILHETES <br>
+      <span>(N°) 1 atê 60</span>
+    </h3>
+<table border="0" id="formCompra" class="input-numero">
+    <tr>
+        <td class="texto"></td>
+    </tr>
+    <tr>
+        <td class="infoBolas" colspan="2">
+            <div class="ultimasbolas2">
+                <span class="numero" contenteditable="true"></span>
+                <div class="ultimas"></div>
+            </div>
+        </td>
 
-    <h3 style="color:#abe900; font-family: monospace;">TOTAL A PAGAR: R$ <span style="color: darkorange; font-family: monospace; font-size:22px; font-weight: bold;" id="total">0.00</span></h3>
-    <input id="formCompra" type="text" class="input-numero" maxlength="4" placeholder="(exemplo:0001)">
-    <button style="font-family: monospace;" class="btn-generate" onclick="gerarBilhete()">Gerar Bilhete</button>
+        <td class="infoBolas" colspan="2">
+            <div class="ultimasbolas2">
+                <span class="numero" contenteditable="true"></span>
+                <div class="ultimas"></div>
+            </div>
+        </td>
+
+        <td class="infoBolas" colspan="2">
+            <div class="ultimasbolas3">
+                <span class="numero" contenteditable="true"></span>
+                <div class="ultimas"></div>
+            </div>
+        </td>
+
+        <td class="infoBolas" colspan="2">
+            <div class="ultimasbolas4">
+                <span class="numero" contenteditable="true"></span>
+                <div class="ultimas"></div>
+            </div>
+        </td>
+    </tr>
+</table>
+    <h3 style="color:#abe900; font-family: sans, serif;">TOTAL Á PAGAR : <span style="color: darkorange; font-family: monospace; font-size:22px; font-weight: bold; background: #fff; border-radius: 8px;" id="total">R$ 0.00</span></h3>
+
+    <button style="font-family: sans, serif;" class="btn-generate" onclick="gerarBilhete()">GERAR BILHETE</button>
+  <p id="loading" style="display:none;">
+    ⏳ Processando bilhete.
+    <br>
+    <span class="linha2">aguarde.....</span>
+    <span id="dots"></span>
+</p>
     
-
-  
     <div class="cards" id="cards"></div>
   </div>
 
 <footer style="display: flex; gap: 10px; margin: 10px; padding: 10px; font-family: monospace;">
-  <button id="confirmBtn">Confirmar</button>
-  <!-- 
-   -->
+  
 </footer>
-<div class="modal" id="modal">
-  <div class="modal-content">
+
+<div style="display: none;">
     <h2>Confirmação dados</h2>
     
      <p style="color:#0e0000; font-weight: bold; font-family: monospace;">
@@ -64,35 +160,122 @@
       vendedor:
       <span  id="vendedor" style="color: #4a90e2;" >{{ usuario.vendedor }}</span>
     </p>
-
-    <p style="color:#0e0000; font-weight: bold; font-family: monospace;">
-    NUMEROS:
-</p>
-
-<div id="lista-numeros">
-    <span></span>
-    <span></span>
-    <span></span>
 </div>
 
-    <h2>Metodos Pagamentos</h2>
-    <div class="modal-buttons">
-      <button  class="purchase" id="btn-pagar">Metodo Pix Rapido</button>
-      <button class="purchase" id="btn-preference">Outros/mercado pago</button>
-      <button class="btn-cancel" id="cancelBtn">Cancelar</button>
+
+<div style="display: none;" class="modal" id="modal">
+        <div id="loading-pagamento" style="display:none;">
+        <span class="loader"></span>
+        <p>Gerando pagamento, aguarde...</p>
+        </div>
+    
+        <div class="carrinho">
+
+            <div class="topo">
+                <button id="closeBtn" class="voltar"></button>
+                <div class="titulo">Meus Bilhetes</div>
+            </div>
+
+            <!-- LISTA DINÂMICA -->
+            <div id="lista-numeros"></div>
+
+
+            <div class="total-bruto">
+            Total á Pagar: R$ <span style="font-size: 22px; color: blue;" id="total-bruto">0.00</span>
+            </div>
+
+            
+            <div class="linha-btn">
+            <img class="icon" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778015403/artpoin-logo-pix_tizueq.png">
+            <button class="purchase" id="btn-pagar">PAGAR PIX</button>
+            </div>
+
+            <div class="linha-btn">
+            <img class="icon" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778025827/pngwing.com_pkfnfu.png">
+            <a style="width: 100%;" href="/pagamento/cartao_credito/{{ usuario._id }}/{{ projeto_id }}">
+            <button class="purchase-card">Cartão Crédito</button>
+            </a>
+            </div>
+
+
+            <div style="display: none;" class="linha-btn">
+            <img class="icon" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778018729/mercado-pago_aycs9m.png">
+            <button class="purchase-preference" id="btn-preference">Preferências Mercado Pago</button>
+            </div>  
+            
+            <div style="display: none;" class="linha-btn">
+            <img class="icon" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778105576/5968365_rxpzyy.png">
+            <button class="purchase-preference" id="btn-pay-pal">Pay Pal</button>
+            </div>              
+
+
+
+            <div class="linha-btn">
+            <img class="icon" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1765238905/ticket_juifuh.png">
+            <button class="btn-cancel" id="cancelBtn">CANCELAR/BILHETES<br>deleta todos bilhetes</button>
+            </div>
+
+        </div>
     </div>
+</div>
+
+
+</div> 
+
+
+
+
+    
+
+
+ <div id="cancelandoOverlay" style="display:none;">
+    <div class="cancelando-box">
+        <div class="cancelando-anim"></div>
+        <div id="cancelandoTexto">Cancelando, aguarde</div>
+    </div>
+
+ </div>
     
   </div>
 </div>
 
-
-
-    <!-- SOCKET.IO CDN -->
-    
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script src="{{ url_for('static', filename='js/pagamento.js') }}"></script>
     <script src="{{ url_for('static', filename='js/numeros.js') }}"></script>
-    
+    <script src="{{ url_for('static', filename='js/overlay.js') }}"></script>
+<script> 
+document.querySelectorAll('.numero').forEach(el => {
 
+    el.addEventListener('beforeinput', (e) => {
+
+        if (e.data && /\D/.test(e.data)) {
+            e.preventDefault();
+            return;
+        }
+
+        if (e.inputType === 'insertText' && el.textContent.length >= 2) {
+            e.preventDefault();
+        }
+
+    });
+
+});
+
+
+const closeBtn = document.getElementById('closeBtn');
+const Modal = document.getElementById('modal');
+
+// Função para fechar o modal
+closeBtn.addEventListener('click', () => {
+  Modal.style.display = 'none';
+});
+
+// Fechar também ao clicar fora da caixa branca
+Modal.addEventListener('click', (e) => {
+  if (e.target === Modal) {
+    Modal.style.display = 'none';
+  }
+});
+
+</script>
 </body>
 </html>

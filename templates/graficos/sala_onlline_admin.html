@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0, maximum-scale=10, minimum-scale=1.0" />
+    <meta name="theme-color" content="#fff">
+    <title>Sala Online - Ferrari Tech</title>
+
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='w.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sala_online.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/motorola-g5-536_largura_360px.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/sansung-a35.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
+    <style> 
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+.container {
+    height: 100dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 250px; /* espaço do teclado */
+}
+    
+    </style>
+</head>
+
+<body>
+
+<!-- Botão flutuante -->
+<button class="help-btn"  onclick="dispararSorteio()">🔍</button>
+
+
+
+<div class="container">
+
+    <div class="barra">
+        <div class="progress-bar"></div>
+    </div>
+
+    
+
+    <div>
+        <img class="img" src="/static/img/marca.png" />
+    </div>
+
+    <!-- BOLA GRANDE -->
+    <span class="bola">
+        <span class="numero_sorteado" id="mostrar_num"></span>
+    </span>
+
+    <input type="hidden" id="final" value="" />
+
+    <table border="0" class="tabela">
+
+        <!-- 1 a 10 -->
+        <tr>
+            <td class="td"><span class="bolinha2 bola-num" id="b1"><span class="transparente">1</span></span></td>
+            <td class="td"><span class="bolinha2 bola-num" id="b2"><span class="transparente">2</span></span></td>
+            <td class="td"><span class="bolinha2 bola-num" id="b3"><span class="transparente">3</span></span></td>
+            <td class="td"><span class="bolinha2 bola-num" id="b4"><span class="transparente">4</span></span></td>
+            <td class="td"><span class="bolinha2 bola-num" id="b5"><span class="transparente">5</span></span></td>
+            <td class="td"><span class="bolinha2 bola-num" id="b6"><span class="transparente">6</span></span></td>
+            <td class="td"><span class="bolinha2 bola-num" id="b7"><span class="transparente">7</span></span></td>
+            <td class="td"><span class="bolinha2 bola-num" id="b8"><span class="transparente">8</span></span></td>
+            <td class="td"><span class="bolinha2 bola-num" id="b9"><span class="transparente">9</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b10"><span class="transparente">10</span></span></td>
+        </tr>
+
+        <!-- 11 a 20 -->
+        <tr>
+            <td class="td"><span class="bolinha bola-num" id="b11"><span class="transparente">11</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b12"><span class="transparente">12</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b13"><span class="transparente">13</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b14"><span class="transparente">14</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b15"><span class="transparente">15</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b16"><span class="transparente">16</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b17"><span class="transparente">17</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b18"><span class="transparente">18</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b19"><span class="transparente">19</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b20"><span class="transparente">20</span></span></td>
+        </tr>
+
+        <!-- 21 a 30 -->
+        <tr>
+            <td class="td"><span class="bolinha bola-num" id="b21"><span class="transparente">21</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b22"><span class="transparente">22</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b23"><span class="transparente">23</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b24"><span class="transparente">24</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b25"><span class="transparente">25</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b26"><span class="transparente">26</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b27"><span class="transparente">27</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b28"><span class="transparente">28</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b29"><span class="transparente">29</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b30"><span class="transparente">30</span></span></td>
+        </tr>
+
+        <!-- 31 a 40 -->
+        <tr>
+            <td class="td"><span class="bolinha bola-num" id="b31"><span class="transparente">31</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b32"><span class="transparente">32</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b33"><span class="transparente">33</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b34"><span class="transparente">34</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b35"><span class="transparente">35</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b36"><span class="transparente">36</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b37"><span class="transparente">37</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b38"><span class="transparente">38</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b39"><span class="transparente">39</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b40"><span class="transparente">40</span></span></td>
+        </tr>
+
+        <!-- 41 a 50 -->
+        <tr>
+            <td class="td"><span class="bolinha bola-num" id="b41"><span class="transparente">41</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b42"><span class="transparente">42</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b43"><span class="transparente">43</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b44"><span class="transparente">44</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b45"><span class="transparente">45</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b46"><span class="transparente">46</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b47"><span class="transparente">47</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b48"><span class="transparente">48</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b49"><span class="transparente">49</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b50"><span class="transparente">50</span></span></td>
+        </tr>
+
+        <!-- 51 a 60 -->
+        <tr>
+            <td class="td"><span class="bolinha bola-num" id="b51"><span class="transparente">51</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b52"><span class="transparente">52</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b53"><span class="transparente">53</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b54"><span class="transparente">54</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b55"><span class="transparente">55</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b56"><span class="transparente">56</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b57"><span class="transparente">57</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b58"><span class="transparente">58</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b59"><span class="transparente">59</span></span></td>
+            <td class="td"><span class="bolinha bola-num" id="b60"><span class="transparente">60</span></span></td>
+        </tr>
+
+        <tr>
+            <td colspan="10" class="texto">
+                🚀 {{ nome_projeto }}
+            </td>
+        </tr>
+
+        <!-- 4 ultimas -->
+        <tr>
+
+            <td class="infoBolas" colspan="2">
+                <div class="ultimasbolas">
+                    <div class="ultimas" id="ultimo"></div>
+                </div>
+            </td>
+
+            <td class="infoBolas" colspan="2">
+                <div class="ultimasbolas2">
+                    <div class="ultimas" id="penultimo"></div>
+                </div>
+            </td>
+
+            <td class="infoBolas" colspan="2">
+                <div class="ultimasbolas3">
+                    <div class="ultimas" id="antepenultimo"></div>
+                </div>
+            </td>
+
+            <td class="infoBolas" colspan="2">
+                <div class="ultimasbolas4">
+                    <div class="ultimas" id="anteantepenultimo"></div>
+                </div>
+            </td>
+
+        </tr>
+
+        <!-- teclado -->
+        <tr>
+
+            <td colspan="10">
+
+                <div style="margin:15px auto; text-align:center;">
+
+                    <input
+                        type="text"
+                        id="campoNumero"
+                        maxlength="2"
+                        style="
+                           color: rgb(244, 243, 243);
+                           border-radius: 50%;
+                           border: 1px solid #000;
+                           background: radial-gradient(circle at 30% 30%, #ff5722, #b71c1c); /* Efeito 3D na cor */
+                           /* Sombra interna (brilho) + Sombra externa (projeção) */
+                           box-shadow: 
+                           inset -5px -5px 10px rgba(0,0,0,0.5), 
+                           3px 5px 8px rgba(0,0,0,0.4);
+                           display: inline-flex;
+                           align-items: center;
+                           justify-content: center;
+                           text-align: center;
+                           font-weight: bold;
+                           width: 40px;
+                           height: 40px;
+                           font-size:1.3em;
+                           font-family: sans, serif;
+                        "
+                    >
+
+                    <div
+                        class="teclado"
+                        style="
+                            display:grid;
+                            grid-template-columns:repeat(3, 100px);
+                            gap:12px;
+                            justify-content:center;
+                            margin-top:30px;
+                        "
+                    >
+
+                        <button style="height:30px;" onclick="addNum(1)">1</button>
+                        <button style="height:30px;" onclick="addNum(2)">2</button>
+                        <button style="height:30px;" onclick="addNum(3)">3</button>
+
+                        <button style="height:30px;" onclick="addNum(4)">4</button>
+                        <button style="height:30px;" onclick="addNum(5)">5</button>
+                        <button style="height:30px;" onclick="addNum(6)">6</button>
+
+                        <button style="height:30px;" onclick="addNum(7)">7</button>
+                        <button style="height:30px;" onclick="addNum(8)">8</button>
+                        <button style="height:30px;" onclick="addNum(9)">9</button>
+
+                        
+                        <button style="height:30px;" onclick="addNum(0)">0</button>
+                        <button style="background:rgb(246, 206, 2); height:30px;" onclick="limpar()">C</button>
+                        <button style="background:green; height:30px;" onclick="apagar()">⌫</button>
+
+                        <button
+                            style="grid-column: span 3; background: blue; width: 100%; height: 50px; font-size: 1.2em; color: white; border-radius: 8px;"
+                            onclick="dispararSorteio()"
+                        >
+                            Sortear
+                        </button>
+
+                    </div>
+
+                    <div id="resultado"></div>
+
+                </div>
+
+            </td>
+
+        </tr>
+        <tr>
+    <td style="background-color: rgb(0, 0, 6); padding: 0;" colspan="10" class="texto">
+         <strong style="color: chartreuse;">Participantes Entrou Sala</strong>
+<div id="vencedor" class="chat-simulado">
+
+    {% for b in bilhetes %}
+
+    <div class="user-entry">
+
+        <img src="{{ b.lista_urls_img_bilhetes[0] }}" class="perfil"
+             onclick="abrirImagem(this.src)">
+
+        <span class="nome">{{ b.nome_usuario }}</span>
+
+        <span style="color: green;" class="cidade">{{ b.payment_id}}</span>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+<div id="modalImg" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:9999;">
+  <img id="imgExpandida" style="max-width:90%; max-height:90%; border-radius:10px;">
+</div>
+    </td>
+</tr>
+        </tr>
+    </table>
+ 
+
+</div>
+
+    </table>
+
+</div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+<script>
+const socket = io('/sorteio');
+let historico = []; // Alterado para let para permitir manipulação
+
+const campo = document.getElementById('campoNumero');
+const displayResultado = document.getElementById('resultado');
+
+// Pega o ID do projeto do Flask
+const projetoIdAtual = "{{ projeto_id }}"; 
+
+// Recupera números já sorteados do banco (em formato String para comparar fácil)
+let numerosJaSorteadosNoBanco = {{ projeto.numeros_sorteados | tojson | safe if projeto.numeros_sorteados else [] }};
+
+function aplicarCores() {
+    document.querySelectorAll("#vencedor .user-entry").forEach((linha, index) => {
+        const cor = `hsl(${(index * 137) % 360}, 80%, 60%)`;
+        const tdNome = linha.querySelector(".nome");
+        const tdCidade = linha.querySelector(".cidade");
+        if (tdNome) { tdNome.style.color = cor; tdNome.style.fontWeight = "bold"; }
+        if (tdCidade) { tdCidade.style.color = cor; tdCidade.style.fontWeight = "bold"; }
+    });
+}
+
+function addNum(num){
+    if(campo.value.length < 2) { campo.value += num; }
+}
+
+function apagar(){ campo.value = campo.value.slice(0,-1); }
+
+function limpar(){
+    campo.value = '';
+    displayResultado.innerText = '';
+}
+
+function atualizarTela(numero){
+    document.getElementById('mostrar_num').innerText = numero;
+    const bola = document.getElementById('b' + numero);
+    if(bola){
+        bola.classList.remove('bolinha', 'bolinha2');
+        bola.classList.add('marcado', 'ultimas');
+    }
+    
+    // Atualiza o histórico visual
+    historico.unshift(numero);
+    if(historico.length > 4) historico.pop();
+    
+    document.getElementById('ultimo').innerText = historico[0] || '';
+    document.getElementById('penultimo').innerText = historico[1] || '';
+    document.getElementById('antepenultimo').innerText = historico[2] || '';
+    document.getElementById('anteantepenultimo').innerText = historico[3] || '';
+}
+
+// CARGA INICIAL
+document.addEventListener("DOMContentLoaded", function() {
+    aplicarCores();
+    // Marca na tela tudo que já foi sorteado antes
+    numerosJaSorteadosNoBanco.forEach(num => {
+        atualizarTela(num.toString());
+    });
+});
+
+// --- FUNÇÃO DE DISPARO COM TRAVAS ---
+function dispararSorteio() {
+    const numDigitado = campo.value.trim();
+    
+    if (!numDigitado) return;
+
+    const n = parseInt(numDigitado);
+
+    // 1. VALIDAÇÃO DE INTERVALO (1 a 60)
+    if (n < 1 || n > 60) {
+        alert("Erro: Digite um número entre 01 e 60.");
+        limpar();
+        return;
+    }
+
+    // 2. VALIDAÇÃO DE DUPLICIDADE
+    if (numerosJaSorteadosNoBanco.includes(numDigitado) || numerosJaSorteadosNoBanco.includes(n.toString())) {
+        alert("Atenção: O número " + numDigitado + " já foi sorteado!");
+        limpar();
+        return;
+    }
+
+    // Se passar nas travas, envia
+    socket.emit('enviar_numero', { 
+        numero: numDigitado, 
+        projeto_id: projetoIdAtual 
+    });
+
+    // Adiciona à lista local para não repetir antes do refresh
+    numerosJaSorteadosNoBanco.push(numDigitado);
+
+    atualizarTela(numDigitado);
+    displayResultado.innerText = numDigitado;
+    limpar();
+}
+
+// --- ESCUTAS DE STATUS DO SORTEIO (ADMIN TAMBÉM VÊ) ---
+
+socket.on('vencedor_encontrado', function(data) {
+    const g = data.ganhadores[0];
+    alert("🚨 GANHADOR IDENTIFICADO NO SISTEMA! 🚨\nNome: " + g.nome + "\nBilhete: " + g.numero_bilhete);
+});
+
+socket.on('proxima_rodada', function(data) {
+    console.log(data.mensagem);
+    // Opcional: mostrar um aviso discreto no painel do admin
+});
+
+socket.on('usuarios_atualizados', function(data) {
+    const container = document.getElementById('vencedor');
+    if(!container) return;
+    container.innerHTML = '';
+    const vistos = new Set();
+    const usuariosUnicos = data.usuarios.filter(u => {
+        if (vistos.has(u.nome_usuario)) return false;
+        vistos.add(u.nome_usuario);
+        return true;
+    });
+    usuariosUnicos.forEach(b => {
+        const div = document.createElement('div');
+        div.classList.add('user-entry');
+        const imgUrl = (b.lista_urls_img_bilhetes && b.lista_urls_img_bilhetes.length > 0) 
+                       ? b.lista_urls_img_bilhetes[0] : '/static/img/default-user.png';
+        div.innerHTML = `
+            <img src="${imgUrl}" class="perfil" onclick="abrirImagem(this.src)">
+            <span class="nome">${b.nome_usuario}</span>
+            <span class="cidade">${b.payment_id}</span>
+        `;
+        container.appendChild(div);
+    });
+    aplicarCores();
+});
+
+function abrirImagem(src) {
+    const modal = document.getElementById("modalImg");
+    const img = document.getElementById("imgExpandida");
+    if(modal && img) { modal.style.display = "flex"; img.src = src; }
+}
+
+const modalImg = document.getElementById("modalImg");
+if(modalImg) { modalImg.onclick = function() { this.style.display = "none"; }; }
+
+</script>
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

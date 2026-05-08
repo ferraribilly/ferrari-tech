@@ -16,6 +16,7 @@ img{
     max-width: 100%;
 }
 
+
 .container{
    width: 100vw;
    height: 100dvh;
@@ -36,7 +37,6 @@ img{
 .main{
     padding-top: 4rem;
     height: 785px;
-    background: url(../img/image.jpg) center;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -329,24 +329,24 @@ input {
     width: 100%;
     overflow-x: auto; /* Adiciona rolagem horizontal apenas se necessário */
     margin-bottom: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Opcional: melhora visualização */
-    border-radius: 3px;
+    box-shadow: 0 2px 4px rgba(252, 67, 0, 0.785); /* Opcional: melhora visualização */
+    border-radius: 10px;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     min-width: 300px; /* Impede que a tabela encolha demais e fique ilegível */
-    background-color: rgb(254, 254, 254);
+    background-color: rgba(254, 254, 254, 0);
     font-family: monospace;
     
 }
 
 th, td {
-    background-color: #10385f;
+    background-color: #00040702;
     text-align: left;
     padding: 12px;
-    border-bottom: 1px solid #ddd;
+    /* border-bottom: 1px solid #ddd; */
     white-space: nowrap; /* Impede que o texto quebre linhas, mantendo a colunas organizadas */
     text-align: center;
     
@@ -354,9 +354,189 @@ th, td {
 }
 
 thead {
-    background-color: #145290;
+    background-color: #00020300;
 }
 
+      /* Botão flutuante */
+    .help-btn {
+        position: fixed;
+        bottom: 70px;
+        right: 20px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        transition: background-color 0.3s;
+        z-index: 9999;
+    }
+    .help-btn:hover {
+        background-color: #00b318;
+    }
+
+    /* Fundo do modal */
+    .modal-overlay {
+        display: none; 
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(95, 15, 135, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+    }
+
+ 
+
+.modal-card {
+    background: #f7f5f5;
+    padding: 20px;
+    border-radius: 8px;
+    width: 320px;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.help-options {
+    list-style: none;
+    padding: 0;
+}
+
+.help-options li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    cursor: pointer;
+}
+
+/* BASE ICON */
+.item-icon::before {
+    content: "";
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    background-size: cover;
+    background-position: center;
+}
+
+
+
+/* ICONES */
+.video::before {
+    background-image: url('../img/icons8-video.gif');
+}
+
+.whatsapp::before {
+    background-image: url('../img/icons8-whatsapp.gif');
+     border-radius: 50%;
+}
+
+.instagram::before {
+    background-image: url('../img/icons8-instagram.gif');
+     border-radius: 50%;
+}
+
+.ajuda::before {
+    background-image: url('../img/icons8-help.gif');
+    border-radius: 50%;
+}
+
+.help-options li:hover {
+    background: #444;
+    color: #00b318;
+    
+}
+
+a {
+    color: rgb(9, 1, 1);
+    text-decoration: none;
+}
+
+
+    .cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333;
+    color: #fff;
+    padding: 15px 0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+    transform: translateY(100%);
+    transition: transform 0.5s ease-in-out;
+    z-index: 9999;
+    font-family: sans-serif;
+}
+
+.cookie-banner.show {
+    transform: translateY(0);
+}
+
+.cookie-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Para responsividade */
+}
+
+.cookie-banner p {
+    margin: 0;
+    font-size: 14px;
+    flex: 1;
+    padding-right: 20px;
+}
+
+.cookie-banner a {
+    color: #4da6ff;
+    text-decoration: none;
+}
+
+.cookie-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.cookie-btn:hover {
+    background-color: #218838;
+}
+
+ /* Classe para o efeito de piscar */
+  .piscar {
+    animation: blink 3s step-start infinite;
+  }
+
+  /* Animação que alterna a opacidade */
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+/* Responsividade para telas pequenas */
+@media (max-width: 600px) {
+    .cookie-container {
+        flex-direction: column;
+        text-align: center;
+    }
+    .cookie-banner p {
+        padding-right: 0;
+        margin-bottom: 15px;
+    }
+}
 
 
 /* Responsivo */

@@ -1,8 +1,3 @@
-
-
-
-
-
 document.getElementById("formRegistro").addEventListener("submit", async function(e) {
     e.preventDefault();
 
@@ -12,7 +7,9 @@ document.getElementById("formRegistro").addEventListener("submit", async functio
         cpf: this.cpf.value,
         dt_nascimento: this.dt_nascimento.value,
         email: this.email.value,
-        chave_pix: this.chave_pix.value
+        chave_pix: this.chave_pix.value,
+        comissao: this.comissao.value
+
     };
 
     console.log("ENVIANDO:", formData);
@@ -27,34 +24,11 @@ document.getElementById("formRegistro").addEventListener("submit", async functio
     console.log("RESPOSTA:", data);
 
     if (data.status === "sucesso") {
-        window.location.href = `/fechamento`;
+        window.location.href = `/graficos/resumo/sistema/detalhes`;
     }
 });
 
 
-
-
-// LOGIN (CORRIGIDO)
-document.getElementById("formLogin").addEventListener("submit", async function(e) {
-    e.preventDefault();
-
-    const cpf = document.getElementById("cpfLogin").value.trim();
-
-    const res = await fetch("/login/vendedores", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cpf: cpf })
-    });
-
-    const data = await res.json();
-
-    if (data.status === "sucesso") {
-        window.location.href = `/fechamento`;
-    } else {
-        document.getElementById("loginMsg").innerHTML =
-            `<div class="alert alert-danger">${data.mensagem}</div>`;
-    }
-});
 
 
 

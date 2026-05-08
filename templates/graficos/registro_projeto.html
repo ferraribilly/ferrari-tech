@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#fff">
+    <title>Criar Projeto{{vendedor_id}}</title>
+
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='w.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/registro.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-box {
+            background: #fff;
+            padding: 25px 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        .spinner {
+            width: 45px;
+            height: 45px;
+            border: 5px solid #ddd;
+            border-top: 5px solid #28a745;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+<div id="loading-overlay">
+    <div class="loading-box">
+        <div class="spinner"></div>
+        <p>Gerando projeto...</p>
+    </div>
+</div>
+
+<div class="container py-4">
+    <div class="card mb-4" style="background-color: rgba(248, 246, 248, 0.793); text-align: center;">
+        <div class="card-body">
+
+            <form id="criar-projeto" enctype="multipart/form-data">
+
+                <img src="{{url_for('static', filename='img/marca.png')}}"
+                     style="display:block;margin:0 auto;width:100%;height:100%;">
+
+                <input name="nome_projeto" class="form-control mb-2" placeholder="Nome Projeto" required>
+                <input name="valor_injetado_premiacao" class="form-control mb-2" placeholder="Valor Injetado Premiação" required>
+                <input name="horario_sorteio" type="time" class="form-control mb-2" placeholder="Horário Sorteio" required>
+                <input name="quantidade" class="form-control mb-2" placeholder="Quantidade Total" required>
+                <input name="dt_sorteio" type="date" class="form-control mb-2" required>
+                <input name="valor_unidade" class="form-control mb-2" placeholder="Valor Unidade" required>
+
+                <input type="file" name="imagem_projeto" class="form-control mb-2" accept="image/*" required>
+                <input type="file" name="video_instrucao" class="form-control mb-2" accept="video/*">
+
+                <!-- 🔥 SEM REQUIRED (não trava mais) -->
+                <input name="link_instagram" class="form-control mb-2" placeholder="Instagram">
+                <input name="link_youtube" class="form-control mb-2" placeholder="YouTube">
+                <input name="link_whatsapp_grupo" class="form-control mb-2" placeholder="WhatsApp Grupo">
+                <input name="link_whatsapp_canal" class="form-control mb-2" placeholder="WhatsApp Canal">
+                <input name="link_whatsapp_suporte" class="form-control mb-2" placeholder="WhatsApp Suporte">
+                <input name="link_tiktok" class="form-control mb-2" placeholder="TikTok">
+                <input name="link_facebook" class="form-control mb-2" placeholder="Facebook">
+                <input name="link_kwai" class="form-control mb-2" placeholder="Kwai">
+
+                <button type="submit" class="btn btn-success w-100">CRIAR PROJETO</button>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/criar_projetos.js') }}"></script>
+
+</body>
+</html>

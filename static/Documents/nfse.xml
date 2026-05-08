@@ -1,0 +1,123 @@
+<NotaFiscalServico>
+
+    <IdentificacaoNfse>
+        <Numero>0</Numero>
+        <CodigoVerificacao>0</CodigoVerificacao>
+        <DataEmissao>2026-04-25</DataEmissao>
+    </IdentificacaoNfse>
+
+    <Prestador>
+        <RazaoSocial>FERRARI TECH LTDA</RazaoSocial>
+        <NomeFantasia>FERRARI TECH</NomeFantasia>
+        <CNPJ>{{cpf_vendedor}}</CNPJ>
+
+        <Endereco>
+            <Logradouro>NAO INFORMADO</Logradouro>
+            <Numero>0</Numero>
+            <Municipio>RIBEIRAO PRETO</Municipio>
+            <UF>SP</UF>
+            <CEP>00000000</CEP>
+        </Endereco>
+
+        <RegimeTributario>Simples Nacional</RegimeTributario>
+        <OptanteSimples>1</OptanteSimples>
+    </Prestador>
+
+    <Tomador>
+        <TipoDocumento>CPF/CNPJ</TipoDocumento>
+        <Documento>{{cpf_cliente}}</Documento>
+        <RazaoSocial>{{nome_cliente}}</RazaoSocial>
+
+        <Endereco>
+            <Municipio>{{municipio_cliente}}</Municipio>
+            <UF>{{uf_cliente}}</UF>
+        </Endereco>
+    </Tomador>
+
+    <Servico>
+        <Descricao>SERVICO DE APOSTAS E SORTEIOS ONLINE</Descricao>
+        <CFOP>5933</CFOP>
+        <NBS>118059030</NBS>
+
+        <ValorUnitario>{{valor_unidade}}</ValorUnitario>
+        <Quantidade>{{quantidade}}</Quantidade>
+
+        <ValorTotal>{{valor_total}}</ValorTotal>
+
+        <Impostos>
+
+            <ISSQN>
+                <BaseCalculo>{{valor_total}}</BaseCalculo>
+                <Aliquota>2.00</Aliquota>
+                <ValorImposto>{{valor_iss}}</ValorImposto>
+                <ISSRetido>0</ISSRetido>
+            </ISSQN>
+
+            <IVA>
+                <BaseCalculo>1.25</BaseCalculo>
+                <Aliquota>28.00</Aliquota>
+                <ValorImposto>0.35</ValorImposto>
+            </IVA>
+
+            <ImpostoSeletivo>
+                <Incidencia>Sim</Incidencia>
+                <Descricao>Incidência de Imposto Seletivo sobre Jogos e Apostas</Descricao>
+            </ImpostoSeletivo>
+
+        </Impostos>
+    </Servico>
+
+    <ValoresTotais>
+        <ValorServicos>{{valor_total}}</ValorServicos>
+        <ValorDeducoes>0.00</ValorDeducoes>
+        <ValorISS>{{valor_iss}}</ValorISS>
+        <ValorLiquido>{{valor_liquido}}</ValorLiquido>
+    </ValoresTotais>
+
+    <OutrasInformacoes>
+        <Discriminacao>Prestação de serviços de plataforma de apostas e sorteios online.</Discriminacao>
+    </OutrasInformacoes>
+
+</NotaFiscalServico>
+
+
+
+
+
+
+# ========================================================
+# 🔥 BLOCO FISCAL - FERRARI TECH (Apostas/Sorteios)
+# ========================================================
+
+faturamento_total = total_pagamentos_approved
+
+# Códigos Fiscais Ajustados
+cfop_interno = "5.933"
+cfop_interestadual = "6.933"
+nbs_servico = "1.1805.90.30"
+cst_iva_ibs_cbs = "00"
+
+# AJUSTE: O código para Sorteio/Aposta é 19.01 (e não 17.22 que é TI)
+codigo_servico_lei116 = "19.01" 
+
+aliquota_futura = Decimal("0.0028")
+aliquota_transicao = Decimal("0.0015")
+
+imposto_futuro = faturamento_total * aliquota_futura
+imposto_transicao = faturamento_total * aliquota_transicao
+
+# AJUSTE NO REGIME: Apostas/Sorteios NÃO podem ser MEI (atividade impedida)
+# Faixas baseadas no faturamento mensal
+if faturamento_total > Decimal("400000"): # Acima de 4.8MM/ano
+    regime = "Lucro Presumido/Real"
+elif faturamento_total > Decimal("0"):
+    regime = "Simples Nacional (ME/EPP)"
+else:
+    regime = "Pessoa Física (Carnê-Leão)"
+
+# 🔥 CÁLCULO DO LUCRO LÍQUIDO
+# Incluindo a taxa do Mercado Pago e comissões
+lucro = faturamento_total - total_taxa_mp - total_comissao - imposto_futuro
+
+
+

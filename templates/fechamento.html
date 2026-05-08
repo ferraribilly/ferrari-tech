@@ -1,199 +1,256 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Resumo Financeiro</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-     <link rel="stylesheet" href="{{ url_for('static', filename='css/graficos.css') }}">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 20px;
-            background: #1e1e2f;
-            color: #ecf0f1;
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2rem;
-            color: #00aaff;
-        }
-        .cards {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 30px;
-        }
-        .card {
-            background: #2a2a3d;
-            padding: 20px;
-            border-radius: 12px;
-            width: 28%;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            text-align: center;
-            transition: transform 0.2s;
-        }
-        .card:hover {
-            transform: scale(1.05);
-        }
-        .card h2 {
-            margin: 0;
-            font-size: 1.4rem;
-            margin-bottom: 10px;
-        }
-        .card p {
-            font-size: 1.6rem;
-            font-weight: bold;
-        }
-        .faturamento { border-top: 5px solid #27ae60; }
-        .usuarios { border-top: 5px solid #2980b9; }
-        .numeros { border-top: 5px solid #8e44ad; }
-        .graficos {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-        }
-        .grafico-container {
-            background: #2a2a3d;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            margin: 10px;
-            text-align: center;
-            width: 45%;
-        }
-        canvas {
-            max-width: 350px;
-            max-height: 350px;
-            margin: auto;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#36a2eb">
+<title>Resumo Financeiro</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/graficos.css') }}">
+
+<style>
+.titulo { padding: 10px 15px; }
+
+.extrato {
+  max-width: 500px;
+  margin: auto;
+}
+
+.grupo-header {
+  background: #e9e9e9;
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  color: #555;
+  margin: 10px 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  padding: 12px 8px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.icone {
+  width: 40px;
+  height: 40px;
+  background: #eee;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.info { flex: 1; }
+
+.desc { font-weight: bold; }
+
+.sub {
+  font-size: 12px;
+  color: #777;
+}
+
+.direita { text-align: right; }
+
+.valor { font-weight: bold; }
+
+.hora {
+  font-size: 12px;
+  color: #777;
+}
+
+.entrada .valor { color: #2e7d32; }
+.saida .valor { color: #c62828; }
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  display: none;
+  z-index: 999;
+  animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.modal-content { padding: 20px; }
+
+.topo button {
+  background: #eee;
+  border: none;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.icone-grande {
+  width: 80px;
+  height: 80px;
+  background: #eee;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+  font-size: 30px;
+}
+
+.valor-grande {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.titulo-grande {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.sub-grande { color: #666; }
+.data-grande { color: #666; margin-top: 5px; }
+
+.bloco { margin-top: 20px; }
+
+/* VALORES */
+.valor-positivo {
+    color: #16a34a; /* verde */
+    font-weight: bold;
+}
+
+.valor-negativo {
+    color: #dc2626; /* vermelho */
+}
+
+/* STATUS */
+.status {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Approved → verde */
+.status-pago {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+/* Pending → laranja */
+.status-pendente {
+    background-color: #ffedd5;
+    color: #f97316;
+}
+
+/* Canceled → vermelho */
+.status-cancelado {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+</style>
 </head>
+
 <body>
-    <h1>📊 Dashboard Financeiro</h1>
 
-    <div class="cards">
-        <div class="card faturamento">
-            <h2>Faturamento</h2>
-            <p>R$ {{ "%.2f"|format(resumo.faturamento) }}</p>
-        </div>
+<!-- ✅ SEU HEADER (mantido) -->
+<header class="header">
+  <a href="#" class="logo">FERRARI TECH</a>
 
-        <div class="card usuarios">
-            <h2>Usuários</h2>
-            <p>{{ resumo.usuarios }}</p>
-        </div>
+  <input type="checkbox" id="menu-bar">
+  <label for="menu-bar" class="menu-icon">&#9776;</label>
 
-   
-<div class="card numeros">
-    <h2>Números</h2>
-    <p>Total: {{ resumo.numeros_aprovados }}</p>
+  <nav class="navbar">
+    <ul>
+      <li><a href="/resumo">Resumo</a></li>
+      <li><a href="#">Cadastros &#9662;</a>
+        <ul class="dropdown">
+          <li><a href="/clientes">Clientes</a></li>
+          <li><a href="#">Produtos</a></li>
+          <li><a href="#">Vendedores</a></li>
+        </ul>
+      </li>
+      <li><a href="#">Faturamento &#9662;</a>
+        <ul class="dropdown">
+          <li><a href="/BoletoCarneHTML/index.html">Notas</a></li>
+          <li><a href="/营业额">Relatórios Faturamento</a></li>
+        </ul>
+      </li>
+      <li><a href="/销售">Vendas</a></li>
+      <li><a href="#">Despesas</a></li>
+    </ul>
+  </nav>
+</header>
+
+<div id="" class="table-container">
+    <h2 class="titulo">Extrato</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th style="color: #ffffff; font-weight: bold;"><span style="color: #0543fc;">(=)</span> Saldo anterior</th>
+                <th style="color: #ffffff; font-weight: bold;"><span style="color: #a8ff05;">(+)</span> Total Aprovado</th>
+                <th style="color: #fff7fe; font-weight: bold;"><span style="color: #fc9505;">(?)</span> Pendente</th>
+                <th style="color: #fbf8fb; font-weight: bold;"><span style="color: #ff0505;">(-)</span> Total Cancelado</th>
+                <th style="color: #ffffff; font-weight: bold;"><span style="color: #0543fc;">(=)</span> Saldo Atual</th>
+
+            </tr>
+        </thead>
+
+        <tbody>
+           
+            <tr>
+                <td id="saldo-anterior" style="color: #ccde01; font-weight: bold;">R$ 0,00</td>
+                <td id="total-aprovado" style="color: #12ec8e; font-weight: bold;">R$ 0,00</td>
+                <td id="total-pendente" style="color: #ccde01; font-weight: bold;">R$ 0,00</td>
+                <td id="total-cancelado" style="color: #ff0505; font-weight: bold;">R$ 0,00</td>
+                <td id="saldo-atual" style="color: #ccde01; font-weight: bold;">R$ 0,00</td>                                                
+            </tr>
+           
+        </tbody>
+
+    </table>
 </div>
 
-    </div>
-
-    <div class="graficos">
-        <div class="grafico-container">
-            <h3>Pagamentos</h3>
-            <canvas id="pagamentosChart"></canvas>
-        </div>
-
-        <div class="grafico-container">
-            <h3>Números</h3>
-            <canvas id="numerosChart"></canvas>
-        </div>
-            <div class="chart-container">
-        <h2>Desempenho de Vendas - Polar Area</h2>
-        <canvas id="vendedoresChart"></canvas>
-        <h2>Produtos Mais Vendidos</h2>
-        <canvas id="myDoughnutChart"></canvas>
-        <h2>Despesas Mensais 2026</h2>
-        <!-- O Canvas é onde o Chart.js desenha -->
-        <canvas id="despesasChart"></canvas>
-        <h2>Faturamento Mensal 2026</h2>
-        <canvas id="faturamentoChart"></canvas>
-        <h2>Impostos - Polar Area</h2>
-        <canvas id="impostosChart"></canvas>
-    </div>
-    </div>
+<div id="" class="table-container">
+     <h2 style="text-align: center;">Extrato: Entradas vs Saídas</h2>
     
+        <table border="1">
+<thead>
+    <tr>
+        <th>Data</th>
+        <th>Hora</th> <!-- nova -->
+        <th>Descrição</th>
+        <th>Valor</th>
+        <th>Status</th>
+    </tr>
+</thead>
 
 
- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>      
-  <script src="../static/js/graficos/grafico_despesas_mensal.js"></script>   
-  <script src="../static/js/graficos/grafico_faturamento_mensal.js"></script>
-  <script src="../static/js/graficos/grafico_impostos.js"></script>
-  <script src="../static/js/graficos/grafico_mais_produtos_mais_vendidos.js"></script>
-  <script src="../static/js/graficos/grafico_vendas_vendedores.js"></script>
-  
-  
+        <tbody id="extrato-body"></tbody>
+    </table>
+
+</div>
+
+<script src="../static/js/graficos/extratos_mercado_pago.js"></script>
 <script>
-    const pagamentosData = {
-        labels: ["Pendente", "Aprovado", "Cancelado"],
-        datasets: [{
-            data: [
-                {{ resumo.pagamentos.pending }},
-                {{ resumo.pagamentos.approved }},
-                {{ resumo.pagamentos.cancelled }}
-            ],
-            backgroundColor: ["#f39c12", "#27ae60", "#e74c3c"]
-        }]
-    };
 
+ // Dados Exemplo
+        
 
-const numerosData = {
-        labels: ["Números Aprovados"],
-        datasets: [{
-            data: [{{ resumo.numeros_aprovados }}],
-            backgroundColor: ["#8e44ad"]
-        }]
-    };
+        
+         
 
-    new Chart(document.getElementById("numerosChart"), {
-        type: "pie",
-        data: numerosData,
-        options: {
-            plugins: {
-                legend: { labels: { color: "#ecf0f1" }, position: "right" },
-                datalabels: {
-                    color: "#fff",
-                    formatter: (value, ctx) => {
-                        let total = ctx.chart.data.datasets[0].data.reduce((a,b) => a+b, 0);
-                        let percent = (value/total*100).toFixed(1);
-                        return value + " (" + percent + "%)";
-                    }
-                }
-            }
-        },
-        plugins: [ChartDataLabels]
-    });
-   
-
-    new Chart(document.getElementById("pagamentosChart"), {
-        type: "bar",
-        data: pagamentosData,
-        options: {
-            plugins: {
-                legend: { labels: { color: "#ecf0f1" }, position: "bottom" },
-                datalabels: {
-                    color: "#ecf0f1",
-                    anchor: "end",
-                    align: "top",
-                    formatter: (value, ctx) => {
-                        let total = ctx.chart.data.datasets[0].data.reduce((a,b) => a+b, 0);
-                        let percent = (value/total*100).toFixed(1);
-                        return "R$ " + value.toFixed(2) + " (" + percent + "%)";
-                    }
-                }
-            },
-            scales: {
-                x: { ticks: { color: "#ecf0f1" } },
-                y: { ticks: { color: "#ecf0f1" }, beginAtZero: true }
-            }
-        },
-        plugins: [ChartDataLabels]
-    });
-
-   
 </script>
 </body>
+
 </html>

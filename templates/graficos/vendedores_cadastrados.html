@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="theme-color" content="#082c62">
+<title>Visão Geral de Vendas - Ferrari Tech</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/grafico_geral_sistema.css') }}">
+
+<style>
+/* 🔥 ESPAÇAMENTO ENTRE BLOCOS */
+.analysis {
+    margin: 30px auto;       /* espaço entre tabelas */
+    padding: 15px;           /* espaço interno */
+    max-width: 95%;
+}
+
+/* 🔥 TABELA MAIS LIMPA */
+.analysis table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+/* 🔥 ESPAÇO ENTRE CÉLULAS */
+.analysis th,
+.analysis td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ccc;
+}
+
+/* 🔥 TÍTULO MAIS SEPARADO */
+.analysis h3 {
+    margin-bottom: 10px;
+}
+
+.analysis {
+  background: #ffffffed;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  font-weight: bold;
+
+  max-width: 100%;
+  overflow-x: auto; /* 🔥 evita explosão horizontal */
+}
+/* 🔥 DISTÂNCIA DO FILTRO */
+.filter-container {
+    margin-bottom: 30px;
+}
+    
+.dropdown1 {
+    display: none;
+    position: absolute;
+    background-color: #0d0101;
+    min-width: 270px;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+}
+
+/* FILTRO */
+.filter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 300px;
+  margin: 20px auto;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.dados-input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+}
+
+
+@media (min-width: 600px) {
+  .filter-container {
+    flex-direction: row;
+    max-width: 600px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header1">
+  <a href="#" class="logo">FERRARI TECH</a>
+  <input type="checkbox" id="menu-bar">
+  <label for="menu-bar" class="menu-icon">&#9776;</label>
+
+  <nav class="navbar">
+    <ul>
+      <li><a href="/graficos/resumo/sistema/detalhes">VOLTAR PAINEL</a></li>
+    </ul>
+  </nav>
+</header>
+
+<header>
+  <h1>VENDEDORES CADASTRADOS - FERRARI TECH</h1>
+</header>
+<div class="analysis">
+  <h3 style="text-align: center; font-family: monospace;">📋 Buscar Vendedor Cadastrado</h3>
+<div class="filter-container">
+  <label style="color:#000;font-weight: bold; ">Filtrar por CPF:</label>
+  <input type="text" id="dados-filter" class="dados-input">
+<button type="button" class="filter-btn" onclick="buscarDados()"
+  style="
+    width:60px;
+    height:60px;
+    border:none;
+    border-radius:5px;
+    background-image:url('/static/img/xmag_search_find_export_locate_5984.png');
+    background-position:center;
+    background-size:20px;
+    background-repeat:no-repeat;
+    cursor:pointer;
+  ">
+</button>
+</div>
+
+
+<table border="1">
+<thead>
+<tr>
+  <th style="background-color: #00BFFF;">ID</th>
+  <th style="background-color: #00BFFF;">Nome</th>
+  <th style="background-color: #00BFFF;">Sobrenome</th>
+  <th style="background-color: #00BFFF;">Dt Nasc</th>
+  <th style="background-color: #00BFFF;">CPF</th>
+  <th style="background-color: #00BFFF;">Email</th>
+  <th style="background-color: #00BFFF;">Chave Pix</th>
+  
+</tr>
+</thead>
+
+<tbody id="tabela-vendedores">
+<tr>
+  <td colspan="10" style="text-align: center; font-family: monospace;">Nenhum dado carregado no momento!</td>
+</tr>
+</tbody>
+
+</table>
+</div>
+<div class="analysis">
+<table id="tableRegistro" border="1">
+<h3 style="text-align: center; font-family: monospace;">📋 Cadastrar Novo Vendedor</h3>
+  <thead>
+    <tr>
+      <th style="background-color: #00BFFF;">Nome</th>
+      <th style="background-color: #00BFFF;">Sobrenome</th>
+      <th style="background-color: #00BFFF;">Dt Nasc</th>
+      <th style="background-color: #00BFFF;">CPF</th>
+      <th style="background-color: #00BFFF;">Email</th>
+      <th style="background-color: #00BFFF;">Chave Pix</th>
+      <th style="background-color: #00BFFF;">Comissão</th>
+      <th style="background-color: #FF7F50;">Ações</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    
+<tr>
+  <td contenteditable="true" id="nome"></td>
+  <td contenteditable="true" id="sobrenome"></td>
+  <td><input type="date" id="dt_nascimento" style="width:100%;"></td>
+  <td contenteditable="true" id="cpf"></td>
+  <td contenteditable="true" id="email"></td>
+  <td contenteditable="true" id="chave_pix"></td>
+  <td contenteditable="true" id="comissao">30%</td>
+
+  <td>
+
+        <button type="submit"
+        style="
+        width:40px;
+        height:40px;
+        border:none;
+        border-radius:5px;
+        background-image:url('/static/img/Save_37110.png');
+        background-position:center;
+        background-size:20px;
+        background-repeat:no-repeat;
+        cursor:pointer;
+        ">
+        </button>            
+  </td>
+</tr>
+  </tbody>
+</table>
+</div>
+
+
+
+<!-- TODOS OS VENDEDORES -->
+<div class="analysis">
+
+  <h3 style="text-align: center; font-family: monospace;">📋 Todos os Vendedor Cadastrados</h3>
+
+  <table border="1">
+
+    <thead>
+      <tr>
+      <th style="background-color: #00BFFF;">ID</th>
+      <th style="background-color: #00BFFF;">Nome</th>
+      <th style="background-color: #00BFFF;">Sobrenome</th>
+      <th style="background-color: #00BFFF;">Dt Nasc</th>
+      <th style="background-color: #00BFFF;">CPF</th>
+      <th style="background-color: #00BFFF;">Email</th>
+      <th style="background-color: #00BFFF;">Chave Pix</th>
+      <th style="background-color: #00BFFF;">Comissão</th>
+      <th style="background-color: #FF7F50;">Ações</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for u in vendedores %}
+      <tr>
+
+        <td data-id="{{ u._id }}">{{ u._id }}</td>
+
+        <td>{{ u.nome }}</td>
+        <td>{{ u.sobrenome }}</td>
+        <td>{{ u.dt_nascimento }}</td>
+        
+        <td>{{ u.cpf }}</td>
+
+        <td contenteditable="true" data-field="email" data-id="{{ u._id }}">
+          {{ u.email }}
+        </td>
+
+        <td contenteditable="true" data-field="chave_pix" data-id="{{ u._id }}">
+          {{ u.chave_pix }}
+        </td>
+
+        <!-- CORREÇÃO AQUI -->
+        <td contenteditable="true" data-field="comissao" data-id="{{ u._id }}">
+          {{ u.comissao }}
+        </td>
+
+        <td>
+          <div style="display:flex; gap:8px; align-items:center;">
+
+        <button onclick="abrirModal('salvar', this)"
+        style="
+        width:40px;
+        height:40px;
+        border:none;
+        border-radius:5px;
+        background-image:url('/static/img/Save_37110.png');
+        background-position:center;
+        background-size:20px;
+        background-repeat:no-repeat;
+        cursor:pointer;
+        ">
+        </button>            
+
+        <button onclick="abrirModal('deletar', this)"
+        style="
+        width:40px;
+        height:40px;
+        border:none;
+        border-radius:5px;
+        background-image:url('/static/img/trash-can_115312.svg');
+        background-position:center;
+        background-size:20px;
+        background-repeat:no-repeat;
+        cursor:pointer;
+        ">
+        </button>
+
+          </div>
+        </td>
+
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+<div id="modalSenha" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+background:rgba(0,0,0,0.6); justify-content:center; align-items:center;">
+
+  <div style="background:#fff; padding:20px; border-radius:10px; width:300px; text-align:center;">
+
+    <h3>Confirmação</h3>
+
+    <input type="password" id="senhaInput" placeholder="Digite a senha"
+           style="width:90%; padding:8px; margin-top:10px;">
+
+    <button onclick="confirmarAcao()"
+            style="margin-top:10px; padding:8px 12px; background:blue; color:#fff; border:none; border-radius:5px;">
+      Confirmar
+    </button>
+
+    <button onclick="fecharModal()"
+            style="margin-top:10px; padding:8px 12px; background:gray; color:#fff; border:none; border-radius:5px;">
+      Cancelar
+    </button>
+  </div>
+</div>
+</div>
+
+ <script src="{{ url_for('static', filename='js/graficos/vendedores_cadastrados.js') }}"></script>
+ <script src="{{ url_for('static', filename='js/graficos/delete_editeV.js') }}"></script>
+ <script src="{{ url_for('static', filename='js/graficos/lista_vendedores.js') }}"></script>
+<script>
+  
+</script>
+</body>
+</html>

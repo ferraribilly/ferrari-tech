@@ -1,0 +1,79 @@
+    /* Reset básico */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+        background-image: url('../img/HcUcY.jpg');
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        height: 100dvh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow-y: hidden;
+     
+    }
+
+    .container {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 40px;
+        border-radius: 15px;
+        
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+        color: white;
+        margin-bottom: 30px;
+        font-size: 1.8rem;
+    }
+
+    .btn {
+        display: block;
+        width: 220px;
+        margin: 10px auto;
+        padding: 14px;
+        font-size: 1rem;
+        font-weight: bold;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-register {
+        background: linear-gradient(45deg, #ff416c, #ff4b2b);
+    }
+
+    .btn-register:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(255, 65, 108, 0.5);
+    }
+
+    .btn-panel {
+        background: linear-gradient(45deg, #00c6ff, #0072ff);
+    }
+
+    .btn-panel:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(0, 114, 255, 0.5);
+    }
+
+
+    /* Responsividade */
+    @media (max-width: 480px) {
+        .container {
+            width: 90%;
+            padding: 20px;
+        }
+        .btn {
+            width: 100%;
+        }
+    }

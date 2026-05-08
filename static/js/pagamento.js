@@ -1,10 +1,11 @@
 document.getElementById("btn-pagar").onclick = () => {
 
+    document.getElementById("loading-pagamento").style.display = "flex";
+
     const nome = document.getElementById("nome").innerText;
     const sobrenome = document.getElementById("sobrenome").innerText;
     const cpf = document.getElementById("cpf").innerText;
     const email = document.getElementById("email").innerText;
-    
 
     const url = `/payment_qrcode_pix/pagamento_pix/{{ usuario_id }}`
         + `?nome=${encodeURIComponent(nome)}`
@@ -17,8 +18,10 @@ document.getElementById("btn-pagar").onclick = () => {
     window.location.href = url;
 };
 
-// PAGAMENTO PREFERENCE MERCADO PAGO
+
 document.getElementById("btn-preference").onclick = () => {
+
+    document.getElementById("loading-pagamento").style.display = "flex";
 
     const nome = document.getElementById("nome").innerText;
     const sobrenome = document.getElementById("sobrenome").innerText;
@@ -35,50 +38,3 @@ document.getElementById("btn-preference").onclick = () => {
 
     window.location.href = url;
 };
-
-
-var usuario_Id = "{{ usuario_id }}";
-
-
-var paymentId = "{{ payment_id }}";
-var usuario_Id = "{{ usuario_id }}";
-var socket = io(window.location.origin);
-
-socket.on("connect", function () {
-    socket.emit("join_payment", { payment_id: paymentId });
-});
-
-
-
-socket.on("payment_update", function (data) {
-    if (data.payment_id !== paymentId) return;
-
-    var div = document.getElementById("notifications");
-    var p = document.createElement("p");
-
-    if (data.status === "approved") {
-        p.style.color = "green";
-        p.innerText = "✅ Pagamento aprovado com sucesso!";
-        div.innerHTML = "";
-        div.appendChild(p);
-
-        setTimeout(function () {
-            
-            window.location.href = `/success`;
-        }, 3000);
-
-    } else {
-        p.style.color = "red";
-        p.innerText = "❌ Pagamento recusado!";
-        div.innerHTML = "";
-        div.appendChild(p);
-
-        setTimeout(function () {
-            window.location.href = `/recusado`;
-        }, 3000);
-    }
-});
-
-
-
-

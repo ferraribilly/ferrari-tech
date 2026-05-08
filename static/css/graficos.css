@@ -1,10 +1,15 @@
-.chart-container {
-    width: 80%;
-    max-width: 600px;
-    background-color: rgb(14, 0, 0);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 20px;
+    background: #1e1e2f;
+    color: #ecf0f1;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2rem;
+    color: #00aaff;
 }
 
 h2 {
@@ -12,28 +17,281 @@ h2 {
     color: #333;
 }
 
-.bar-chart {
+.cards {
     display: flex;
     justify-content: space-around;
-    align-items: flex-end;
-    height: 300px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: #20206600;
     padding: 20px;
-    border-bottom: 2px solid #333;
+    border-radius: 12px;
+    width: 28%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0);
+    text-align: center;
+    transition: transform 0.2s;
 }
 
-.bar-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 20%;
+.card:hover {
+    transform: scale(1.05);
 }
 
-.bar {
+.card h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+}
+
+.card p {
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+
+.faturamento { border-top: 5px solid #27ae60; }
+.usuarios { border-top: 5px solid #2980b9; }
+.numeros { border-top: 5px solid #8e44ad; }
+
+.chart-container {
     width: 100%;
-    background-color: #3498db;
-    border-radius: 4px 4px 0 0;
-    transition: height 0.5s ease;
+    max-width: 100%;
+    background-color: #1e1e2f;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(137, 238, 4, 0.463);
 }
 
-.bar-value { margin-top: 5px; font-size: 12px; font-weight: bold; }
-.bar-label { font-size: 14px; margin-top: 5px; 
+canvas {
+    color: #00aaff;
+    max-width: 350px;
+    max-height: 350px;
+    margin: auto;
+    display: block;
+}
+
+
+            /* Container que faz a mágica da responsividade */
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* Adiciona rolagem horizontal apenas se necessário */
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Opcional: melhora visualização */
+    border-radius: 3px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 300px; /* Impede que a tabela encolha demais e fique ilegível */
+    background-color: rgb(254, 254, 254);
+    font-family: monospace;
+    
+}
+
+th, td {
+    background-color: #10385f;
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    white-space: nowrap; /* Impede que o texto quebre linhas, mantendo a colunas organizadas */
+    text-align: center;
+    
+   
+}
+
+thead {
+    background-color: #145290;
+}
+
+
+/* Colunas */
+.tipo {
+  text-align: center;
+  font-weight: bold;
+  width: 30px;
+}
+
+.data {
+  font-size: 12px;
+  color: #666;
+  white-space: nowrap;
+}
+
+.valor {
+  text-align: right;
+  font-weight: bold;
+}
+
+/* 🔥 CORES POR TIPO (linha inteira) */
+tr.neutro td {
+  color: #007bff; /* azul */
+}
+
+tr.entrada td {
+  color: #28a745; /* verde */
+}
+
+tr.saida td {
+  color: #dc3545; /* vermelho */
+}
+
+tr.total td {
+  color: #007bff; /* azul saldo final */
+  font-weight: bold;
+  border-top: 2px solid #000;
+}
+
+
+ 
+.header {
+    position: relative;
+    background-color: #0856a3;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    color: white;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+.navbar ul {
+    list-style: none;
+}
+
+.navbar ul li {
+    position: relative;
+    float: left;
+}
+
+.navbar ul li a {
+    display: block;
+    padding: 15px 20px;
+    color: white;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.navbar ul li a:hover {
+    background-color: #555;
+}
+
+/* --- Dropdown (Submenu) --- */
+.dropdown {
+    display: none;
+    position: absolute;
+    background-color: #444;
+    min-width: 150px;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+}
+
+.navbar ul li:hover .dropdown {
+    display: block;
+}
+
+.dropdown li {
+    width: 100%;
+}
+
+/* --- Menu Mobile --- */
+#menu-bar {
+    display: none;
+}
+
+.menu-icon {
+    display: none;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+/* Container principal com Flexbox para responsividade */
+.filter-container {
+  display: flex;
+  flex-direction: column; /* Pilha os itens no mobile */
+  gap: 10px;
+  max-width: 300px; /* Largura máxima para desktop */
+  margin: 20px auto;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+}
+
+/* Estilização do Input de Data */
+.date-input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  /* Garante que o input ocupe a largura total do container */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Estilização do Botão */
+.filter-btn {
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.filter-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Responsividade: Ajustes para telas maiores (Desktop) */
+@media (min-width: 600px) {
+  .filter-container {
+    flex-direction: row; /* Coloca os itens lado a lado */
+    max-width: 600px;
+    align-items: center;
+  }
+  
+  .date-input {
+    flex-grow: 1; /* Input ocupa o espaço restante */
+  }
+}
+
+
+/* --- Responsividade (Media Query) --- */
+@media (max-width: 768px) {
+    .menu-icon {
+        display: block;
+    }
+
+    .navbar {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: #333;
+    }
+
+    .navbar ul li {
+        width: 100%;
+        float: none;
+    }
+
+    .dropdown {
+        position: static;
+        display: none;
+    }
+
+    /* Mostrar menu ao clicar no checkbox */
+    #menu-bar:checked ~ .navbar {
+        display: block;
+    }
+}
+

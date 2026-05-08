@@ -1,0 +1,341 @@
+   html{
+                font-family: Helvetica, Arial, sans-serif;
+                background:#0c0000;
+        }
+
+
+      /* Botão flutuante */
+    .help-btn {
+        position: fixed;
+        bottom: 70px;
+        right: 20px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        transition: background-color 0.3s;
+        z-index: 9999;
+    }
+    .help-btn:hover {
+        background-color: #00b318;
+    }
+
+    /* Fundo do modal */
+    .modal-overlay {
+        display: none; 
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(95, 15, 135, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+    }
+
+.modal-card {
+    background: #f7f5f5;
+    padding: 20px;
+    border-radius: 8px;
+    width: 320px;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.help-options {
+    list-style: none;
+    padding: 0;
+}
+
+.help-options li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    cursor: pointer;
+}
+
+/* BASE ICON */
+.item-icon::before {
+    content: "";
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    background-size: cover;
+    background-position: center;
+}
+
+
+    /*   bolona   */
+    .bola{
+        top:200px;
+        width:150px;
+        height:150px;
+        left:450px;
+        background: radial-gradient(circle at 30% 30%, #ff5722, #b71c1c); /* Efeito 3D na cor */
+         /* Sombra interna (brilho) + Sombra externa (projeção) */
+        box-shadow:
+            inset -5px -5px 10px rgba(0,0,0,0.5),
+            3px 5px 8px rgb(249, 249, 249);
+        display:flex;
+        flex-flow: column;
+        align-items: center;
+        justify-content: center;
+        border:1px solid #ccc;
+        border-radius:100%;
+        background-color: #ddd;
+        text-align: center;
+        font-size:0.5em;
+    }
+
+    @keyframes spinBall {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+    .bingo{
+        position:absolute;
+        top:30px;
+        font-size:3em;
+        font-weight: bold;
+        left:780px;
+        color:red;
+        display:none;
+        }
+
+    /*  número dentro da bolona   */
+   .numero_sorteado{
+        position:relative;
+        color:#f9f7f7;
+        font-size: 12em;
+        font-weight: bold;
+        font-family: sans, serif;
+        
+        
+   }
+
+   /* bolinhas que vão ser sorteadas, de 10 até 90*/
+   .bolinha{
+        position:relative;
+        border-radius:100%;
+        color:#bbb;
+        width:90px;
+        height:90px;
+        box-shadow: inset -5px -5px 15px rgba(0,0,0,.5);
+        display:flex;
+        flex-flow: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.1;
+        }
+
+    /* bolinhas que vão ser sorteadas, de 1 até 9*/
+    .bolinha2{
+        position:relative;
+        border-radius:100%;
+        color:#bbb;
+        width:90px;
+        height:90px;
+        box-shadow: inset -5px -5px 15px rgba(0,0,0,.5);
+        display:flex;
+        flex-flow: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.1;
+        }
+
+   .ultimasbolas, .ultimasbolas2, .ultimasbolas3, .ultimasbolas4{
+        position:relative;
+        color: white;
+        margin: 0 auto;
+        width:50px;
+        height:50px;
+        /* Sombra interna (brilho) + Sombra externa (projeção) */
+        box-shadow: 
+        inset -5px -5px 10px rgba(0,0,0,0.5), 
+        3px 5px 8px rgba(251, 250, 250, 0.912);        
+        display:flex;
+        flex-flow: column;
+        align-items: center;
+        justify-content: center;
+        border:1px solid #ccc;
+        border-radius:100%;
+        font-family: sans, serif;
+        font-weight: bold;
+        background: radial-gradient(circle at 30% 30%, #ff5722, #b71c1c); /* Efeito 3D na cor */
+        left:150px;
+    }
+
+    .img{
+      position:relative;
+      float:right;
+      top:0px;
+      margin-right:10px;
+        /* Sombra interna (brilho) + Sombra externa (projeção) */
+        box-shadow:
+            inset -5px -5px 10px rgba(0,0,0,0.5),
+            3px 5px 8px rgb(249, 249, 249);    
+    }
+
+    img{
+        width:200px;
+        height:auto;
+        
+    }
+
+    .tabela{
+        background:#000000;
+        padding:5px;
+        margin-top:8px;
+        border-radius:5px;
+        width: 100%;        
+    }
+
+    .td{
+        padding:3px;
+    }
+
+   a{
+        text-decoration:none;
+   }
+
+   .texto{
+        color:#fff;
+        padding:10px;
+        text-align:center;
+        background:#14010103;
+        font-weight: bold;
+        font-family: sans, serif;
+        border-radius:10px;
+        
+   }
+
+   .tdbola{
+        background: #ffffff;
+        color:#ffffff;
+        text-align:right;
+        padding-right:10px;
+   }
+
+ .marcado {
+    color: rgb(244, 243, 243);
+    border-radius: 50%;
+    border: 1px solid #000;
+    background: radial-gradient(circle at 30% 30%, #ff5722, #b71c1c); /* Efeito 3D na cor */
+    /* Sombra interna (brilho) + Sombra externa (projeção) */
+    box-shadow: 
+    inset -5px -5px 10px rgba(0, 0, 0, 0.838), 
+    3px 5px 8px rgba(249, 247, 247, 0.853);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    width: 100px;
+    height: 100px;
+    font-size: 22px;
+    font-family: sans, serif;
+}
+
+#confetti-button {
+    padding: 15px 30px;
+    font-size: 18px;
+    background-color: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+#confetti-button:hover {
+    background-color: #ff6b81;
+    transform: scale(1.05);
+}
+
+/* Container que segura as entradas */
+    .chat-simulado {
+        height: 250px; /* Ajuste a altura conforme desejar */
+        overflow-y: auto; /* Esconde a barra de rolagem para parecer TV */
+        display: flex;
+        flex-direction: column-reverse; /* Faz o novo item entrar por baixo e empurrar o resto */
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    /* Estilo de cada linha de usuário */
+    .user-entry {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 5px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        animation: entrar 0.4s ease-out; /* Efeito de entrada */
+    }
+
+    .perfil {
+        width: 100px;
+        height:auto;
+        border: 1px solid #fff;
+    }
+
+    .nome {
+        /* color: #f6ad02; */
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .cidade {
+        color: #add8e6; /* Azul claro */
+        font-size: 12px;
+        font-style: italic;
+    }
+
+    /* Animação para os nomes subirem */
+    @keyframes entrar {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+   .teclado{
+    background: #3601013b;
+    border-radius: 8px;
+    height: 200px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.teclado button{
+    background: radial-gradient(circle at 30% 30%, #ff5722, #b71c1c);
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    font-size:16px;
+    font-weight:bold;
+
+    box-shadow:
+        inset -4px -4px 8px rgba(0,0,0,0.5),
+        2px 3px 6px rgba(0,0,0,0.4);
+
+    cursor:pointer;
+}
+
+.teclado button:hover{
+    filter:brightness(1.1);
+}
+
+.teclado button:active{
+    transform:scale(0.95);
+}    
+
+
+
+
+
+

@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import os
 from datetime import datetime, timezone
 
+
 # Carrega variáveis de ambiente
 load_dotenv()
 
@@ -23,6 +24,8 @@ PAGAMENTOS_COLLECTION_NAME = "pagamentos"
 BILHETES_COLLECTION_NAME = "bilhetes"
 users_collection = db["users"]
 vendedores_collection = db["vendedores"]
+saques_collection = db["saques"]
+
 
 
 
@@ -40,14 +43,22 @@ def validar_cpf(cpf: str) -> bool:
 #     
 #------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------
-# USUARIOS
-def criar_usuario(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, email: str, vendedor: str, chave_pix: str) -> dict:
+def criar_usuario(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, email: str, estado: str, vendedor: str, chave_pix: str) -> dict:
     cpf = limpar_cpf(cpf)
 
-    if not nome.strip() or not validar_cpf(cpf) or not email.strip() or not dt_nascimento.strip() or not vendedor.strip() or not chave_pix.strip():
+    estado = (estado or "").strip().upper()
+
+    if (
+        not nome.strip()
+        or not validar_cpf(cpf)
+        or not email.strip()
+        or not dt_nascimento.strip()
+        or not vendedor.strip()
+        or not chave_pix.strip()
+        or not estado
+    ):
         raise ValueError("Dados inválidos para cadastro.")
 
-    # Evita duplicado pelo CPF
     if users_collection.find_one({"cpf": cpf}):
         raise ValueError("CPF já cadastrado.")
 
@@ -57,6 +68,7 @@ def criar_usuario(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, email
         "cpf": cpf,
         "dt_nascimento": dt_nascimento.strip(),
         "email": email.strip(),
+        "estado": estado,  # 🔥 GARANTE SALVAR
         "vendedor": vendedor.strip(),
         "chave_pix": chave_pix.strip(),
         "criado_em": datetime.now(timezone.utc)
@@ -66,19 +78,110 @@ def criar_usuario(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, email
 
     usuario["_id"] = str(result.inserted_id)
     return usuario
+
+
+#================================================================================
+class UsuarioModel:
+    def __init__(self):
+        self.collection = users_collection  # corrigido aqui
+
+    def create_usuario(self, data):
+        try:
+            existente = self.collection.find_one({"cpf": data.get("cpf")})
+            if existente:
+                return str(existente["_id"])
+
+            result = self.collection.insert_one(data)
+            return str(result.inserted_id)
+
+        except Exception as e:
+            print("ERRO MODEL INSERT:", e)
+            return None
+
+
+def deletar_usuario(user_id: str) -> bool:
+    try:
+        if not ObjectId.is_valid(user_id):
+            return False
+        result = users_collection.delete_one({"_id": ObjectId(user_id)})
+        return result.deleted_count > 0
+    except Exception as e:
+        print("ERRO AO DELETAR:", e)
+        return False
 #================================================================================================================================
 #================================================================================================================================
 
+
+# =========================
+# MODELS.PY
+# =========================
+
+from datetime import datetime, timezone
+
+# PROJETO
+projetos_collection = db["projetos"]
+
+
+def criar_projeto(
+    nome_projeto: str,
+    quantidade: str,
+    valor_unidade: float,
+    dt_sorteio: str,
+    valor_injetado_premiacao: str = "",
+    horario_sorteio: str = "",
+    imagem_projeto: str = "",
+    video_instrucao: str = "",
+    link_instagram: str = "",
+    link_youtube: str = "",
+    link_whatsapp_grupo: str = "",
+    link_whatsapp_canal: str = "",
+    link_whatsapp_suporte: str = "",
+    link_tiktok: str = "",
+    link_facebook: str = "",
+    link_kwai: str = "",
+    status: str = ""
+) -> dict:
+
+    projeto = {
+        "nome_projeto": nome_projeto.strip(),
+        "quantidade": quantidade.strip(),
+        "valor_unidade": valor_unidade,
+        "dt_sorteio": dt_sorteio.strip(),
+        "valor_injetado_premiacao": valor_injetado_premiacao.strip(),
+        "horario_sorteio": horario_sorteio.strip(),
+        "imagem_projeto": imagem_projeto.strip(),
+        "video_instrucao": video_instrucao.strip(),
+        "link_instagram": link_instagram.strip(),
+        "link_youtube": link_youtube.strip(),
+        "link_whatsapp_grupo": link_whatsapp_grupo.strip(),
+        "link_whatsapp_canal": link_whatsapp_canal.strip(),
+        "link_whatsapp_suporte": link_whatsapp_suporte.strip(),
+        "link_tiktok": link_tiktok.strip(),
+        "link_facebook": link_facebook.strip(),
+        "link_kwai": link_kwai.strip(),
+        "status": status.strip(),
+        "numeros_sorteados": [],
+        "criado_em": datetime.now(timezone.utc)
+    }
+
+    result = projetos_collection.insert_one(projeto)
+
+    projeto["_id"] = str(result.inserted_id)
+
+    return projeto
+
+
+def get_all_projetos():
+    return list(projetos_collection.find())
 #--------------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------------
 # VENDEDORES
-def criar_vendedor(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, email: str, chave_pix: str) -> dict:
+def criar_vendedor(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, email: str, chave_pix: str, comissao: str) -> dict:
     cpf = limpar_cpf(cpf)
 
     if not nome.strip() or not validar_cpf(cpf) or not email.strip() or not dt_nascimento.strip() or not chave_pix.strip():
         raise ValueError("Dados inválidos para cadastro.")
 
-    # Evita duplicado pelo CPF
     if vendedores_collection.find_one({"cpf": cpf}):
         raise ValueError("CPF já cadastrado.")
 
@@ -89,13 +192,17 @@ def criar_vendedor(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, emai
         "dt_nascimento": dt_nascimento.strip(),
         "email": email.strip(),
         "chave_pix": chave_pix.strip(),
+        "comissao": comissao.strip(),
         "criado_em": datetime.now(timezone.utc)
     }
 
     result = vendedores_collection.insert_one(vendedor)
-
     vendedor["_id"] = str(result.inserted_id)
+
     return vendedor
+
+
+  
 #================================================================================================================================
 #================================================================================================================================
 
@@ -110,9 +217,11 @@ pagamentos_collection = db[PAGAMENTOS_COLLECTION_NAME]
 
 
 def criar_documento_pagamento(payment_id, status, valor, cpf, email_user,
+                              payment_method_id,
                               lista_numeros=None,
                               qr_code=None,
                               qr_image_url=None,
+                              taxa_mp=None,
                               data_criacao=None):
 
     if data_criacao is None:
@@ -125,12 +234,13 @@ def criar_documento_pagamento(payment_id, status, valor, cpf, email_user,
         "cpf": cpf,
         "email_usuario": email_user,
         "qr_code": qr_code,
+        "payment_method_id": payment_method_id,
         "qr_image_url": qr_image_url,
         "data_criacao": data_criacao,
         "data_atualizacao": None,
+        "taxa_mp": float(taxa_mp) if taxa_mp is not None else None,
         "lista_numeros": lista_numeros or []
     }
-
 
 class PagamentoModel:
 
@@ -165,6 +275,9 @@ class PagamentoModel:
             d["_id"] = str(d["_id"])
         return docs
 
+
+        
+
     def update_pagamento(self, pagamento_id, new_data):
         try:
             new_data["data_atualizacao"] = datetime.now(timezone.utc)
@@ -196,12 +309,13 @@ class PagamentoModel:
 #=====================================================================================================================
 #=====================================================================================================================
 
+
 #---------------------------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------------------------
 # URLS E BILHETES 
 bilhetes_collection = db[BILHETES_COLLECTION_NAME]
 
-def criar_documento_bilhete(bilhete_id, cpf, email_user, lista_numeros=None, lista_urls_img_bilhetes=None, data_criacao=None):
+def criar_documento_bilhete(bilhete_id, cpf, nome_user, valor_unidade, email_user, lista_numeros=None, lista_urls_img_bilhetes=None, data_criacao=None):
 
     if data_criacao is None:
         data_criacao = datetime.now(timezone.utc)
@@ -209,13 +323,15 @@ def criar_documento_bilhete(bilhete_id, cpf, email_user, lista_numeros=None, lis
     return {
         "_id": str(bilhete_id),
         "cpf": cpf,
+        "nome_usuario": nome_user,
         "email_usuario": email_user,
         "data_criacao": data_criacao,
-        "data_atualizacao": None,
+        "status": "pending",
+        "valor": valor_unidade,
+        "payment_id": "aguardando gerar pagamento",
         "lista_numeros": lista_numeros or [],
         "lista_urls_img_bilhetes": lista_urls_img_bilhetes or []
     }
-
 
 class BilheteModel:
     def __init__(self):
@@ -275,7 +391,6 @@ class BilheteModel:
             d["_id"] = str(d["_id"])
         return docs
 
-    
 # DELETE BILHETE
     def delete_bilhete(self, bilhete_id):
         try:
@@ -286,6 +401,23 @@ class BilheteModel:
             print("ERRO DELETE:", e)
             return 0
 
+    # BUSCAR POR EMAIL (para pegar as URLs do Cloudinary antes de apagar)
+    def find_by_email(self, email):
+        try:
+            # Retorna todos os documentos que possuem esse email
+            return list(self.collection.find({"email_usuario": email}))
+        except Exception as e:
+            print("ERRO BUSCA POR EMAIL:", e)
+            return []
+
+    # DELETAR TODOS POR EMAIL (MongoDB)
+    def delete_many_by_email(self, email):
+        try:
+            result = self.collection.delete_many({"email_usuario": email})
+            return result.deleted_count
+        except Exception as e:
+            print("ERRO DELETE MANY:", e)
+            return 0
 
 
 
@@ -293,170 +425,34 @@ class BilheteModel:
 
 
 
+# SAQUES
+saques_collection = db["saques"]
 
+def criar_saque(
+    nome_favorecido,
+    cpf_favorecido,
+    email_favorecido,
+    valor_saque,
+    identificacao,
+    descricao,
+    status=""
+) -> dict:
 
+    saque = {
+        "identificacao": str(identificacao).strip(),
+        "valor_saque": float(valor_saque),  # ✅ número não usa strip
+        "descricao": str(descricao).strip(),
+        "nome_favorecido": str(nome_favorecido).strip(),
+        "cpf_favorecido": str(cpf_favorecido).strip(),
+        "email_favorecido": str(email_favorecido).strip(),
+        "status": str(status).strip(),
+        "criado_em": datetime.now(timezone.utc)
+    }
 
+    result = saques_collection.insert_one(saque)
+    saque["_id"] = str(result.inserted_id)
 
+    return saque
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# lista_urls_img_bilhetes = []
-# # GERADOR DE RIFAS 
-# W, H = 900, 450
-
-# @app.route("/gerar-bilhete", methods=["POST"])
-# def gerar_bilhete():
-
-#     data = request.json
-
-#     numero_bilhete = f"Nº {data['numero']}"
-#     evento = "Pix no Bolso "
-#     descricao = "Prêmio: R$ 150,00 via Pix"
-#     data_sorteio = "Sorteio: Quartas e domingos"
-
-#     nome = data["nome"]
-#     email = data["email"]
-#     cpf = data["cpf"]
-#     cpf = f"{cpf[:3]}.***.***-{cpf[9:11]}"
-
-#     link_qrcode = "https://ferrari-tech.onrender.com"
-#     caminho_logo = "static/w.png"
-
-#     # =========================
-#     # FUNDO
-#     # =========================
-#     img = Image.new("RGB", (W, H))
-#     draw = ImageDraw.Draw(img)
-
-#     for y in range(H):
-#         draw.line([(0, y), (W, y)], fill=(200 - y//5, 20, 20))
-
-#     # =========================
-#     # CARD
-#     # =========================
-#     margin = 30
-#     cx1, cy1 = margin, margin
-#     cx2, cy2 = W - margin, H - margin
-
-#     cw, ch = cx2 - cx1, cy2 - cy1
-
-#     card = Image.new("RGB", (cw, ch), "white")
-#     shadow = Image.new("RGBA", (cw, ch), (0, 0, 0, 100)).filter(ImageFilter.GaussianBlur(10))
-
-#     img.paste(shadow, (cx1+4, cy1+4), shadow)
-#     img.paste(card, (cx1, cy1))
-
-#     draw = ImageDraw.Draw(img)
-
-#     # =========================
-#     # FONTES
-#     # =========================
-#     try:
-#         f_titulo = ImageFont.truetype("arialbd.ttf", 36)
-#         f_texto = ImageFont.truetype("arial.ttf", 24)
-#         f_label = ImageFont.truetype("arialbd.ttf", 20)
-#         f_num = ImageFont.truetype("arialbd.ttf", 28)
-#     except:
-#         f_titulo = f_texto = f_label = f_num = ImageFont.load_default()
-
-#     # =========================
-#     # LOGO
-#     # =========================
-#     if os.path.exists(caminho_logo):
-#         logo = Image.open(caminho_logo).convert("RGBA")
-#         logo.thumbnail((100, 60))
-#         img.paste(logo, (cx1 + 20, cy1 + 20), logo)
-
-#     # =========================
-#     # TEXTOS
-#     # =========================
-#     draw.text((cx1 + 140, cy1 + 25), evento, font=f_titulo, fill=(0, 0, 0))
-#     draw.text((cx1 + 140, cy1 + 70), descricao, font=f_texto, fill=(80, 80, 80))
-#     draw.text((cx1 + 140, cy1 + 100), data_sorteio, font=f_texto, fill=(80, 80, 80))
-#     draw.text((cx1 + 140, cy1 + 130), "SORTEIO PELA LOTERIA FEDERAL", font=f_label, fill=(180, 0, 0))
-
-#     # =========================
-#     # DADOS
-#     # =========================
-#     left_x = cx1 + 20
-#     right_x = cx2 - 220
-
-#     start_y = cy1 + 170
-#     gap = 40
-
-#     def linha(label, valor, y):
-#         draw.text((left_x, y), label, font=f_label, fill=(150, 0, 0))
-#         draw.text((left_x + 140, y), valor, font=f_texto, fill=(0, 0, 0))
-
-#     linha("Nome:", nome, start_y)
-#     linha("Email:", email, start_y + gap)
-#     linha("CPF:", cpf, start_y + gap*2)
-
-#     draw.line((left_x, start_y - 15, right_x - 20, start_y - 15), fill=(200,0,0), width=2)
-
-#     # =========================
-#     # NUMERO
-#     # =========================
-#     draw.rectangle([left_x, cy2 - 60, left_x + 200, cy2 - 20], fill=(200, 0, 0))
-#     draw.text((left_x + 10, cy2 - 55), numero_bilhete, fill="white", font=f_num)
-
-#     # =========================
-#     # QR CODE
-#     # =========================
-#     qr = qrcode.make(link_qrcode).convert("RGB").resize((150,150))
-
-#     qr_box = 180
-#     qr_bg = Image.new("RGB", (qr_box, qr_box), "white")
-#     qr_draw = ImageDraw.Draw(qr_bg)
-
-#     qr_draw.rectangle([0,0,qr_box-1,qr_box-1], outline=(200,0,0), width=3)
-#     qr_bg.paste(qr, (15,15))
-
-#     qr_y = cy1 + (ch // 2) - (qr_box // 2)
-#     img.paste(qr_bg, (right_x, qr_y))
-
-#     # =========================
-#     # SALVAR  CLOUDINARY 
-#     # =========================
-#     buffer = BytesIO()
-#     img.save(buffer, format="PNG")
-#     buffer.seek(0)
-
-#     upload_result = cloudinary.uploader.upload(
-#         buffer,
-#         folder="rifas",
-#         public_id=f"bilhete_{numero_bilhete}_{cpf}_{uuid.uuid4()}",
-#         resource_type="image"
-#     )
-
-#     url_imagem = upload_result["secure_url"]
-
-#     lista_urls_img_bilhetes.append(url_imagem)
-
-#     documento = criar_documento_bilhete(
-#         bilhete_id=numero_bilhete,
-#         cpf=cpf,
-#         email_user=email,
-#         lista_numeros=[numero_bilhete],
-#         lista_urls_img_bilhetes=lista_urls_img_bilhetes
-#     )
-
-#     BilheteModel().create_bilhete(documento)
-
-#     return jsonify({
-#         "img": url_imagem
-#     })
-
+def get_all_saques():
+    return list(saques_collection.find())
