@@ -67,7 +67,7 @@ cloudinary.config(
 
 @app.route("/")
 def produtos():
-    return render_template("produtos/minha_pagina.html")
+    return render_template("Produtos/minha_pagina.html")
 #================================================================================
 # Limpar cpf
 def limpar_cpf(cpf):
