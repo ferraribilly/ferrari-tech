@@ -14,11 +14,13 @@
 <style>
     body {
 
-        height: 100dvh;
-        width: 100vw;
+         width: 100%;
+         min-height: 100vh;
     }
+
+    
 </style>
-<body class="bg-light"></body>
+<body class="bg-light">
 <div class="container py-4">
  
 
@@ -27,7 +29,7 @@
     <div class="card-body">
         <form id="formLogin">
     <img 
-    src="../static/img/marca.png"
+    src="{{ url_for('static', filename='img/marca.png') }}"
     style="display: block; margin: 0 auto; width:100%; height: 100%;">
 
             <div class="mb-3">

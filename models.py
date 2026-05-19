@@ -22,6 +22,7 @@ db = client[DB_NAME]
 # Coleções
 PAGAMENTOS_COLLECTION_NAME = "pagamentos"
 BILHETES_COLLECTION_NAME = "bilhetes"
+RASPADINHAS_COLLECTION_NAME = "raspadinhas"
 users_collection = db["users"]
 vendedores_collection = db["vendedores"]
 saques_collection = db["saques"]
@@ -43,10 +44,10 @@ def validar_cpf(cpf: str) -> bool:
 #     
 #------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------
-def criar_usuario(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, email: str, estado: str, vendedor: str, chave_pix: str) -> dict:
+def criar_usuario(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, email: str, vendedor: str, chave_pix: str) -> dict:
     cpf = limpar_cpf(cpf)
 
-    estado = (estado or "").strip().upper()
+    # estado = (estado or "").strip().upper()
 
     if (
         not nome.strip()
@@ -55,7 +56,7 @@ def criar_usuario(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, email
         or not dt_nascimento.strip()
         or not vendedor.strip()
         or not chave_pix.strip()
-        or not estado
+        # or not estado
     ):
         raise ValueError("Dados inválidos para cadastro.")
 
@@ -68,9 +69,11 @@ def criar_usuario(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, email
         "cpf": cpf,
         "dt_nascimento": dt_nascimento.strip(),
         "email": email.strip(),
-        "estado": estado,  # 🔥 GARANTE SALVAR
+        # "estado": estado,  # 
         "vendedor": vendedor.strip(),
         "chave_pix": chave_pix.strip(),
+        "ganhos": 0.00,
+        "saques": 0.00, # valor minimo saque e de 3.00
         "criado_em": datetime.now(timezone.utc)
     }
 
@@ -108,6 +111,21 @@ def deletar_usuario(user_id: str) -> bool:
     except Exception as e:
         print("ERRO AO DELETAR:", e)
         return False
+
+    def update_usuario(self, user_id, new_data):
+        try:
+            new_data["data_atualizacao"] = datetime.now(timezone.utc)
+
+            result = self.collection.update_one(
+                {"_id": str(user_id)},
+                {"$set": new_data}
+            )
+            return result.modified_count
+
+        except Exception as e:
+            print("ERRO UPDATE:", e)
+            return 0
+
 #================================================================================================================================
 #================================================================================================================================
 
@@ -201,12 +219,8 @@ def criar_vendedor(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, emai
 
     return vendedor
 
-
-  
 #================================================================================================================================
 #================================================================================================================================
-
-
 
 #--------------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------------
@@ -420,7 +434,107 @@ class BilheteModel:
             return 0
 
 
+#=====================================================================================================================
+# RASPADINHAS
+#=====================================================================================================================
+raspadinhas_collection = db[RASPADINHAS_COLLECTION_NAME]
 
+def criar_documento_raspadinha(raspadinha_id, cpf, nome_user, valor_unidade, email_user, quantidade_raspadinha=None, data_criacao=None):
+
+    if data_criacao is None:
+        data_criacao = datetime.now(timezone.utc)
+
+    return {
+        "_id": str(raspadinha_id),
+        "cpf": cpf,
+        "nome_usuario": nome_user,
+        "email_usuario": email_user,
+        "data_criacao": data_criacao,
+        "status": "pending",
+        "valor": valor_unidade,
+        "payment_id": "aguardando gerar pagamento",
+        # "quantidade_raspadinha": quantidade_raspadinha or [],
+        # "quantidade_raspadinhas_raspadas": quantidade_raspadinha_raspada or []
+
+    }
+
+class RaspadinhaModel:
+    def __init__(self):
+        self.collection = raspadinhas_collection
+
+    def create_raspadinha(self, data):
+        try:
+            # 👇 evita erro de duplicado (_id já existe)
+            existente = self.collection.find_one({"_id": data["_id"]})
+            if existente:
+                return data["_id"]
+
+            result = self.collection.insert_one(data)
+            return str(result.inserted_id)
+
+        except Exception as e:
+            print("ERRO MODEL INSERT:", e)
+            return None    
+
+
+    def get_raspadinha_by_id(self, raspadinha_id):
+        return self.get_raspadinha(raspadinha_id)
+
+
+    def get_all_raspadinhas(self):
+        docs = list(self.collection.find())
+        for d in docs:
+            d["_id"] = str(d["_id"])
+        return docs
+
+
+    def update_raspadinha(self, raspadinha_id, new_data):
+        try:
+            new_data["data_atualizacao"] = datetime.now(timezone.utc)
+
+            result = self.collection.update_one(
+                {"_id": str(raspadinha_id)},
+                {"$set": new_data}
+            )
+            return result.modified_count
+
+        except Exception as e:
+            print("ERRO UPDATE:", e)
+            return 0
+
+
+    def get_raspadinhas_by_usuario(self, usuario_id):
+        docs = list(self.collection.find({"usuario_id": ObjectId(usuario_id)}))
+        for d in docs:
+            d["_id"] = str(d["_id"])
+        return docs
+
+    def delete_raspadinha(self, raspadinha_id):
+        try:
+            result = self.collection.delete_one({"_id": str(raspadinha_id)})
+            return result.deleted_count
+
+        except Exception as e:
+            print("ERRO DELETE:", e)
+            return 0
+
+    # BUSCAR POR EMAIL (para pegar as URLs do Cloudinary antes de apagar)
+    def find_by_email(self, email):
+        try:
+            # Retorna todos os documentos que possuem esse email
+            return list(self.collection.find({"email_usuario": email}))
+        except Exception as e:
+            print("ERRO BUSCA POR EMAIL:", e)
+            return []
+
+    # DELETAR TODOS POR EMAIL (MongoDB)
+    def delete_many_by_email(self, email):
+        try:
+            result = self.collection.delete_many({"email_usuario": email})
+            return result.deleted_count
+        except Exception as e:
+            print("ERRO DELETE MANY:", e)
+            return 0
 
 
 
@@ -439,13 +553,15 @@ def criar_saque(
 ) -> dict:
 
     saque = {
+        "ganhos": 0,
         "identificacao": str(identificacao).strip(),
-        "valor_saque": float(valor_saque),  # ✅ número não usa strip
+        "valor_saque": float(valor_saque), 
         "descricao": str(descricao).strip(),
         "nome_favorecido": str(nome_favorecido).strip(),
         "cpf_favorecido": str(cpf_favorecido).strip(),
         "email_favorecido": str(email_favorecido).strip(),
         "status": str(status).strip(),
+        "quantidade_raspadinhas": quantidade_raspadinhas or [],
         "criado_em": datetime.now(timezone.utc)
     }
 

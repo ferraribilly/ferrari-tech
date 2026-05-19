@@ -3,120 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eventos da Semana</title>
+    <title>Eventos e Assinaturas</title>
     <style> 
-        /* Estilos Gerais */
         body { 
-            font-family: sans-serif; 
+            font-family: 'Segoe UI', sans-serif; 
             margin: 0; 
             padding: 0; 
-            top:0;
             background: #000; 
             color: #fff;
         }
 
-        /* Header e Logo */
+        /* HEADER FIXO */
         header {
             width: 100%;
-            padding: 20px 0;
+            padding: 10px 0;
             display: flex;
             justify-content: center;
-            align-items: center;
             background: #052753;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
         }
 
-        .logo {
-            max-width: 250px; /* Ajuste o tamanho da sua logo aqui */
-            height: auto;
-        }
+        .logo { max-width: 130px; height: auto; }
 
-        /* Container do Carrossel */
+        /* ESPAÇO PARA O HEADER */
+        .wrapper { padding-top: 70px; }
+
+        /* CARROSSEL LATERAL */
         .carousel-container {
             display: flex;
             overflow-x: auto;
-            scroll-snap-type: x mandatory;
             gap: 15px;
             padding: 20px;
-            scroll-behavior: smooth;
+            scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
         }
 
-        .carousel-container::-webkit-scrollbar {
-            display: none;
-        }
+        .carousel-container::-webkit-scrollbar { display: none; }
 
-        .carousel-item {
+        /* ESTILO DOS CARDS */
+        .project-card {
             flex: 0 0 85%;
             scroll-snap-align: center;
-            background-color: #080000;
-            border-radius: 10px;
+            background-color: #0d0d0d;
+            border-radius: 12px;
+            border: 1px solid #1a1a1a;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            text-align: center;
-            padding: 20px;
-            /* border: 1px solid #222; */
         }
 
-        .carousel-item img {
-            max-width: 80%;
+        .project-card img {
+            width: 100%;
             height: auto;
-            border-radius: 8px;
+            max-height: 200px;
+            object-fit: contain;
+            background: #111;
         }
 
-        .content { padding: 15px 0; }
+        .content { padding: 15px; text-align: center; flex-grow: 1; }
+        .content h3 { margin: 5px 0; font-size: 1.1rem; }
+        .premiação { margin-bottom: 10px; font-size: 0.85rem; }
 
+        /* BOTÕES */
         .btn-participar {
-            display: inline-block;
-            padding: 12px 30px;
+            display: block;
+            padding: 10px;
             background-color: #007bff;
             color: white;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 6px;
             font-weight: bold;
-            margin-top: 10px;
-            transition: background 0.3s;
+            font-size: 0.9rem;
+            margin-top: 5px;
         }
 
-        .btn-participar:hover {
-            background-color: #0056b3;
+        .btn-whatsapp { background-color: #25d366 !important; }
+
+        /* ESTILO ESPECÍFICO DO CARD ASSINATURA */
+        .pacotes-list {
+            text-align: left;
+            background: #161616;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .pacote-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            padding: 4px 0;
+            border-bottom: 1px solid #222;
+        }
+        .pacote-row:last-child { border-bottom: none; }
+        
+        .temas {
+            color: #f68a05;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin: 10px 0;
         }
 
-        /* Responsividade Desktop */
+        footer { text-align: center; padding: 20px; color: #555; font-size: 0.75rem; }
+
         @media (min-width: 768px) {
-            .carousel-item {
-                flex: 0 0 30%;
-            }
+            .project-card { flex: 0 0 300px; }
+            .carousel-container { justify-content: center; flex-wrap: wrap; }
         }
     </style>
 </head>
 <body>
 
-<header>
-    <img src="/static/img/marca.png" class="logo">
-</header>
+    <header>
+        <img src="/static/img/marca.png" class="logo">
+    </header>
 
-<div class="carousel-container">
+    <div class="wrapper">
+        <main class="carousel-container">
+            
+            {% for p in projetos %}
+            <div class="project-card">
+                <img src="{{ p.imagem_projeto or '/static/img/marca.png' }}">
+                <div class="content">
+                    <small style="color: #444;">ID: {{ p._id }}</small>
+                    <h3>{{ p.nome_projeto }}</h3>
+                    <span style="color: #75f605; font-weight: bold;">Por R$ {{ p.valor_unidade }}</span>
 
-    {% for p in projetos %}
+                    <div class="premiação">
+                        <span style="color: #f68a05; font-weight: bold;">Premiação R$ {{ p.valor_injetado_premiacao }}</span>
+                        <br><small style="color:#12ec8e;">✓ Via Pix</small>
+                    </div>
+                    <a href="/vitoria_visionaria/projeto-desenvolvimento-fase-teste/codigo_servico/1722/{{ usuario_id }}/{{ p._id }}" class="btn-participar">
+                        Participar
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+            
 
-    <div class="carousel-item">
-        <img src="{{ p.imagem_projeto or '' }}">
-        
-        <div class="content">
-            <h3>{{ p._id }}</h3>
-            <h3>{{ p.nome_projeto }}</h3>
-            <h3>Premiação: R$ <span style="color: rgba(246, 138, 5, 0.96);"> {{ p.valor_injetado_premiacao }}</span><strong style="color:green;"> Via Pix</strong></h3>
+
 
             
-            <a href="/vitoria_visionaria/projeto-desenvolvimento-fase-teste/codigo_servico/1722/{{ usuario_id }}/{{ p._id }}" class="btn-participar">
-                Participar
-            </a>
-        </div>
+            <!-- <div class="project-card" style="border: 1px solid #007bff;">
+                <div style="background: #007bff; padding: 8px; text-align: center; font-size: 0.75rem; font-weight: bold;">
+                    ASSINATURA PREMIUM
+                </div>
+                <div class="content">
+                    <h3>Crie o Seu Ai</h3>
+                    <div class="pacotes-list">
+                        <div class="pacote-row"><span>60 Bilhetes</span> <span style="color:#75f605">R$ 19,99</span></div>
+                        <div class="pacote-row"><span>75 Bilhetes</span> <span style="color:#75f605">R$ 23,99</span></div>
+                        <div class="pacote-row"><span>100 Bilhetes</span> <span style="color:#75f605">R$ 30,00</span></div>
+                    </div>
+                    <div class="temas">
+                        TEMAS: Chá Bebê • Nomes • Números
+                    </div>
+                    <a href="#" class="btn-participar">ASSINAR JÁ 👍</a>
+                    <a href="https://wa.me/5527998031796?text=Preciso%20tirar%20Dúvidas%20%20Por%20Favor%20Usuario%20ID%20:%20{{usuario_id}}%20%20👉Assinatura%20Premium%20" target="_blank" class="btn-participar btn-whatsapp">TIRAR DUVIDAS WHATSAPP</a>
+                </div>
+            </div>
+
+            <div class="project-card" style="border: 1px solid #e91e63;">
+                <div style="background: #e91e63; padding: 8px; text-align: center; font-size: 0.75rem; font-weight: bold;">
+                    MARKETING PROFISSIONAL 🍷
+                </div>
+                <div class="content">
+                    <h3>Slot Machine para Adegas</h3>
+                    <p style="font-size: 0.8rem; color: #ccc;">Transforme sua Adega em uma experiência digital única!</p>
+                    <div class="pacotes-list" style="background: #1a0a0f;">
+                        <ul style="margin: 0; padding: 0 15px; font-size: 0.8rem; color: #ff85a1;">
+                            <li>• Seus produtos na Máquina</li>
+                            <li>• Sorteios automatizados</li>
+                            <li>• Venda mais com Gamificação</li>
+                        </ul>
+                    </div>
+                    <div class="temas" style="color: #e91e63;">
+                        IDEAL PARA: VINHOS • DESTILADOS • CERVEJAS
+                    </div>
+                    <a href="#" class="btn-participar" style="background-color: #e91e63;">SOLICITAR DEMO 👍</a>
+                <a href=" https://wa.me/5527998031796?text=Preciso%20tirar%20Dúvidas%20%20Por%20Favor%20Usuario%20ID%20:%20{{usuario_id}}%20%20🔞🎰Maquina%20Virtual%20"target="_blank" class="btn-participar btn-whatsapp">FALAR COM CONSULTOR 👍</a>
+                </div>
+            </div> -->
+
+        </main>
+
+        <p style="text-align: center; color: #333; font-size: 0.7rem; margin: 0;">Slide para o lado ➔</p>
+
+        <footer>
+            <p>&copy; 2026 Ferrari Tech - Todos os direitos reservados.</p>
+        </footer>
     </div>
 
-    {% endfor %}
-
-</div>
+</body>
+</html>

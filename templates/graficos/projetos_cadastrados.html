@@ -396,6 +396,8 @@
 
       <th style="background-color:#ff0066;">Vídeo</th>    
 
+      <th style="background-color:#ff0066;">Dezenas Sorteadas</th>    
+
       <th style="background-color:#FF7F50;">Ações</th>    
 
     </tr>    
@@ -438,6 +440,8 @@
 
       <td contenteditable="true">{{ p.link_kwai or '' }}</td>    
 
+        
+
       
       <td>
         <img src="{{ p.imagem_projeto }}"
@@ -458,6 +462,8 @@
           trocar
         </button>
       </td>
+
+      <td contenteditable="true">{{ p.numeros_sorteados or '' }}</td>        
 
       <td>
         <div style="display:flex; gap:8px; align-items:center;">

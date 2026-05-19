@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Prévia Segura</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 5rem;
+            color: rgba(0, 0, 0, 0.08);
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        body {
+            user-select: none;
+        }
+
+    </style>
+
+</head>
+
+<body class="bg-gray-900 p-4 md:p-10">
+
+    <div class="max-w-2xl mx-auto bg-white p-12 shadow-2xl relative overflow-hidden min-h-[842px]">
+
+        <div class="watermark">
+            PRÉVIA BLOQUEADA
+        </div>
+
+        <!-- FOTO -->
+         {% if dados.foto %}
+<div class="absolute top-10 right-10 z-20">
+    <img 
+        src="{{ url_for('static', filename='uploads/' + dados.foto) }}" 
+        class="w-[90px] h-[100px] border border-blue-600 object-cover">
+</div>
+{% endif %}
+
+<input type="hidden" name="habilidades" value="{{ dados.habilidades|join('\n') }}">
+
+
+ 
+
+        <!-- NOME -->
+
+        <div class="pr-32">
+
+            <h1 class="text-[30px] font-bold text-blue-600 uppercase leading-tight break-words">
+
+                {{ dados.nome }}
+
+            </h1>
+
+            <p class="text-gray-600 text-lg mt-2">
+
+                {{ dados.objetivo }}
+
+            </p>
+
+        </div>
+
+        <hr class="border-blue-600 border-b-2 mt-6">
+
+        <!-- CONTATO -->
+
+        <div class="mt-5 text-gray-700 leading-7 text-sm">
+
+            <p>{{ dados.cidade }}</p>
+
+            <p>{{ dados.contato }}</p>
+
+            <p>{{ dados.email }}</p>
+
+        </div>
+
+        <!-- PERFIL -->
+
+        <div class="mt-10">
+
+            <h3 class="text-blue-600 font-bold text-lg border-b pb-1">
+
+                Perfil Profissional
+
+            </h3>
+
+            <p class="mt-4 text-gray-700 whitespace-pre-line leading-7 break-words">
+
+                {{ dados.resumo }}
+
+            </p>
+
+        </div>
+
+        <!-- HABILIDADES -->
+
+        <div class="mt-10">
+
+            <h3 class="text-blue-600 font-bold text-lg border-b pb-1">
+
+                Habilidades e Diferenciais
+
+            </h3>
+
+            <ul class="list-disc ml-6 mt-4 space-y-2">
+
+                {% for hab in dados.habilidades %}
+
+                <li class="text-gray-700 break-words">
+
+                    {{ hab }}
+
+                </li>
+
+                {% endfor %}
+
+            </ul>
+
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+
+    <div class="fixed bottom-0 left-0 w-full bg-white border-t shadow-2xl p-5 text-center">
+
+        <form action="/template"
+            method="POST">
+
+            <input type="hidden" name="nome" value="{{ dados.nome }}">
+            <input type="hidden" name="objetivo" value="{{ dados.objetivo }}">
+            <input type="hidden" name="email" value="{{ dados.email }}">
+            <input type="hidden" name="contato" value="{{ dados.contato }}">
+            <input type="hidden" name="cidade" value="{{ dados.cidade }}">
+            <input type="hidden" name="resumo" value="{{ dados.resumo }}">
+            <input type="hidden" name="habilidades" value="{{ '\n'.join(dados.habilidades) }}">
+            <input type="hidden" name="foto_preview" value="{{ dados.foto }}">
+            <input type="hidden" name="acao" value="baixar">
+
+            <button type="submit"
+                class="bg-green-600 hover:bg-green-700 text-white font-bold px-10 py-3 rounded-full">
+
+                PAGAR E BAIXAR PDF OFICIAL
+
+            </button>
+
+        </form>
+
+    </div>
+
+</body>
+
+</html>

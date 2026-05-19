@@ -74,6 +74,16 @@
         
   </header>
   <div  class="container">
+<h3 id="valor-bilhete" style="color:#fecc03; font-family: sans, serif; text-align: center;">
+    <span style="color:#fff; font-family: sans, serif; text-align: center;">
+        Cada Bilhete
+    </span>
+    R$ {{ projeto_principal.valor_unidade }}
+</h3>
+
+    <h3 style="color:#fecc03; font-family: sans, serif; text-align: center;">
+     {{ projeto_principal.nome_projeto }}
+    </h3>
     <h3 style="color:#fff; font-family: sans, serif; text-align: center;">GERADOR BILHETES <br>
       <span>(N°) 1 atê 60</span>
     </h3>
@@ -158,7 +168,7 @@
     
     <p style="color:#0e0000; font-weight: bold; font-family: monospace;">
       vendedor:
-      <span  id="vendedor" style="color: #4a90e2;" >{{ usuario.vendedor }}</span>
+    <span  id="vendedor" style="color: #4a90e2;" >{{ usuario.vendedor }}</span>
     </p>
 </div>
 
@@ -198,7 +208,7 @@
             </div>
 
 
-            <div style="display: none;" class="linha-btn">
+            <div style="display:none ;" class="linha-btn">
             <img class="icon" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778018729/mercado-pago_aycs9m.png">
             <button class="purchase-preference" id="btn-preference">Preferências Mercado Pago</button>
             </div>  

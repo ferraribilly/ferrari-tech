@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Gerador de Currículo Profissional</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+</head>
+
+<body class="bg-gray-50 font-sans text-gray-800">
+
+    <div class="max-w-4xl mx-auto py-10 px-4">
+
+        <header class="text-center mb-10">
+
+            <h1 class="text-4xl font-extrabold text-blue-700">
+                Gerador de Currículo
+            </h1>
+
+            <p class="text-gray-500 mt-2">
+                Preencha os campos abaixo para gerar seu PDF profissional
+            </p>
+
+        </header>
+
+        <form action="/template"
+            method="POST"
+            enctype="multipart/form-data"
+            class="bg-white shadow-2xl rounded-2xl overflow-hidden">
+
+            <!-- DADOS -->
+            <div class="p-8 border-b border-gray-100">
+
+                <h2 class="text-xl font-semibold mb-6 flex items-center text-blue-600">
+
+                    <i class="fas fa-user-circle mr-2"></i>
+
+                    Dados Pessoais
+
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <div>
+
+                        <label class="block text-sm font-medium mb-1">
+                            Nome Completo
+                        </label>
+
+                        <input type="text"
+                            name="nome"
+                            placeholder="Ex: William Henrique..."
+                            class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                            required>
+
+                    </div>
+
+                    <div>
+
+                        <label class="block text-sm font-medium mb-1">
+                            Objetivo Profissional
+                        </label>
+
+                        <input type="text"
+                            name="objetivo"
+                            placeholder="Ex: Analista de Dados"
+                            class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                            required>
+
+                    </div>
+
+                    <div>
+
+                        <label class="block text-sm font-medium mb-1">
+                            E-mail
+                        </label>
+
+                        <input type="email"
+                            name="email"
+                            placeholder="email@exemplo.com"
+                            class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                            required>
+
+                    </div>
+
+                    <div>
+
+                        <label class="block text-sm font-medium mb-1">
+                            Telefone/WhatsApp
+                        </label>
+
+                        <input type="text"
+                            name="contato"
+                            placeholder="(00) 0 0000-0000"
+                            class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                            required>
+
+                    </div>
+
+                    <div>
+
+                        <label class="block text-sm font-medium mb-1">
+                            Cidade - UF
+                        </label>
+
+                        <input type="text"
+                            name="cidade"
+                            placeholder="Ex: Franca - SP"
+                            class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                            required>
+
+                    </div>
+
+                    <!-- FOTO -->
+                    <div>
+
+                        <label class="block text-sm font-medium mb-2">
+                            Foto de Perfil
+                        </label>
+
+                        <input type="file"
+                            id="foto"
+                            name="foto"
+                            accept="image/*"
+                            capture="user"
+                            class="hidden">
+
+                        <div class="flex gap-3">
+
+                            <button type="button"
+                                onclick="document.getElementById('foto').click()"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-semibold">
+
+                                <i class="fas fa-camera mr-2"></i>
+                                Tirar Foto
+
+                            </button>
+
+                            <button type="button"
+                                onclick="abrirGaleria()"
+                                class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-3 rounded-lg font-semibold">
+
+                                <i class="fas fa-image mr-2"></i>
+                                Galeria
+
+                            </button>
+
+                        </div>
+
+                        <!-- PREVIEW -->
+                        <div class="mt-4">
+
+                            <img id="preview"
+                                class="hidden w-32 h-32 object-cover rounded-xl border shadow">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- PERFIL -->
+            <div class="p-8 border-b border-gray-100 bg-gray-50">
+
+                <h2 class="text-xl font-semibold mb-6 flex items-center text-blue-600">
+
+                    <i class="fas fa-file-alt mr-2"></i>
+
+                    Perfil Profissional
+
+                </h2>
+
+                <textarea name="resumo"
+                    rows="4"
+                    placeholder="Fale um pouco sobre sua experiência e formação..."
+                    class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                    required></textarea>
+
+            </div>
+
+            <!-- HABILIDADES -->
+            <div class="p-8 border-b border-gray-100">
+
+                <h2 class="text-xl font-semibold mb-6 flex items-center text-blue-600">
+
+                    <i class="fas fa-tools mr-2"></i>
+
+                    Habilidades (uma por linha)
+
+                </h2>
+
+                <textarea name="habilidades"
+                    rows="5"
+                    placeholder="Ex: Python&#10;Excel Avançado&#10;SQL"
+                    class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                    required></textarea>
+
+                <p class="text-xs text-gray-400 mt-2 italic">
+                    Cada linha vira um tópico no PDF.
+                </p>
+
+            </div>
+
+            <!-- BOTÃO -->
+            <div class="p-8 bg-white text-center">
+
+                <button type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-10 rounded-full shadow-lg transform transition hover:scale-105 active:scale-95">
+
+                    <i class="fas fa-download mr-2"></i>
+
+                    PREVIA CURRÍCULO AGORA
+
+                </button>
+
+                <p class="text-xs text-gray-400 mt-4">
+                    Custo por geração: 1.25 centavos
+                </p>
+
+            </div>
+
+        </form>
+
+        <footer class="mt-10 text-center text-gray-400 text-sm">
+
+            &copy; 2026 - Sistema de Automação de Currículos via Python
+
+        </footer>
+
+    </div>
+
+    <script>
+
+        const fotoInput = document.getElementById("foto")
+
+        const preview = document.getElementById("preview")
+
+        function abrirGaleria() {
+
+            fotoInput.removeAttribute("capture")
+
+            fotoInput.click()
+
+        }
+
+        fotoInput.addEventListener("change", function () {
+
+            const arquivo = this.files[0]
+
+            if (arquivo) {
+
+                const reader = new FileReader()
+
+                reader.onload = function (e) {
+
+                    preview.src = e.target.result
+
+                    preview.classList.remove("hidden")
+
+                }
+
+                reader.readAsDataURL(arquivo)
+
+            }
+
+        })
+
+    </script>
+
+</body>
+
+</html>

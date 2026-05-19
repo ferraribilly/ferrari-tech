@@ -1,3 +1,4 @@
+//PAGAMENTOS PIX BILHETES
 document.getElementById("btn-pagar").onclick = () => {
 
     document.getElementById("loading-pagamento").style.display = "flex";
@@ -17,6 +18,8 @@ document.getElementById("btn-pagar").onclick = () => {
 
     window.location.href = url;
 };
+
+
 
 
 document.getElementById("btn-preference").onclick = () => {

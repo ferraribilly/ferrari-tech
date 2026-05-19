@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/finalize.css') }}"> 
     <title>Pagamento via Pix | </title>
     <style> 
-       
+
 /* Isso centraliza o ícone dentro da div do QR Code */
 .qrcode {
     position: relative; /* Referência para o ícone absoluto */
@@ -59,7 +59,7 @@
                 
             </div>
             <div class="pix-value">
-                <span style="font-family: monospace; font-weight: bold;">ID transação:</span>
+                <span style="font-family: monospace; font-weight: bold;">ID Usuario:</span>
                 <strong id="usuario-id" style="color: brown; font-weight: bold;">{{ usuario_id }}</strong>
             </div>                 
 
@@ -69,7 +69,7 @@
             </div>            
 
             <div class="pix-value">
-                 <strong style="color: brown; font-weight: bold;">Dia das Maes</strong>
+                 <strong style="color: brown; font-weight: bold;">Ferrari Tech Serviço Digital</strong>
             </div>
            
             <div class="pix-value">
@@ -90,7 +90,8 @@
     </div>
 </main>
 
-<script src="{{ url_for('static', filename='js/finalize1.js') }}"></script>
+<script src="{{ url_for('static', filename='js/graficos/eventos/raspadinha/Pagamentos/verificando _status_pagamento.js') }}"></script>
+
 <script>
 
  

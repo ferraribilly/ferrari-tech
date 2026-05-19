@@ -2,129 +2,137 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="theme-color" content="#fff">
-        <title>Registro usuarios</title>
-        <link rel="apple-touch-icon" href="{{ url_for('static', filename='w.png') }}">
-        <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-        <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/registro.css') }}">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#fff">
+    <title>Registro usuários</title>
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='w.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/registro.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* Estilo do Loader de Verificação */
+        #loadingOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            color: #198754; /* Cor verde do Bootstrap */
+        }
+        #loadingText {
+            margin-top: 15px;
+            font-family: monospace;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
 </head>
 
- <body class="bg-light">
-</div>
-<div  class="container py-4">
-    <h1 class="text-center mb-4"></h1>
-    <!-- Formulário de Registro -->
-    <div style="background-color: rgba(248, 246, 248, 0.793); text-align: center;" class="card mb-4">
-        <div style="text-align: center; font-family: monospace; font-weight: bold;"></div>
-        <div class="card-body">
-            
-            <form style="font-family:monospace; font-weight: bold;" id="formRegistro">
-                   <img 
-    src="../static/img/marca.png"
-    style="display: block; margin: 0 auto; width:100%; height: 100%;">
+<body class="bg-light">
 
-
-    <div class="mb-3">
-        <input id="nome" type="text" class="form-control" name="nome" placeholder="Digite seu nome" required>
+    <div id="loadingOverlay">
+        <div class="spinner-border" role="status"></div>
+        <span id="loadingText">Verificando dados...</span>
     </div>
 
-    <div class="mb-3">
-        <input id="sobrenome" type="text" class="form-control" name="sobrenome" placeholder="Digite seu sobrenome" required>
-    </div>
+    <div class="container py-4">
+        <div style="background-color: rgba(248, 246, 248, 0.793); text-align: center;" class="card mb-4">
+            <div class="card-body">
+                
+                <form style="font-family:monospace; font-weight: bold;" id="formRegistro">
+                    <img src="../static/img/marca.png" style="display: block; margin: 0 auto; width:100%; height: auto; max-width: 300px; margin-bottom: 20px;">
 
-    <div class="mb-3">
-        <input id="cpf" type="text" class="form-control" name="cpf" placeholder="Digite seu CPF (s/ Pontos)" pattern="\d{11}" required>
-    </div>
+                    <div class="mb-3">
+                        <input id="nome" type="text" class="form-control" name="nome" placeholder="Digite seu nome" required>
+                    </div>
 
- <div class="mb-3">
-       <label style="font-family:monospace; font-weight: bold;"  >Data Nascimento</label>
-    <input id="dt_nascimento" type="date" class="form-control" name="dt_nascimento" required>
-</div>
+                    <div class="mb-3">
+                        <input id="sobrenome" type="text" class="form-control" name="sobrenome" placeholder="Digite seu sobrenome" required>
+                    </div>
 
-    <div class="mb-3">
-        <input id="email" type="text" class="form-control" name="email" placeholder="Digite seu email" required>
-    </div>
+                    <div class="mb-3">
+                        <input id="cpf" type="text" class="form-control" name="cpf" placeholder="Digite seu CPF (apenas números)" maxlength="11" required>
+                    </div>
 
-    <div class="mb-3">
-    <select id="estado" name="estado" class="form-select" required style="border-radius: 5px;">
-        <option value="" selected disabled>Selecione seu Estado</option>
-        <!-- O JavaScript preencherá o restante -->
-    </select>
-    </div>
+                    <div class="mb-3 text-start">
+                        <label style="font-family:monospace; font-weight: bold; margin-left: 5px;">Data Nascimento</label>
+                        <input id="dt_nascimento" type="date" class="form-control" name="dt_nascimento" required>
+                    </div>
 
-    
+                    <div class="mb-3">
+                        <input id="email" type="email" class="form-control" name="email" placeholder="Digite seu email" required>
+                    </div>
 
-    <!-- VENDEDOR TEM QUE FICAR AQUI -->
-    <div class="mb-3">
-        <label for="vendedorInput" class="form-label">Lista Indicação</label>
+                    <div class="mb-3">
+                        <select id="estado" name="estado" class="form-select" required style="border-radius: 5px;">
+                            <option value="" selected disabled>Selecione seu Estado</option>
+                        </select>
+                    </div>
 
-        <input type="text" 
-               class="form-control" 
-               id="vendedorInput" 
-               name="vendedor" 
-               placeholder="Clique para selecionar..."
-               data-bs-toggle="modal" 
-               data-bs-target="#vendedorModal"
-               readonly
-               required>
-    </div>
+                    <div class="mb-3">
+                        <label for="vendedorInput" class="form-label text-start d-block">Lista Indicação</label>
+                        <input type="text" class="form-control" id="vendedorInput" name="vendedor" placeholder="Clique para selecionar..." data-bs-toggle="modal" data-bs-target="#vendedorModal" readonly required>
+                    </div>
 
-    <div class="mb-3">
-        <input id="chave_pix" type="text" class="form-control" name="chave_pix" placeholder="Digite sua chave PIX" required>
-    </div>
+                    <div class="mb-3">
+                        <input id="chave_pix" type="text" class="form-control" name="chave_pix" placeholder="Digite sua chave PIX" required>
+                    </div>
 
-    <!-- BOTÃO SEMPRE POR ÚLTIMO -->
-    <button style="border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); font-weight: bold; transition: all 0.3s ease;" type="submit" class="btn btn-success w-100">
-        Confirmar Registro
-    </button>
+                    <button id="btnSubmit" style="border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); font-weight: bold; transition: all 0.3s ease;" type="submit" class="btn btn-success w-100 mb-3">
+                        Confirmar Registro
+                    </button>
 
-        <!-- Botão Voltar -->
-    <a href="/vitoria_vitoriosa/login" class="btn-voltar"><span class="seta">←</span> Voltar</a>
- 
+                    <a href="/vitoria_vitoriosa/login" class="btn-voltar d-block text-decoration-none" style="color: #666;">
+                        <span class="seta">←</span> Voltar para Login
+                    </a>
 
-      <!-- Aviso de Segurança -->
-    <div id="segurity-notice" class="security-notice">
-        <div class="security-icon">🔒</div>
-        <p class="security-text">
-            <strong>Segurança Total:</strong> Seus dados são coletados e protegidos por criptografia de ponta a ponta. Apenas você e o destinatário final têm acesso às informações.
-        </p>
-    </div>
-</form>
-            <div id="registroMsg" class="mt-2"></div>
+                    <div id="segurity-notice" class="security-notice mt-4" style="font-size: 0.8rem; background: #e9ecef; padding: 10px; border-radius: 8px;">
+                        <div class="security-icon">🔒</div>
+                        <p class="security-text mb-0">
+                            <strong>Segurança Total:</strong> Seus dados são protegidos por criptografia de ponta a ponta.
+                        </p>
+                    </div>
+                </form>
+
+                <div id="registroMsg" class="mt-2"></div>
+            </div>
         </div>
     </div>
-</div>
 
+    <div class="modal fade" id="vendedorModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Selecione um Vendedor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for u in vendedores %}
+                        <button type="button" class="list-group-item list-group-item-action vendor-option">
+                            {{ u.nome }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<!-- MODAL (FALTAVA) -->
-<div class="modal fade" id="vendedorModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h5 class="modal-title">Selecione um Vendedor</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      
-
- <div class="modal-body p-0">
-  <div class="list-group list-group-flush">
-    {% for u in vendedores %}
-      <button type="button" class="list-group-item list-group-item-action vendor-option">
-        {{ u.nome }}
-      </button>
-    {% endfor %}
-  </div>
-</div>
-</div>
-
-<!-- JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<script src="{{ url_for('static', filename='js/registro_login.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/registro_login.js') }}"></script>
 
 </body>
 </html>

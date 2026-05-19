@@ -9,6 +9,7 @@ from threading import Thread
 import pandas as pd
 import requests
 import mercadopago
+import requests
 import hmac
 import hashlib
 from io import BytesIO
@@ -18,7 +19,7 @@ import fitz
 import re
 import os
 import pytesseract
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import cloudinary
@@ -27,16 +28,21 @@ import cloudinary.api
 from bson.objectid import ObjectId
 from models import criar_usuario, users_collection, pagamentos_collection, criar_documento_pagamento, PagamentoModel,  criar_vendedor, vendedores_collection
 from models import  bilhetes_collection, criar_documento_bilhete, BilheteModel
+from models import  raspadinhas_collection, criar_documento_raspadinha, RaspadinhaModel
 from models import criar_projeto
 from models import projetos_collection
 from models import criar_saque, saques_collection
 from models import get_all_saques
+from models import db  # Puxa a conexão direta do seu arquivo de modelos
 from flask_cors import CORS
 from datetime import datetime, timezone
+from datetime import datetime, date
 import time
 import uuid
 import io
 import json
+import textwrap
+import traceback
 
 load_dotenv()
 
@@ -46,16 +52,25 @@ CORS(app)
 client = MongoClient(os.getenv("MONGO_URI"))
 pagamento_model = PagamentoModel()
 bilhete_model = BilheteModel()
+raspadinha_model = RaspadinhaModel()
 socketio = SocketIO(app, cors_allowed_origins="*")
 app.secret_key = os.getenv("APP_SECRET_KEY")
 notification_url = os.getenv("NOTIFICATION_URL")
-premiacao1 = os.getenv("PREMIACAO1")
-dt_sort = os.getenv("SORTEIO")
-cfop_fora_estado = os.getenv("CFOP_FORA_ESTADO")
-cfop_estado = os.getenv("CFOP_ESTADO")
-codigo_servico =  os.getenv("CODIGO_SERVICO")
-ncm = os.getenv("NCM")
 
+
+
+
+@app.route('/ver-logs')
+def ver_logs():
+    # Busca todos os logs salvos do mais novo para o mais antigo
+    logs = list(db["logs_seguranca_erros"].find().sort("_id", -1))
+    
+    # Converte o ObjectId do MongoDB em string para o Flask conseguir gerar o JSON sem quebrar
+    for log in logs:
+        log["_id"] = str(log["_id"])
+        
+    # Retorna o JSON puro diretamente na tela
+    return jsonify(logs)
 
 
 # ---------------- CLOUDINARY ----------------
@@ -67,7 +82,480 @@ cloudinary.config(
 
 @app.route("/")
 def produtos():
-    return render_template("Produtos/minha_pagina.html")
+    return render_template("produtos/minha_pagina.html")
+
+
+
+@app.route("/gerador/curriculo")
+def curriculos():
+    # Renderiza o seu formulário HTML
+    return render_template("produtos/gerador_curriculo.html")
+
+
+# Configurações de pastas
+UPLOAD_FOLDER = "static/uploads"
+PDF_FOLDER = "static/pdfs"
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(PDF_FOLDER, exist_ok=True)
+
+
+
+
+# =========================================================================
+# CENTRALIZADOR GLOBAL DE SEGURANÇA E AUDITORIA DE ERROS
+# =========================================================================
+# def obter_localizacao_ip(ip):
+#     """
+#     Consulta a API de geolocalização para extrair cidade e estado do IP.
+#     """
+#     # Ignora IPs de teste local
+#     if ip in ['127.0.0.1', 'localhost'] or ip.startswith('192.168.'):
+#         return "Rede Local / Teste"
+    
+#     try:
+#         # Consulta a API de forma ultra rápida (limite de 1s para não travar o site)
+#         resposta = requests.get(f"http://ip-api.com{ip}?fields=status,city,regionName,country", timeout=1)
+#         dados_geo = resposta.json()
+        
+#         if dados_geo.get("status") == "success":
+#             return f"{dados_geo.get('city')}, {dados_geo.get('regionName')} - {dados_geo.get('country')}"
+#     except:
+#         pass
+    
+#     return "Não identificada"
+
+
+# @app.before_request
+# def monitorar_seguranca_global():
+#     ip_usuario = request.headers.get('X-Forwarded-For', request.remote_addr)
+#     # Se houver uma lista de IPs, pega apenas o primeiro (IP real do cliente)
+#     if ip_usuario and ',' in ip_usuario:
+#         ip_usuario = ip_usuario.split(',')[0].strip()
+
+#     rotas_criticas = ['/saque', '/raspadinha/resultado']
+    
+#     if request.path in rotas_criticas:
+#         dados = request.get_json(silent=True) or {}
+#         usuario_id = dados.get("usuario_id") or request.args.get("usuario_id")
+        
+#         if usuario_id and not ObjectId.is_valid(str(usuario_id)):
+#             # Busca a localização antes de salvar
+#             localizacao = obter_localizacao_ip(ip_usuario)
+
+#             db["logs_seguranca_erros"].insert_one({
+#                 "tipo": "TENTATIVA_INVASAO_ID",
+#                 "status_code": 400,
+#                 "rota": request.path,
+#                 "metodo": request.method,
+#                 "detalhe": f"Formato de ID inválido ou tentativa de injeção: '{usuario_id}'",
+#                 "ip": ip_usuario,
+#                 "localizacao": localizacao, # <-- Novo campo salvo no banco
+#                 "user_agent": request.headers.get("User-Agent"),
+#                 "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")
+#             })
+#             return jsonify({"erro": "Ação inválida. Esta tentativa foi registrada para auditoria."}), 400
+
+
+# @app.errorhandler(Exception)
+# def capturar_erros_500_global(e):
+#     ip_usuario = request.headers.get('X-Forwarded-For', request.remote_addr)
+#     if ip_usuario and ',' in ip_usuario:
+#         ip_usuario = ip_usuario.split(',')[0].strip()
+        
+#     erro_completo = traceback.format_exc()
+    
+#     # Busca a localização antes de salvar
+#     localizacao = obter_localizacao_ip(ip_usuario)
+
+#     db["logs_seguranca_erros"].insert_one({
+#         "tipo": "ERRO_SISTEMA_500",
+#         "status_code": getattr(e, 'code', 500),
+#         "rota": request.path,
+#         "metodo": request.method,
+#         "erro_mensagem": str(e),
+#         "rastreamento_terminal": erro_completo,
+#         "ip": ip_usuario,
+#         "localizacao": localizacao, # <-- Novo campo salvo no banco
+#         "user_agent": request.headers.get("User-Agent"),
+#         "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")
+#     })
+    
+#     return jsonify({
+#         "erro": "Ocorreu uma inconsistência interna no servidor.",
+#         "mensagem": "O incidente foi registrado automaticamente para análise técnica."
+#     }), 500
+
+@app.route("/template", methods=["POST"])
+def template():
+
+    acao = request.form.get("acao")
+    foto = request.files.get("foto")
+
+    dados = {
+        "nome": request.form.get("nome"),
+        "objetivo": request.form.get("objetivo"),
+        "email": request.form.get("email"),
+        "contato": request.form.get("contato"),
+        "cidade": request.form.get("cidade"),
+        "resumo": request.form.get("resumo"),
+        "habilidades": request.form.get("habilidades").splitlines(),
+        "foto": None
+    }
+
+    caminho_foto = None
+
+    # =====================================
+    # FOTO - CORREÇÃO DE ORIENTAÇÃO INCLUÍDA
+    # =====================================
+
+    if foto and foto.filename != "":
+
+        nome_foto = f"{uuid.uuid4().hex}_{secure_filename(foto.filename)}"
+
+        caminho_foto = os.path.join(
+            UPLOAD_FOLDER,
+            nome_foto
+        )
+
+        foto.save(caminho_foto)
+        
+        # --- CORREÇÃO DA FOTO TORTA ---
+        # Abre a imagem, corrige a rotação automática do celular (EXIF) e salva de volta
+        img_fix = Image.open(caminho_foto)
+        img_fix = ImageOps.exif_transpose(img_fix)
+        img_fix.save(caminho_foto)
+        # ------------------------------
+
+        dados["foto"] = nome_foto
+
+    # =====================================
+    # PREVIEW
+    # =====================================
+
+    if acao != "baixar":
+
+        return render_template(
+            "produtos/preview.html",
+            dados=dados
+        )
+
+    # =====================================
+    # FOTO VINDO DA PREVIEW
+    # =====================================
+
+    foto_preview = request.form.get("foto_preview")
+
+    if foto_preview:
+
+        caminho_foto = os.path.join(
+            UPLOAD_FOLDER,
+            foto_preview
+        )
+
+    # =====================================
+    # PDF
+    # =====================================
+
+    nome_pdf = f"{uuid.uuid4().hex}.pdf"
+
+    caminho_pdf = os.path.join(
+        PDF_FOLDER,
+        nome_pdf
+    )
+
+    c = canvas.Canvas(
+        caminho_pdf,
+        pagesize=A4
+    )
+
+    largura, altura = A4
+
+    azul = HexColor("#0066CC")
+    cinza = HexColor("#444444")
+
+    margem_esquerda = 50
+
+    # =====================================
+    # FOTO PDF
+    # =====================================
+
+    x_foto = largura - 140
+    y_foto = altura - 140
+
+    largura_foto = 100
+    altura_foto = 100
+
+    c.setStrokeColor(azul)
+
+    c.setLineWidth(1)
+
+    c.rect(
+        x_foto,
+        y_foto,
+        largura_foto,
+        altura_foto
+    )
+
+    try:
+
+        if caminho_foto and os.path.exists(caminho_foto):
+
+            img = Image.open(caminho_foto)
+
+            img = img.convert("RGB")
+
+            largura_original, altura_original = img.size
+
+            proporcao = min(
+                largura_foto / largura_original,
+                altura_foto / altura_original
+            )
+
+            nova_largura = largura_original * proporcao
+            nova_altura = altura_original * proporcao
+
+            pos_x = x_foto + (
+                (largura_foto - nova_largura) / 2
+            )
+
+            pos_y = y_foto + (
+                (altura_foto - nova_altura) / 2
+            )
+
+            # Usando ImageReader direto na imagem processada
+            imagem = ImageReader(img)
+
+            c.drawImage(
+                imagem,
+                pos_x,
+                pos_y,
+                width=nova_largura,
+                height=nova_altura,
+                mask='auto'
+            )
+
+        else:
+            raise Exception()
+
+    except Exception as erro:
+
+        print("ERRO FOTO:", erro)
+
+        c.setFont("Helvetica", 9)
+
+        c.drawCentredString(
+            x_foto + 45,
+            y_foto + 50,
+            "Foto"
+        )
+
+    # =====================================
+    # NOME
+    # =====================================
+
+    c.setFillColor(azul)
+
+    c.setFont("Helvetica-Bold", 20)
+
+    nome_linhas = textwrap.wrap(
+        dados["nome"],
+        width=28
+    )
+
+    y_nome = altura - 90
+
+    for linha in nome_linhas:
+
+        c.drawString(
+            margem_esquerda,
+            y_nome,
+            linha
+        )
+
+        y_nome -= 24
+
+    # =====================================
+    # OBJETIVO
+    # =====================================
+
+    c.setFillColor(cinza)
+
+    c.setFont("Helvetica", 14)
+
+    c.drawString(
+        margem_esquerda,
+        y_nome - 5,
+        dados["objetivo"]
+    )
+
+    # =====================================
+    # LINHA
+    # =====================================
+
+    linha_y = y_nome - 30
+
+    c.setStrokeColor(azul)
+
+    c.setLineWidth(2)
+
+    c.line(
+        50,
+        linha_y,
+        largura - 50,
+        linha_y
+    )
+
+    # =====================================
+    # CONTATO
+    # =====================================
+
+    c.setFillColor(azul)
+
+    c.setFont("Helvetica-Bold", 12)
+
+    c.drawString(
+        margem_esquerda,
+        linha_y - 30,
+        "Contato:"
+    )
+
+    c.setFillColor(cinza)
+
+    c.setFont("Helvetica", 11)
+
+    contato = (
+        f"{dados['cidade']} | "
+        f"{dados['contato']} | "
+        f"{dados['email']}"
+    )
+
+    contato_linhas = textwrap.wrap(
+        contato,
+        width=65
+    )
+
+    y_contato = linha_y - 30
+
+    for linha in contato_linhas:
+
+        c.drawString(
+            120,
+            y_contato,
+            linha
+        )
+
+        y_contato -= 16
+
+    # =====================================
+    # PERFIL
+    # =====================================
+
+    y_atual = y_contato - 35
+
+    c.setFillColor(azul)
+
+    c.setFont("Helvetica-Bold", 14)
+
+    c.drawString(
+        margem_esquerda,
+        y_atual,
+        "Perfil Profissional"
+    )
+
+    y_atual -= 25
+
+    c.setFillColor(cinza)
+
+    c.setFont("Helvetica", 11)
+
+    resumo_linhas = textwrap.wrap(
+        dados["resumo"],
+        width=85
+    )
+
+    for linha in resumo_linhas:
+
+        c.drawString(
+            margem_esquerda,
+            y_atual,
+            linha
+        )
+
+        y_atual -= 18
+
+    # =====================================
+    # HABILIDADES
+    # =====================================
+
+    y_atual -= 10
+
+    c.setFillColor(azul)
+
+    c.setFont("Helvetica-Bold", 14)
+
+    c.drawString(
+        margem_esquerda,
+        y_atual,
+        "Habilidades e Diferenciais"
+    )
+
+    y_atual -= 25
+
+    c.setFillColor(cinza)
+
+    c.setFont("Helvetica", 11)
+
+    for hab in dados["habilidades"]:
+
+        if hab.strip():
+
+            linhas_hab = textwrap.wrap(
+                hab.strip(),
+                width=80
+            )
+
+            for i, linha in enumerate(linhas_hab):
+
+                prefixo = "• " if i == 0 else "  "
+
+                c.drawString(
+                    margem_esquerda + 10,
+                    y_atual,
+                    prefixo + linha
+                )
+
+                y_atual -= 18
+
+                if y_atual < 80:
+
+                    c.showPage()
+
+                    y_atual = altura - 80
+
+                    c.setFont("Helvetica", 11)
+
+    # =====================================
+    # RODAPÉ
+    # =====================================
+
+    c.setFont("Helvetica-Oblique", 9)
+
+    c.setFillColor(cinza)
+
+    c.drawCentredString(
+        largura / 2,
+        40,
+        "Currículo gerado automaticamente em Python"
+    )
+
+    c.save()
+
+    return send_file(
+        caminho_pdf,
+        as_attachment=True
+    )
+
 #================================================================================
 # Limpar cpf
 def limpar_cpf(cpf):
@@ -76,7 +564,7 @@ def limpar_cpf(cpf):
     return ''.join(filter(str.isdigit, cpf))
 #---------------------------------------------------------------------------------
 #=================================================================================
-#=================================================================================politica-privacidade
+#=================================================================================
 # PAGINA INICIAL DO USUARIOS OPÇOES
 #/ferrari-tech/tecnlogia
 @app.route("/vitoria-visonaria_franca-sp")
@@ -86,39 +574,106 @@ def options():
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
-@app.route("/politica-privacidade")
+@app.route("/termos")
 def politica_privacidade():
     return render_template("termos.html")   
 
 #=================================================================================
 # REGISTRAR USUARIOS
 #---------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------
+
+
+def validar_cpf(cpf):
+    # Remove caracteres não numéricos
+    cpf = re.sub(r'\D', '', cpf)
+    
+    if len(cpf) != 11 or cpf == cpf[0] * 11:
+        return False
+    
+    # Validação dos dígitos verificadores
+    for i in range(9, 11):
+        soma = sum(int(cpf[num]) * ((i + 1) - num) for num in range(i))
+        digito = (soma * 10 % 11) % 10
+        if digito != int(cpf[i]):
+            return False
+    return True
+
+def validar_maioridade(dt_nascimento_str):
+    try:
+        # Ajuste o formato conforme o que vier do seu front-end (ex: YYYY-MM-DD)
+        data_nasc = datetime.strptime(dt_nascimento_str, "%Y-%m-%d").date()
+        hoje = date.today()
+        idade = hoje.year - data_nasc.year - ((hoje.month, hoje.day) < (data_nasc.month, data_nasc.day))
+        return idade >= 18
+    except ValueError:
+        return False
+
 @app.route("/registrar", methods=["POST"])
 def registrar():
+
     try:
+
         data = request.get_json(force=True)
+
         print("CHEGOU NO BACK:", data)
 
-        estado = (data.get("estado") or "").strip().upper()
+        cpf = data.get("cpf", "")
+        dt_nascimento = data.get("dt_nascimento", "")
+
+        # --- VALIDAÇÕES ---
+        if not validar_cpf(cpf):
+            return jsonify({
+                "status": "erro",
+                "mensagem": "CPF inválido."
+            }), 400
+
+        if not validar_maioridade(dt_nascimento):
+            return jsonify({
+                "status": "erro",
+                "mensagem": "Usuário deve ser maior de 18 anos."
+            }), 400
+
+        # ------------------
 
         usuario = criar_usuario(
             data.get("nome", ""),
             data.get("sobrenome", ""),
-            data.get("cpf", ""),
-            data.get("dt_nascimento", ""),
+            cpf,
+            dt_nascimento,
             data.get("email", ""),
-            estado,
             data.get("vendedor", "Plataforma Ferrari Tech"),
             data.get("chave_pix", "")
         )
 
-        return jsonify({"status": "sucesso", "usuario": usuario}), 201
+        # GARANTIA DOS CAMPOS (caso versão antiga do banco exista sem eles)
+        users_collection.update_one(
+            {"_id": ObjectId(usuario["_id"])},
+            {
+                "$setOnInsert": {
+                    "ganhos": 0.00,
+                    "saques": 0.00
+                }
+            },
+            upsert=True
+        )
+
+        session["user_id"] = usuario["_id"]
+
+        return jsonify({
+            "status": "sucesso",
+            "usuario": usuario
+        }), 201
 
     except Exception as e:
+
         print("ERRO:", e)
-        return jsonify({"status": "erro", "mensagem": str(e)}), 400
+
+        return jsonify({
+            "status": "erro",
+            "mensagem": str(e)
+        }), 400
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
@@ -183,11 +738,9 @@ def logout():
 
 #------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------
-# 📄 PÁGINA PRINCIPAL
+# 📄 PÁGINA PROJETO  PRINCIPAL
 @app.route("/vitoria_visionaria/projeto-desenvolvimento-fase-teste/codigo_servico/1722/<usuario_id>/<projeto_id>")
 def view_pagamentos(usuario_id, projeto_id):
-
- 
 
     def limpar_numero(n):
         return re.sub(r"\D", "", str(n))
@@ -208,17 +761,21 @@ def view_pagamentos(usuario_id, projeto_id):
     if not usuario_id:
         return redirect("/vitoria-visonaria_franca-sp")
 
+    # BUSCA USUÁRIO
     usuario = users_collection.find_one({"_id": ObjectId(usuario_id)})
     if not usuario:
         return "usuário não encontrado", 404
+    
+    # Converte ID do usuário para string para evitar erro no template
+    usuario["_id"] = str(usuario["_id"])
 
     email = (usuario.get("email") or usuario.get("email_usuario") or "").strip().lower()
     cpf = limpar_cpf(usuario.get("cpf"))
 
-    # BILHETES
-    bilhetes = bilhete_model.get_all_bilhetes() or []
+    # BILHETES APROVADOS
+    bilhetes_all = bilhete_model.get_all_bilhetes() or []
     bilhetes = [
-        b for b in bilhetes
+        b for b in bilhetes_all
         if (
             b.get("email_usuario", "").strip().lower() == email and
             limpar_cpf(b.get("cpf")) == cpf and
@@ -226,17 +783,12 @@ def view_pagamentos(usuario_id, projeto_id):
         )
     ]
 
-    lista_urls_img_bilhetes = set()
-    for b in bilhetes:
-        for img in b.get("lista_urls_img_bilhetes", []):
-            lista_urls_img_bilhetes.add(img)
-
     numeros_aprovados = set()
     for b in bilhetes:
         for n in b.get("lista_numeros", []):
             numeros_aprovados.add(limpar_numero(n))
 
-    # USUÁRIOS
+    # LISTA DE TODOS OS USUÁRIOS (PARA A TABELA)
     usuarios = []
     for u in users_collection.find():
         usuarios.append({
@@ -248,25 +800,36 @@ def view_pagamentos(usuario_id, projeto_id):
             "bilhetes": []
         })
 
-    # PROJETOS
+    # BUSCA PROJETO SELECIONADO (O QUE O USUÁRIO CLICOU)
+    projeto_principal = {}
+    projeto_data = projetos_collection.find_one({"_id": ObjectId(projeto_id)})
+    
+    if projeto_data:
+        projeto_data["_id"] = str(projeto_data["_id"])
+        projeto_data["nome_projeto"] = projeto_data.get("nome_projeto", "")
+        projeto_data["imagem_projeto"] = projeto_data.get("imagem_projeto", "")
+        projeto_data["dt_sorteio"] = projeto_data.get("dt_sorteio", "")
+        projeto_data["horario_sorteio"] = projeto_data.get("horario_sorteio", "")
+        projeto_data["quantidade"] = projeto_data.get("quantidade", "")
+        projeto_data["link_instagram"] = projeto_data.get("link_instagram", "")
+
+        # Cálculo da meta específico para este projeto
+        vendidos = len(numeros_aprovados)
+        projeto_data["progresso_meta"] = calcular_meta_vendas(vendidos, projeto_data["quantidade"])
+
+        # Formata Data
+        dt = projeto_data["dt_sorteio"]
+        if dt != "Meta 80%" and isinstance(dt, str) and "-" in dt:
+            partes = dt.split("-")
+            if len(partes) == 3:
+                projeto_data["dt_sorteio"] = f"{partes[2]}/{partes[1]}/{partes[0]}"
+        
+        projeto_principal = projeto_data
+
+    # LISTA DE PROJETOS (PARA O CARROSSEL/MENU)
     projetos = list(projetos_collection.find())
     for p in projetos:
         p["_id"] = str(p["_id"])
-        p["nome_projeto"] = p.get("nome_projeto", "")
-        p["imagem_projeto"] = p.get("imagem_projeto", "")
-        p["dt_sorteio"] = p.get("dt_sorteio", "")
-        p["link_instagram"] = p.get("link_instagram", "")
-        p["quantidade"] = p.get("quantidade", "")
-
-        vendidos = len(numeros_aprovados)
-        p["progresso_meta"] = calcular_meta_vendas(vendidos, p["quantidade"])
-
-        if p["dt_sorteio"] != "Meta 80%" and isinstance(p["dt_sorteio"], str):
-            partes = p["dt_sorteio"].split("-")
-            if len(partes) == 3:
-                p["dt_sorteio"] = f"{partes[2]}/{partes[1]}/{partes[0]}"
-
-    projeto_principal = projetos[0] if projetos else {}
 
     return render_template(
         "index.html",
@@ -277,23 +840,47 @@ def view_pagamentos(usuario_id, projeto_id):
         projeto_principal=projeto_principal,
         projeto_id=projeto_id
     )
+
+#----------------------------------------------------------------------  
+#----------------------------------------------------------------------  
+#----------------------------------------------------------------------  
 #----------------------------------------------------------------------    
 @app.route("/vitoria_visonaria/gerar_cupom/<usuario_id>/<projeto_id>")
 def numeros(usuario_id, projeto_id):
+    try:
+        # 1. Busca o usuário
+        usuario = users_collection.find_one({"_id": ObjectId(usuario_id)})
+        if not usuario:
+            return "Usuário não encontrado", 404
 
-    usuario = users_collection.find_one({"_id": ObjectId(usuario_id)})
-    if not usuario:
-        return "usuário não encontrado", 404
+        # 2. Busca o projeto selecionado
+        projeto_data = projetos_collection.find_one({"_id": ObjectId(projeto_id)})
+        
+        if not projeto_data:
+            return "Projeto não encontrado", 404
 
+        # 3. Organiza os dados para o template
+        # Convertemos o ID para string para evitar erros no HTML/JS
+        projeto_data["_id"] = str(projeto_data["_id"])
+        
+        # Garantimos que campos numéricos ou vazios não quebrem o render
+        projeto_principal = {
+            "_id": projeto_data["_id"],
+            "nome_projeto": projeto_data.get("nome_projeto", "Sem nome"),
+            "valor_unidade": projeto_data.get("valor_unidade", 0)
+        }
 
+        return render_template(
+            "gerar_numero.html",
+            usuario=usuario,
+            usuario_id=usuario_id,
+            projeto_id=projeto_id,
+            projeto_principal=projeto_principal,  # Agora ela contém os dados!
+        )
 
-
-    return render_template(
-        "gerar_numero.html",
-        usuario=usuario,
-        usuario_id=usuario_id,
-        projeto_id=projeto_id
-    )
+    except Exception as e:
+        print(f"Erro na rota gerar_cupom: {e}")
+        return "Erro interno no servidor", 500
 
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
@@ -507,6 +1094,33 @@ def listar_projetos():
             "status": "erro",
             "mensagem": str(e)
         }), 400       
+
+
+@app.route("/listar_projetos", methods=["GET"])
+def listar_projeto():
+    try:
+        # Busca todos os projetos no MongoDB
+        # Dica: use .find({}, {"algum_campo": 1}) se quiser filtrar campos específicos
+        projetos = list(projetos_collection.find())
+
+        # Converte ObjectId para string de forma mais Pythonica
+        for projeto in projetos:
+            projeto["_id"] = str(projeto["_id"])
+
+        return jsonify({
+            "status": "sucesso",
+            "quantidade": len(projetos),
+            "projetos": projetos
+        }), 200
+
+    except Exception as e:
+        # Log do erro aqui seria ideal (ex: print(e))
+        return jsonify({
+            "status": "erro",
+            "mensagem": "Erro interno ao listar projetos",
+            "erro_detalhe": str(e)  # Opcional: remova em produção por segurança
+        }), 500
+    
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------    
 #--------------------------------------------------------------------------------- 
@@ -1375,7 +1989,8 @@ def listar_usuarios():
                 "cpf": u.get("cpf", ""),
                 "email": u.get("email", ""),
                 "dt_nascimento": u.get("dt_nascimento", ""),
-                "estado": u.get("estado", ""),
+                "ganhos": u.get("ganhos", ""),
+                "saques": u.get("saques", ""),
                 "vendedor": u.get("vendedor", ""),
                 "chave_pix": u.get("chave_pix", "")
                 
@@ -1387,6 +2002,48 @@ def listar_usuarios():
         print("ERRO /usuarios:", e)  # 👈 MUITO IMPORTANTE PRA DEBUG
         return jsonify({"status": "erro", "mensagem": str(e)}), 500
 
+
+
+
+
+from bson import ObjectId
+
+@app.route("/usuario/<usuario_id>", methods=["GET"])
+def listar_usuarioId(usuario_id):
+    try:
+        usuario = users_collection.find_one({"_id": ObjectId(usuario_id)})
+
+        if not usuario:
+            return jsonify({
+                "status": "erro",
+                "mensagem": "Usuário não encontrado"
+            }), 404
+
+        usuario_formatado = {
+            "_id": str(usuario.get("_id")),
+            "nome": usuario.get("nome", ""),
+            "sobrenome": usuario.get("sobrenome", ""),
+            "cpf": usuario.get("cpf", ""),
+            "email": usuario.get("email", ""),
+            "dt_nascimento": usuario.get("dt_nascimento", ""),
+            "ganhos": usuario.get("ganhos", ""),
+            "saques": usuario.get("saques", ""),
+            "vendedor": usuario.get("vendedor", ""),
+            "chave_pix": usuario.get("chave_pix", "")
+        }
+
+        return jsonify({
+            "status": "sucesso",
+            "usuario": usuario_formatado
+        }), 200
+
+    except Exception as e:
+        print("ERRO /usuario:", e)
+
+        return jsonify({
+            "status": "erro",
+            "mensagem": str(e)
+        }), 500
 #--------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
@@ -1448,12 +2105,14 @@ sdk = mercadopago.SDK(MP_ACCESS_TOKEN)
 
 #=============================================================================================
 # -PAGAMENTO VIA SOMENTE PIX QRCODE => funçoes - GERAR QRCODE E PIX COLA SALVA PAGAMENTO E
-# ATUALIZA PAYMENT_ID NUMERO DO USUARIO "TESTADO (OK)"" 
-#=============================================================================================         
+# ATUALIZA PAYMENT_ID NUMERO DO USUARIO "TESTADO (OK)"
+#=============================================================================================
+
 @app.route("/payment_qrcode_pix/pagamento_pix/<usuario_id>")
 def pagamento_pix(usuario_id):
 
     import json
+    from datetime import datetime, timedelta
 
     lista_numeros = request.args.get("lista_numeros")
 
@@ -1471,16 +2130,29 @@ def pagamento_pix(usuario_id):
     sobrenome = request.args.get("sobrenome") or ""
     cpf = request.args.get("cpf") or ""
     email = request.args.get("email") or ""
+
     quantidade = int(request.args.get("quantidade") or 0)
 
     valor_total = round(quantidade * 0.60, 2)
 
     taxa_mp = round(valor_total * 0.0099, 2)
 
+    # EXPIRA EM 15 MINUTOS
+    expiration_date = (
+        datetime.utcnow() + timedelta(minutes=15)
+    ).strftime('%Y-%m-%dT%H:%M:%S.000-00:00')
+
     payment_data = {
+
         "transaction_amount": float(valor_total),
+
         "description": "Servico Digital",
+
         "payment_method_id": "pix",
+
+        # EXPIRACAO PIX
+        "date_of_expiration": expiration_date,
+
         "payer": {
             "email": email,
             "first_name": nome,
@@ -1490,30 +2162,38 @@ def pagamento_pix(usuario_id):
                 "number": cpf
             }
         },
+
         "external_reference": email,
+
         "notification_url": notification_url,
+
         "statement_descriptor": "FerrariTech"
     }
 
     try:
+
         response = sdk.payment().create(payment_data)
+
         mp = response.get("response", {})
 
         if "id" not in mp:
             return f"ERRO MP: {mp}", 500
 
         payment_id = str(mp["id"])
+
         status = mp.get("status", "pending")
 
         tx = mp.get("point_of_interaction", {}).get("transaction_data", {})
 
         qr_base64 = tx.get("qr_code_base64")
+
         qr_code = tx.get("qr_code")
 
         if not qr_base64 or not qr_code:
             return f"ERRO QR: {tx}", 500
 
         image_bytes = base64.b64decode(qr_base64)
+
         image_file = BytesIO(image_bytes)
 
         upload_result = cloudinary.uploader.upload(
@@ -1525,53 +2205,82 @@ def pagamento_pix(usuario_id):
         qr_image_url = upload_result.get("secure_url")
 
         documento = criar_documento_pagamento(
-            payment_id=payment_id,
-            status=status,
-            payment_method_id="Pix",
-            valor=valor_total,
-            cpf=cpf,
-            email_user=email,
-            lista_numeros=lista_numeros,
-            qr_code=qr_code,
-            qr_image_url=qr_image_url,
-            taxa_mp=taxa_mp
-        )
 
+            payment_id=payment_id,
+
+            status=status,
+
+            payment_method_id="Pix",
+
+            valor=valor_total,
+
+            cpf=cpf,
+
+            email_user=email,
+
+            lista_numeros=lista_numeros,
+
+            qr_code=qr_code,
+
+            qr_image_url=qr_image_url,
+
+            taxa_mp=taxa_mp
+
+        )
 
         try:
             PagamentoModel().create_pagamento(documento)
+
         except Exception as e:
             print("ERRO AO SALVAR:", e)
 
         # ATUALIZA BILHETES COM PAYMENT_ID
         try:
+
             bilhetes_collection.update_many(
+
                 {
                     "cpf": cpf,
                     "status": "pending",
                     "payment_id": "aguardando gerar pagamento"
                 },
+
                 {
                     "$set": {
-                        "payment_id": payment_id
+                        "payment_id": payment_id,
+                        "expiration_date": expiration_date
                     }
                 }
+
             )
+
         except Exception as e:
             print("ERRO AO ATUALIZAR BILHETES:", e)
 
         return render_template(
+
             "finalize.html",
+
             qrcode=qr_image_url,
+
             valor=f"R$ {valor_total:.2f}",
+
             qr_code_cola=qr_code,
+
             status=status,
+
             payment_id=payment_id,
+
             cpf=cpf,
+
+            expiration_date=expiration_date
+
         )
 
     except Exception as e:
+
         print("ERRO GERAL:", e)
+
         return f"ERRO GERAL: {str(e)}", 500
 #=============================================================================================
 #----------------------------------------------------------------------------------------------
@@ -1672,16 +2381,20 @@ def sync_bilhetes_aprovados():
 
 @app.route("/compra/preference/pagamento_pix/<usuario_id>")
 def pagamento_preference(usuario_id):
+
     import json
     import uuid
+    from datetime import datetime, timedelta
 
     lista_numeros = request.args.get("lista_numeros")
+
     if lista_numeros:
         lista_numeros = json.loads(lista_numeros)
     else:
         lista_numeros = []
 
     usuario_id = usuario_id or request.args.get("usuario_id")
+
     if not usuario_id:
         return jsonify({"erro": "usuario_id não informado"}), 400
 
@@ -1691,13 +2404,20 @@ def pagamento_preference(usuario_id):
     email = request.args.get("email") or ""
 
     quantidade = max(1, int(request.args.get("quantidade") or 1))
+
     valor_unitario = 0.60
     valor_total = quantidade * valor_unitario
 
+    # EXPIRA EM 15 MINUTOS
+    expiration_date = (
+        datetime.utcnow() + timedelta(minutes=15)
+    ).strftime('%Y-%m-%dT%H:%M:%S.000-00:00')
+
     payment_data = {
+
         "items": [
             {
-                # "id": str(uuid.uuid4()),
+                "id": str(uuid.uuid4()),
                 "title": "Servico Digital",
                 "description": "Servico digital",
                 "quantity": quantidade,
@@ -1706,6 +2426,12 @@ def pagamento_preference(usuario_id):
                 "category_id": "services"
             }
         ],
+
+        # EXPIRACAO
+        "expires": True,
+
+        "date_of_expiration": expiration_date,
+
         "payer": {
             "email": email,
             "first_name": nome,
@@ -1715,58 +2441,80 @@ def pagamento_preference(usuario_id):
                 "number": cpf
             }
         },
+
+        # IDENTIFICADOR
         "external_reference": cpf,
+
         "statement_descriptor": "FERRARITECH",
+
         "back_urls": {
             "success": "https://ferrari-tech.onrender.com/success",
             "failure": "https://ferrari-tech.onrender.com/recusado"
         },
+
         "auto_return": "approved",
+
         "notification_url": notification_url
     }
 
     result = sdk.preference().create(payment_data)
+
     mp = result.get("response", {})
 
     if "id" not in mp:
         return f"ERRO NO MERCADO PAGO:<br><br>{mp}", 500
 
     preference_id = mp["id"]
+
     status = "pending"
 
     documento = criar_documento_pagamento(
-        payment_id=str(preference_id),
+
+        payment_id=cpf,
+
         status=status,
+
         valor=valor_total,
+
         cpf=cpf,
+
         email_user=email,
+
         payment_method_id="preference",
+
         lista_numeros=lista_numeros
+
     )
 
     PagamentoModel().create_pagamento(documento)
 
     try:
+
         bilhetes_collection.update_many(
+
             {
                 "cpf": cpf,
                 "status": "pending",
                 "payment_id": "aguardando gerar pagamento"
             },
+
             {
                 "$set": {
-                    "payment_id": preference_id
+                    "payment_id": cpf,
+                    "preference_id": preference_id,
+                    "expiration_date": expiration_date
                 }
             }
+
         )
+
     except Exception as e:
+
         print("ERRO AO ATUALIZAR BILHETES:", e)
 
     link_pagamento = mp.get("init_point", "")
+
     return redirect(link_pagamento)
-
-
-
 
 
 
@@ -2668,7 +3416,7 @@ def sala_ao_vivo_usuarios(usuario_id, projeto_id):
         return "usuário não encontrado", 404    
 
     bilhetes = BilheteModel().get_all_bilhetes() or []
-    bilhetes = [b for b in bilhetes if b.get("status") == "pending"]
+    bilhetes = [b for b in bilhetes if b.get("status") == "approved"]
 
     # Busca o projeto específico para pegar os números salvos
     projeto_principal = projetos_collection.find_one({"_id": ObjectId(projeto_id)})
@@ -2683,7 +3431,7 @@ def sala_ao_vivo_usuarios(usuario_id, projeto_id):
                            usuario=usuario, 
                            usuario_id=usuario_id, 
                            projeto_id=projeto_id,
-                           projeto_principal=projeto_principal) # Enviado para o HTML
+                           projeto_principal=projeto_principal) 
 
 # Evento para disparar o sorteio
 
@@ -2707,7 +3455,7 @@ def sala_ao_vivo_admin(projeto_id):
 
     bilhetes = [
         b for b in bilhetes
-        if b.get("status") == "pending"
+        if b.get("status") == "approved"
     ]
 
     return render_template(
@@ -2718,43 +3466,91 @@ def sala_ao_vivo_admin(projeto_id):
         nome_projeto=nome_projeto
     )
 
-# EVENTO QUE SALVA NO BANCO
+
+    
+
+# EVENTO SORTEIO ENVIA NUMERO SALVA VERIFICA NUMEROS E APRESENTA GANHADOR
 @socketio.on('enviar_numero', namespace='/sorteio')
 def receber_numero(data):
     numero = data.get('numero')
-    projeto_id = data.get('projeto_id') # CAPTURADO DO JS
+    projeto_id = data.get('projeto_id')
+    mensagem = ""
+    bilhete_ganhador = None
 
     if numero and projeto_id:
-        # ATUALIZA O BANCO DE DADOS REAL
+        # Mantém seu update original
         projetos_collection.update_one(
             {"_id": ObjectId(projeto_id)},
             {"$push": {"numeros_sorteados": numero}}
         )
 
-    # ENVIA PARA TODOS
-    socketio.emit(
-        'novo_numero',
-        {'numero': numero},
-        namespace='/sorteio'
-    )
+        projeto = projetos_collection.find_one(
+            {"_id": ObjectId(projeto_id)}
+        )
+
+        # Aqui pegamos TODOS os sorteados até agora
+        todos_numeros_sorteados = projeto.get("numeros_sorteados", [])
+        total_numeros = len(todos_numeros_sorteados)
+
+        # Mantém sua regra de só verificar de 4 em 4
+        if total_numeros > 0 and total_numeros % 4 == 0:
+            ultimos_4 = todos_numeros_sorteados[-4:]
+            mensagem = (
+                f"Aguarde estamos fazendo verificação. "
+                f"Números: {', '.join(map(str, ultimos_4))}"
+            )
+
+            # BUSCA BILHETES
+            bilhetes = BilheteModel().get_all_bilhetes() or []
+            bilhetes = [b for b in bilhetes if b.get("status") == "pending"]
+
+            # VERIFICA GANHADOR
+            for bilhete in bilhetes:
+                lista_numeros = bilhete.get("lista_numeros", [])
+                
+                for numero_bilhete in lista_numeros:
+                    acertos = 0
+                    # CORREÇÃO AQUI: Em vez de olhar só os 'ultimos_4', 
+                    # verificamos se cada número do bilhete está no HISTÓRICO COMPLETO
+                    for n_bilhete in numero_bilhete:
+                        if n_bilhete in todos_numeros_sorteados:
+                            acertos += 1
+
+                    # 4 ACERTOS (Considerando o acumulado)
+                    if acertos == 4:
+                        mensagem = (
+                            f"Bilhete ganhador encontrado. "
+                            f"Participante: {bilhete.get('nome_usuario')} "
+                            f"Bilhete: {numero_bilhete}"
+                        )
+                        bilhete_ganhador = bilhete
+                        break
+                
+                if bilhete_ganhador:
+                    break
+
+    # MONTA PAYLOAD COMPLETO (Exatamente como o seu original)
+    payload = {
+        'numero': numero,
+        'mensagem': mensagem
+    }
+
+    if bilhete_ganhador:
+        payload['bilhete'] = {
+            '_id': str(bilhete_ganhador.get('_id')),
+            'nome_usuario': bilhete_ganhador.get('nome_usuario'),
+            'cpf': bilhete_ganhador.get('cpf'),
+            'email_usuario': bilhete_ganhador.get('email_usuario'),
+            'lista_numeros': bilhete_ganhador.get('lista_numeros'),
+            'lista_urls_img_bilhetes': bilhete_ganhador.get('lista_urls_img_bilhetes'),
+            'valor': bilhete_ganhador.get('valor'),
+            'status': bilhete_ganhador.get('status'),
+        }
+
+    socketio.emit('novo_numero', payload, namespace='/sorteio')
 
 
-#---------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------
-# =========================
-# APP.PY
-# =========================
 
-from bson.objectid import ObjectId
-
-
-
-#---------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
@@ -2771,9 +3567,9 @@ def usuario_entrou():
     if not usuario:
         return
 
-    # Pega bilhetes pendentes do usuário
+    # Pega bilhetes approved do usuário
     bilhetes = BilheteModel().get_all_bilhetes() or []
-    bilhetes_usuario = [b for b in bilhetes if b.get("usuario_id") == usuario_id and b.get("status") == "pending"]
+    bilhetes_usuario = [b for b in bilhetes if b.get("usuario_id") == usuario_id and b.get("status") == "approved"]
 
     # Monta objeto que será enviado ao front
     participante = {
@@ -2803,20 +3599,6 @@ def usuario_saiu():
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
-# Evento para disparar o sorteio
-# @socketio.on('enviar_numero', namespace='/sorteio')
-# def receber_numero(data):
-#     numero = data.get('numero')
-
-#     print(f"Número enviado: {numero}")
-
-#     socketio.emit(
-#         'novo_numero',
-#         {'numero': numero},
-#         namespace='/sorteio'
-#     )
-
-
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
@@ -2862,8 +3644,8 @@ def eventos_semana(usuario_id):
 
 MP_PUBLIC_KEY = os.environ.get("MP_PUBLIC_KEY")
 
-@app.route('/pagamento/cartao_credito/<usuario_id>/<projeto_id>')
-def home(usuario_id, projeto_id):
+@app.route('/pagamento/cartao_credito/<usuario_id>')
+def home(usuario_id):
 
     usuario = users_collection.find_one({"_id": ObjectId(usuario_id)})
     if not usuario:
@@ -2877,7 +3659,6 @@ def home(usuario_id, projeto_id):
         'graficos/Pagamentos/cartao_credito.html',
         public_key=MP_PUBLIC_KEY,
         usuario=usuario,
-        projeto_id=projeto_id,
         bilhetes=bilhetes,
         usuario_id=usuario_id
     )
@@ -2890,7 +3671,6 @@ def home(usuario_id, projeto_id):
 @app.route('/process_payment/<usuario_id>', methods=['POST'])
 def add_income(usuario_id):
 
-    import json
 
     try:
         request_values = request.get_json()
@@ -2923,6 +3703,8 @@ def add_income(usuario_id):
             }
         }
 
+        taxa_mp = round(transaction_amount * 0.0499, 2)
+
         payment_response = sdk.payment().create(payment_data)
         payment = payment_response["response"]
 
@@ -2935,7 +3717,8 @@ def add_income(usuario_id):
             cpf=cpf,
             email_user=email,
             payment_method_id=request_values.get("payment_method_id"),
-            lista_numeros=lista_numeros
+            lista_numeros=lista_numeros,
+            taxa_mp=taxa_mp
         )
 
         dados_pagamento["usuario_id"] = usuario_id
@@ -2968,19 +3751,940 @@ def add_income(usuario_id):
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
-# @app.route('/payments', methods=['GET'])
-# def list_payments():
-#     try:
-#         # Busca todos os pagamentos
-#         payments = list(payments_col.find({}, {"_id": 0}))  # remove o _id interno do Mongo
 
-#         return jsonify(payments), 200
 
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
-#===========================================
+
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+# SISTEMA OPERACIONAL DAS RASPADINHAS ONLINES 
+#---------------------------------------------------------------------------------------------
+@app.route('/raspadinha', defaults={'usuario_id': None})
+@app.route('/raspadinha/<usuario_id>')
+def raspadinhas(usuario_id):
+    vendedores = list(vendedores_collection.find({}, {"nome": 1}))
+    
+    usuario = None
+    if usuario_id:
+        usuario = users_collection.find_one({"_id": ObjectId(usuario_id)}) 
+
+    # Apenas CPF, como deve ser, sem e-mail
+    cpf = limpar_cpf(usuario.get("cpf", "")) if usuario else ""
+
+    raspadinhas_all = raspadinha_model.get_all_raspadinhas() or []
+    raspadinhas = [
+        r for r in raspadinhas_all
+        if (
+            limpar_cpf(r.get("cpf", "")) == cpf and
+            r.get("status") == "approved"
+        )
+    ]
+
+    # No seu arquivo Python, antes do return:
+    total_quantidade = sum(int(r.get("quantidade_raspadinhas", 0)) for r in raspadinhas)
+
+    return render_template("graficos/eventos/raspadinha-1.html", 
+                        raspadinhas=raspadinhas, 
+                        total_quantidade=total_quantidade, 
+                        vendedores=vendedores, 
+                        usuario=usuario, 
+                        usuario_id=usuario_id)
+
+
+PREMIOS = [
+    {"id": 1, "valor": "R$ 0,05", "numero": 0.05, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778621532/1778621069295_byxfmy.png", "probabilidade": 0.2},
+    {"id": 2, "valor": "R$ 0,10", "numero": 0.10, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778622997/1778622360189_cyixsr.png", "probabilidade": 0.2},
+    {"id": 3, "valor": "R$ 0,25", "numero": 0.25, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778614222/file_000000000ca4720e8a65a4b4966cee89_kxhcbd.png", "probabilidade": 0.2},
+    {"id": 4, "valor": "R$ 0.30", "numero": 0.30, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778621531/1778621356505_k6jsgw.png", "probabilidade": 0.2},
+    {"id": 5, "valor": "R$ 0.50", "numero": 0.50, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778621531/1778621422435_w6l0n6.png", "probabilidade": 0.5},
+    {"id": 6, "valor": "R$ 1.00", "numero": 1.00, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778621531/1778621498747_xhi8ad.png", "probabilidade": 0.5},
+    {"id": 7, "valor": "R$ 5.00", "numero": 5.00, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778622997/1778622293971_v0zpku.png", "probabilidade": 0.5},
+    {"id": 8, "valor": "R$ 10.00", "numero": 10.00, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778623662/1778623446472_mx8vbn.png", "probabilidade": 0.5},
+    {"id": 9, "valor": "R$ 1.000.00", "numero": 1000, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1779154935/image_1778976107545_gcwmr8.jpg", "probabilidade": 0.5}
+    
+]
+
+
+
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+# NOVA RASPADINHA
+@app.route('/raspadinha/novo')
+def nova_raspadinha():
+    sorteado = random.choices(PREMIOS, weights=[p["probabilidade"] for p in PREMIOS], k=1)[0]
+    return jsonify({"imagem": sorteado["imagem"], "id_premio": sorteado["id"]})
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+# Lista global simplificada apenas para armazenar os logs recentes de atividades
+usuarios = []
+
+@socketio.on('usuario_entrou')
+def handle_usuario_entrou(data):
+    usuario_id = data.get("usuario_id")
+    if not usuario_id or not ObjectId.is_valid(usuario_id):
+        return
+
+    usuario = users_collection.find_one({"_id": ObjectId(usuario_id)})
+    if not usuario:
+        return   
+
+    nome_usuario = usuario.get("nome", "Usuário")
+    mensagem = f'🔥 {nome_usuario} entrou no jogo'
+
+    # Remove duplicados
+    usuarios[:] = [u for u in usuarios if u.get("id") != usuario_id]
+    
+    # Adiciona novo registro
+    usuarios.append({
+        "id": usuario_id,
+        "texto": mensagem
+    })
+
+    # Limita 15 mensagens
+    if len(usuarios) > 8000:
+        usuarios.pop(0)
+
+    # Envia só os textos
+    socketio.emit('notificacao_geral', {'lista': [u["texto"] for u in usuarios]})
+
+
+@socketio.on('disconnect')
+def usuario_saiu_jogo():
+    usuario_id = request.args.get("usuario_id")
+    if not usuario_id:
+        return
+
+    usuarios[:] = [u for u in usuarios if u.get("id") != usuario_id]
+    socketio.emit('notificacao_geral', {'lista': [u["texto"] for u in usuarios]})
+
+
+
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+
+@app.route('/raspadinha/resultado', methods=['POST'])
+def resultado_raspadinha():
+    dados = request.get_json() or {}
+    usuario_id = dados.get("usuario_id")
+    
+    if not usuario_id:
+        referer = request.headers.get("Referer", "")
+        if "/raspadinha/" in referer:
+            usuario_id = referer.split("/raspadinha/")[1].split("/")[0]
+
+    if not usuario_id or usuario_id == "None":
+        return jsonify({"error": "Usuário não detectado"}), 400
+    
+    try:
+        oid = ObjectId(str(usuario_id))
+    except:
+        return jsonify({"error": "ID inválido"}), 400
+
+    usuario = users_collection.find_one({"_id": oid})
+    if not usuario:
+        return jsonify({"error": "Usuário não encontrado no banco"}), 404
+
+    # 1. BUSCA AS RASPADINHAS ATIVAS DO USUÁRIO VIA CPF
+    cpf_usuario = limpar_cpf(usuario.get("cpf", ""))
+    
+    # Busca um registro aprovado que pertença ao CPF e tenha quantidade maior que 0
+    # Modifique o nome da coleção se não for 'raspadinhas_collection'
+    raspadinha_disponivel = raspadinhas_collection.find_one({
+        "cpf": cpf_usuario, # Ou o formato que estiver salvo no banco
+        "status": "approved",
+        "quantidade_raspadinhas": {"$gt": 0} # Garante que é maior que zero
+    })
+
+    if not raspadinha_disponivel:
+        return jsonify({"error": "Você não possui raspadinhas disponíveis"}), 400
+
+    # 2. SE TEM RASPADINHA, SUBTRAI 1 DO BANCO DE DADOS
+    raspadinhas_collection.update_one(
+        {"_id": raspadinha_disponivel["_id"]},
+        {"$inc": {"quantidade_raspadinhas": -1}} # Diminui 1 unidade
+    )
+
+    # O restante da lógica de prêmios permanece idêntico
+    id_premio = dados.get("id_premio")
+    premio = next((p for p in PREMIOS if str(p.get("id")) == str(id_premio)), None)
+
+    if not premio:
+        return jsonify({"valorTexto": "R$ 0,00", "valorNumerico": 0.0, "error": "Prêmio inválido"})
+
+    valor_triplicado = float(premio["numero"]) * 1
+    texto_triplicado = f"R$ {valor_triplicado:.2f}".replace(".", ",")
+
+    # Atualiza o saldo de ganhos do usuário
+    users_collection.update_one(
+        {"_id": oid},
+        {
+            "$set": {"ganhos": round(float(usuario.get("ganhos", 0.0)) + valor_triplicado, 2)},
+            "$push": {"entradas": {"tipo": "raspadinha", "valor": round(valor_triplicado, 2), "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")}}
+        }
+    )
+
+    msg = f'🎉 {usuario.get("nome", "Usuário")} ganhou {texto_triplicado}!'
+    usuarios.append({"id": str(usuario_id), "texto": msg})
+    if len(usuarios) > 8000: usuarios.pop(0)
+    socketio.emit('notificacao_geral', {'lista': [u["texto"] for u in usuarios]})
+    
+    usuario_atualizado = users_collection.find_one({"_id": oid})
+    saldo_atual = float(usuario_atualizado.get("ganhos", 0.0))
+    saldo_formatado = f"R$ {saldo_atual:.2f}".replace(".", ",")
+    
+    # 3. PEGA A NOVA QUANTIDADE RESTANTE PARA RETORNAR PRO JAVASCRIPT
+    # Refaz a soma de todas as raspadinhas restantes do CPF do usuário
+    raspadinhas_all = raspadinha_model.get_all_raspadinhas() or []
+    nova_quantidade_total = sum(int(r.get("quantidade_raspadinhas") or 0) for r in raspadinhas_all if limpar_cpf(r.get("cpf", "")) == cpf_usuario and r.get("status") == "approved")
+
+    return jsonify({
+        "valorTexto": texto_triplicado, 
+        "valorNumerico": valor_triplicado,
+        "novoSaldoTexto": saldo_formatado,
+        "novaQuantidadeTotal": nova_quantidade_total # Envia o novo total para atualizar a tela
+    })
+
+
+# =========================
+# SAQUE (COM HISTÓRICO)
+# =========================
+@app.route('/saque', methods=['POST'])
+def saque():
+    dados = request.get_json() or {}
+    valor_saque = float(dados.get("valor", 0))
+
+    # Sistema de segurança triplo para capturar o ID correto
+    usuario_id = session.get("usuario_id") or dados.get("usuario_id")
+    
+    if not usuario_id or usuario_id == "None" or isinstance(usuario_id, dict):
+        # Fallback: pega o ID da URL da página anterior
+        referer = request.headers.get("Referer", "")
+        if "/raspadinha/" in referer:
+            usuario_id = referer.split("/raspadinha/")[1].split("/")[0]
+
+    if not usuario_id or usuario_id == "None" or not ObjectId.is_valid(str(usuario_id)):
+        return jsonify({"erro": "Usuário inválido ou não autenticado"}), 400
+
+    oid = ObjectId(str(usuario_id))
+    usuario = users_collection.find_one({"_id": oid})
+    
+    if not usuario:
+        return jsonify({"erro": "Usuário não encontrado no banco de dados"}), 404
+
+    ganhos = float(usuario.get("ganhos", 0.0))
+
+    # Validações de valores
+    if valor_saque < 3:
+        return jsonify({"erro": "Valor mínimo é R$ 3,00"}), 400
+
+    if valor_saque > ganhos:
+        return jsonify({"erro": "Saldo insuficiente"}), 400
+
+    # Atualiza banco de dados usando o ID validado
+    users_collection.update_one(
+        {"_id": oid},
+        {
+            "$inc": {
+                "ganhos": -valor_saque,
+                "saques": valor_saque
+            },
+            "$push": {
+                "saidas": {
+                    "tipo": "saque",
+                    "valor": round(valor_saque, 2),
+                    "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")
+                }
+            }
+        }
+    )
+
+    usuario_atualizado = users_collection.find_one({"_id": oid})
+
+    # Notificação do Socket.io no feed geral
+    nome_usuario = usuario.get("nome", "Usuário")
+    msg_saque = f'💸 {nome_usuario} solicitou saque de R$ {valor_saque:.2f}'.replace(".", ",")
+    
+    usuarios.append({
+        "id": str(usuario_id),
+        "texto": msg_saque
+    })
+    if len(usuarios) > 15:
+        usuarios.pop(0)
+
+    lista_texto = [u["texto"] for u in usuarios]
+    socketio.emit('notificacao_geral', {'lista': lista_texto})
+
+    return jsonify({
+        "success": True,
+        "ganhos": float(usuario_atualizado.get("ganhos", 0.0)),
+        "saques": float(usuario_atualizado.get("saques", 0.0))
+    })
+
+#--------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+
+
+
+
+@app.route("/movimentacoes", methods=["GET"])
+def movimentacoes():
+    # Sistema de segurança triplo para capturar o ID correto
+    usuario_id = session.get("usuario_id")
+    
+    # Se nao achar na sessao, tenta pegar via request args (caso seja enviado na URL)
+    if not usuario_id:
+        usuario_id = request.args.get("usuario_id")
+
+    # Fallback: pega o ID da URL da página anterior
+    if not usuario_id:
+        referer = request.headers.get("Referer", "")
+        if "/raspadinha/" in referer:
+            try:
+                usuario_id = referer.split("/raspadinha/")[1].split("/")[0]
+            except:
+                usuario_id = None
+
+    if not usuario_id or not ObjectId.is_valid(usuario_id):
+        return jsonify({"entradas": [], "saidas": [], "ganhos": 0.0})
+
+    usuario = users_collection.find_one({"_id": ObjectId(usuario_id)})
+
+    if not usuario:
+        return jsonify({"entradas": [], "saidas": [], "ganhos": 0.0})
+
+    return jsonify({
+        "entradas": usuario.get("entradas", []),
+        "saidas": usuario.get("saidas", []),
+        "ganhos": usuario.get("ganhos", 0.0)
+    })
+
+
+#---------------------------------------------------------------------------------------------
+
+@app.route('/status/payment_preference/<pref_id>')
+def verificar_pagamento(pref_id):
+
+    filtros = {
+        "preference_id": pref_id
+    }
+
+    resultado_busca = sdk.payment().search(filtros)
+
+    pagamentos = resultado_busca.get("response", {}).get("results", [])
+
+    if not pagamentos:
+        return jsonify({
+            "preference_id": pref_id,
+            "status": "not_found",
+            "message": "Nenhum pagamento iniciado para esta preferência."
+        }), 404
+
+    pagamento_atual = pagamentos[0]
+
+    payment_id = pagamento_atual.get("id")
+    status = pagamento_atual.get("status")
+    cpf = pagamento_atual.get("external_reference")
+
+    # SALVA PAYMENT_ID REAL
+    bilhetes_collection.update_many(
+        {
+            "cpf": cpf,
+            "payment_id": pref_id
+        },
+        {
+            "$set": {
+                "payment_id": str(payment_id),
+                "status": status
+            }
+        }
+    )
+
+    return jsonify({
+        "payment_id": payment_id,
+        "status": status,
+        "status_detail": pagamento_atual.get("status_detail"),
+        "external_reference": cpf
+    }), 200
+
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+# - PAGAMENTO CARTAO CREDITO
+@app.route('/pagamento/cartao_credito/ferrari-tech/<usuario_id>')
+def home_raspadinha(usuario_id):
+
+    usuario = users_collection.find_one({"_id": ObjectId(usuario_id)})
+    if not usuario:
+        return "usuário não encontrado", 404
+        
+    raspadinhas = RaspadinhaModel().get_all_raspadinhas() or []
+
+    raspadinhas = [r for r in raspadinhas if r.get("status") == "pending"]
+
+    return render_template(
+        'graficos/eventos/Pagamentos/Cartao/cartao_credito_raspadinha.html',
+        public_key=MP_PUBLIC_KEY,
+        usuario=usuario,
+        raspadinhas=raspadinhas,
+        usuario_id=usuario_id
+    )
+
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+# - PAGAMENTO CARTAO CREDITO API
+@app.route('/process_payment/ferrari-tech/<usuario_id>', methods=['POST'])
+def add_income_raspadinha(usuario_id):
+
+
+    try:
+        request_values = request.get_json()
+
+        quantidade_raspadinhas = request.args.get("quantidade_raspadinhas")
+        if quantidade_raspadinhas:
+            quantidade_raspadinhas = json.loads(quantidade_raspadinhas)
+        else:
+            quantidade_raspadinhas = []
+
+        usuario_id = usuario_id or request.args.get("usuario_id")
+        if not usuario_id:
+            return jsonify({"erro": "usuario_id não informado"}), 400
+
+        cpf = request_values.get("payer", {}).get("identification", {}).get("number", "")
+        email = request_values.get("payer", {}).get("email", "")
+
+        payment_data = {
+            "transaction_amount": float(request_values["transaction_amount"]),
+            "token": request_values["token"],
+            "installments": int(request_values["installments"]),
+            "payment_method_id": request_values["payment_method_id"],
+            "issuer_id": request_values["issuer_id"],
+            "payer": {
+                "email": email,
+                "identification": {
+                    "type": request_values["payer"]["identification"]["type"],
+                    "number": cpf
+                }
+            }
+        }
+
+        taxa_mp = round(transaction_amount * 0.0499, 2)
+
+        payment_response = sdk.payment().create(payment_data)
+        payment = payment_response["response"]
+
+        pagamento_model = PagamentoModel()
+
+        dados_pagamento = criar_documento_pagamento(
+            payment_id=payment["id"],
+            status=payment["status"],
+            valor=payment["transaction_amount"],
+            cpf=cpf,
+            email_user=email,
+            payment_method_id=request_values.get("payment_method_id"),
+            taxa_mp=taxa_mp
+        )
+
+
+        dados_pagamento["usuario_id"] = usuario_id
+
+        pagamento_model.create_pagamento(dados_pagamento)
+
+        try:
+            raspadinhas_collection.update_many(
+                {
+                    "cpf": cpf,
+                    "status": "pendente",
+                    "payment_id": "aguardando gerar pagamento"
+                },
+                {
+                    "$set": {
+                        "payment_id": payment["id"]
+                    }
+                }
+            )
+        except Exception as e:
+            print("ERRO AO ATUALIZAR RASPADINHAS:", e)
+
+        return jsonify(payment), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+# - SISTEMA PROCESSAMENTO DE PAGAMENTO DAS RASPADINHAS
+# - PAGAMENTO QRCODE PIX E COLA
+#---------------------------------------------------------------------------------------------
+
+@app.route("/payment_qrcode_pix/pagamento_pix/ferrari-tech/<usuario_id>")
+def pagamentosqrcode(usuario_id):
+
+    import json
+
+    from datetime import datetime, timedelta
+
+    usuario_id = usuario_id or request.args.get("usuario_id")
+
+    if not usuario_id:
+
+        return jsonify({
+            "erro": "usuario_id não informado"
+        }), 400
+
+    nome = request.args.get("nome") or ""
+
+    sobrenome = request.args.get("sobrenome") or ""
+
+    cpf = request.args.get("cpf") or ""
+
+    email = request.args.get("email") or ""
+
+    quantidade = int(request.args.get("quantidade") or 0)
+
+    # CORREÇÃO
+    if quantidade <= 0:
+
+        quantidade = 1
+
+    valor_total = round(quantidade * 0.60, 2)
+
+    taxa_mp = round(valor_total * 0.0099, 2)
+
+    expiration_date = (
+        datetime.utcnow() + timedelta(minutes=15)
+    ).strftime('%Y-%m-%dT%H:%M:%S.000-00:00')
+
+    payment_data = {
+
+        "transaction_amount": float(valor_total),
+
+        "description": "Servico Digital",
+
+        "payment_method_id": "pix",
+
+        "date_of_expiration": expiration_date,
+
+        "payer": {
+
+            "email": email,
+
+            "first_name": nome,
+
+            "last_name": sobrenome,
+
+            "identification": {
+
+                "type": "CPF",
+
+                "number": cpf
+
+            }
+        },
+
+        "external_reference": email,
+
+        "notification_url": notification_url,
+
+        "statement_descriptor": "FerrariTech"
+    }
+
+    try:
+
+        response = sdk.payment().create(payment_data)
+
+        mp = response.get("response", {})
+
+        if "id" not in mp:
+
+            return f"ERRO MP: {mp}", 500
+
+        payment_id = str(mp["id"])
+
+        status = mp.get("status", "pending")
+
+        tx = mp.get("point_of_interaction", {}).get("transaction_data", {})
+
+        qr_base64 = tx.get("qr_code_base64")
+
+        qr_code = tx.get("qr_code")
+
+        if not qr_base64 or not qr_code:
+
+            return f"ERRO QR: {tx}", 500
+
+        image_bytes = base64.b64decode(qr_base64)
+
+        image_file = BytesIO(image_bytes)
+
+        upload_result = cloudinary.uploader.upload(
+
+            image_file,
+
+            folder="qrcodes_pix",
+
+            public_id=f"qr_{payment_id}"
+        )
+
+        qr_image_url = upload_result.get("secure_url")
+
+        # DOCUMENTO PAGAMENTO
+        documento_pagamento = {
+
+            "_id": payment_id,
+
+            "payment_id": payment_id,
+
+            "status": status,
+
+            "payment_method_id": "Pix",
+
+            "valor": valor_total,
+
+            "cpf": cpf,
+
+            "email_usuario": email,
+
+            "nome_usuario": nome,
+
+            "qr_code": qr_code,
+
+            "qr_image_url": qr_image_url,
+
+            "taxa_mp": taxa_mp,
+
+            "quantidade_raspadinhas": quantidade,
+
+            "data_criacao": datetime.utcnow().strftime("%a, %d de %B de %Y %H:%M:%S GMT"),
+
+            "data_de_expiração": expiration_date
+
+        }
+
+        try:
+
+            PagamentoModel().create_pagamento(documento_pagamento)
+
+        except Exception as e:
+
+            print("ERRO AO SALVAR:", e)
+
+        # DOCUMENTOS RASPADINHAS
+        documentos_raspadinhas = []
+
+        for _ in range(quantidade):
+
+            documentos_raspadinhas.append({
+
+                "raspadinha_id": payment_id,
+
+                "payment_id": payment_id,
+
+                "usuario_id": usuario_id,
+
+                "cpf": cpf,
+
+                "nome_user": nome,
+
+                "valor_unidade": 0.60,
+
+                "valor_total": valor_total,
+
+                "email_user": email,
+
+                "quantidade_raspadinhas": 1,
+
+                "status": "pending",
+
+                "data_criacao": datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S"),
+
+                "expiration_date": expiration_date
+
+            })
+
+        try:
+
+            raspadinhas_collection.insert_many(documentos_raspadinhas)
+
+        except Exception as e:
+
+            print("ERRO AO SALVAR RASPADINHAS:", e)
+
+        # SOCKET
+        socketio.emit('notificacao_compra', {
+
+            'msg': f'🚀 {nome} acabou de comprar {quantidade} raspadinha(s)!'
+
+        })
+
+        return render_template(
+
+            "graficos/eventos/Pagamentos/Pix/qrcode-pix.html",
+
+            qrcode=qr_image_url,
+
+            valor=f"R$ {valor_total:.2f}",
+
+            qr_code_cola=qr_code,
+
+            status=status,
+
+            payment_id=payment_id,
+
+            cpf=cpf,
+
+            expiration_date=expiration_date
+
+        )
+
+    except Exception as e:
+
+        print("ERRO GERAL:", e)
+
+        return f"ERRO GERAL: {str(e)}", 500
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#=============================================================================================
+@app.route('/aguardando_pagamento/pix/<pagamento_id>', methods=['GET'])
+def aguardando_confirmacao_pagamento_pix_cola(pagamento_id):
+
+    pagamento = pagamento_model.get_pagamento(pagamento_id)
+
+    if not pagamento:
+        return "Pagamento não encontrado", 404
+
+    cpf = pagamento.get("cpf", "")
+
+    # BUSCA NA COLLECTION CERTA: users_collection
+    usuario = None
+    if cpf:
+        usuario = users_collection.find_one({"cpf": cpf})
+
+    if not usuario:
+        return "Usuário não encontrado", 404
+
+    usuario_id = str(usuario["_id"])
+
+    qr_image_url = (
+        pagamento.get("qrcode") or
+        pagamento.get("qr_image_url") or
+        pagamento.get("qr_code_base64")
+    )
+
+    qr_code_cola = (
+        pagamento.get("qr_code_cola") or
+        pagamento.get("qr_code") or
+        pagamento.get("copia_cola")
+    )
+
+    valor = pagamento.get("valor", 0)
+    status = pagamento.get("status", "aguardando pagamento")
+
+    return render_template(
+        "graficos/eventos/Pagamentos/Pix/aguardando_pagamento_pix_cola.html",
+        qrcode=qr_image_url,
+        valor=f"R$ {float(valor):.2f}",
+        qr_code_cola=qr_code_cola,
+        status=status,
+        payment_id=pagamento_id,
+        cpf=cpf,
+        usuario_id=usuario_id
+    )
+
+#=============================================================================================
+
+
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+# - BUSCANDO PAGAMENTOS APROVADOS VIA PIX COLA 
+# - OPERA NA PAGINA AGUARDANDO_CONFIRMARCAO_PAGAMENTO.HTML
+@app.route('/sync_raspadinhas_aprovados', methods=['POST'])
+def sync_raspadinhas_aprovados():
+    try:
+        dados = request.get_json()
+        payment_id = dados.get('payment_id')
+
+        if not payment_id:
+            print("ERRO: NÃO VEIO O ID")
+            return {"ok": False, "erro": "Falta ID"}, 400
+
+        print(f"TENTANDO ATUALIZAR RASPADINHA COM O ID: {payment_id}")
+
+        # BUSCA DIRETO NA COLEÇÃO DE RASPADINHA, NÃO IMPORTA O PAGAMENTO
+        resultado = raspadinha_model.collection.update_many(
+            {"payment_id": payment_id}, # BUSCA EXATAMENTE O NÚMERO
+            {"$set": {
+                "status": "approved",
+                "data_atualizacao": datetime.now(timezone.utc)
+            }}
+        )
+
+        print(f"QUANTIDADE ATUALIZADA: {resultado.modified_count}")
+
+        return {
+            "ok": True,
+            "atualizados": resultado.modified_count
+        }
+
+    except Exception as e:
+        print(f"ERRO NO SERVER: {str(e)}")
+        return {"ok": False, "erro": str(e)}, 500
+
+#---------------------------------------------------------------------------------------------
+# - COMPRA SALDO CONTA
+#---------------------------------------------------------------------------------------------
+
+@app.route('/raspadinha/compra-saldo', methods=['POST'])
+
+def compra_raspadinha_saldo():
+
+    dados = request.get_json() or {}
+
+    quantidade = int(dados.get("quantidade", 1))
+
+    PRECO_UNITARIO = 0.60
+
+    valor_total = round(quantidade * PRECO_UNITARIO, 2)
+
+    usuario_id = dados.get("usuario_id")
+
+    if not usuario_id or usuario_id == "None" or not ObjectId.is_valid(str(usuario_id)):
+
+        return jsonify({
+            "erro": "Usuário inválido ou não autenticado."
+        }), 400
+
+    oid = ObjectId(str(usuario_id))
+
+    usuario = users_collection.find_one({
+        "_id": oid
+    })
+
+    if not usuario:
+
+        return jsonify({
+            "erro": "Usuário não localizado."
+        }), 404
+
+    ganhos_atuais = float(usuario.get("ganhos", 0.0))
+
+    # Verifica saldo
+    if ganhos_atuais < valor_total:
+
+        return jsonify({
+            "erro": f"Saldo insuficiente! Você possui R$ {ganhos_atuais:.2f} e precisa de R$ {valor_total:.2f}."
+        }), 400
+
+    # Desconta saldo
+    users_collection.update_one(
+
+        {"_id": oid},
+
+        {
+            "$inc": {
+                "ganhos": -valor_total
+            },
+
+            "$push": {
+                "entradas": {
+                    "tipo": "compra_com_saldo",
+                    "valor": -valor_total,
+                    "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")
+                }
+            }
+        }
+    )
+
+    # Cria raspadinhas
+    cpf_usuario = usuario.get("cpf", "")
+    nome = usuario.get("nome", "Usuário")
+
+    documentos = []
+
+    for _ in range(quantidade):
+
+        documentos.append({
+
+            "usuario_id": str(usuario_id),
+            "cpf": cpf_usuario,
+            "quantidade_raspadinhas": 1,
+            "status": "approved",
+            "data_compra": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")
+
+        })
+
+    db["raspadinhas"].insert_many(documentos)
+
+    # Busca usuário atualizado
+    usuario_atualizado = users_collection.find_one({
+        "_id": oid
+    })
+
+    novo_saldo = float(usuario_atualizado.get("ganhos", 0.0))
+
+    saldo_formatado = f"R$ {novo_saldo:.2f}".replace(".", ",")
+
+    # Conta raspadinhas aprovadas
+    total_raspadinhas_ativas = db["raspadinhas"].count_documents({
+
+        "cpf": cpf_usuario,
+        "status": "approved"
+
+    })
+
+    # SOCKET
+    socketio.emit('notificacao_compra', {
+
+        'msg': f'🚀 {nome} acabou de comprar {quantidade} raspadinha(s)!'
+
+    })
+
+    return jsonify({
+
+        "success": True,
+        "mensagem": f"🎉 Sucesso! {quantidade} raspadinha(s) comprada(s) com saldo.",
+        "novoSaldoTexto": saldo_formatado,
+        "novaQuantidadeTotal": total_raspadinhas_ativas
+
+    })
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+# - LISTAGEN DE TODOS OS `PAGAMENTOS`
+@app.route("/raspadinhas")
+def listar_raspadinhas():
+
+    raspadinhas = raspadinha_model.get_all_raspadinhas()
+
+    for n in raspadinhas:
+        n["_id"] = str(n["_id"])
+
+        if "usuario_id" in n and n["usuario_id"] is not None:
+            n["usuario_id"] = str(n["usuario_id"])
+
+        if "payment_id" in n and isinstance(n["payment_id"], ObjectId):
+            n["payment_id"] = str(n["payment_id"])
+
+    return jsonify({
+        "raspadinhas": raspadinhas
+    })
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
 # -Run
-#===========================================
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     socketio.run(
@@ -2990,6 +4694,64 @@ if __name__ == "__main__":
         debug=True,
         allow_unsafe_werkzeug=True
     )
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+# =========================
+# RESULTADO RASPADINHA (COM HISTÓRICO)
+# =========================
+# @app.route('/raspadinha/resultado', methods=['POST'])
+# def resultado_raspadinha():
+
+#     dados = request.get_json()
+
+#     premio = next(
+#         (p for p in PREMIOS if p["id"] == dados.get("id_premio")),
+#         None
+#     )
+
+#     if not premio:
+#         return jsonify({
+#             "valorTexto": "R$ 0,00",
+#             "valorNumerico": 0.0
+#         })
+
+#     valor_triplicado = float(premio["numero"]) * 10
+
+#     texto_triplicado = f"R$ {valor_triplicado:.2f}".replace(".", ",")
+
+#     user_id = session.get("user_id")
+
+#     if user_id and ObjectId.is_valid(user_id):
+
+#         usuario = users_collection.find_one({"_id": ObjectId(user_id)})
+
+#         if usuario:
+
+#             ganhos_atuais = float(usuario.get("ganhos", 0.0))
+
+#             novo_total = ganhos_atuais + valor_triplicado
+
+#             users_collection.update_one(
+#                 {"_id": ObjectId(user_id)},
+#                 {
+#                     "$set": {
+#                         "ganhos": round(novo_total, 2)
+#                     },
+#                     "$push": {
+#                         "entradas": {
+#                             "tipo": "raspadinha",
+#                             "valor": round(valor_triplicado, 2),
+#                             "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")
+#                         }
+#                     }
+#                 }
+#             )
+
+#     return jsonify({
+#         "valorTexto": texto_triplicado,
+#         "valorNumerico": valor_triplicado
+#     })
 
 
 
@@ -2997,4 +4759,63 @@ if __name__ == "__main__":
 
 
 
+# @app.route('/raspadinha/resultado', methods=['POST'])
+# def resultado_raspadinha():
+#     dados = request.get_json() or {}
+    
+#     # PEGA O ID DIRETAMENTE DA URL ATUAL DO NAVEGADOR
+#     # Como você entra via /raspadinha/<usuario_id>, o flask sabe quem é esse usuário
+#     # Isso elimina qualquer dependência de variáveis no JavaScript ou HTML
+    
+#     # Se o ID não veio no JSON, tentamos pegar do "Referer" ou do último acesso
+#     usuario_id = dados.get("usuario_id")
+    
+#     if not usuario_id:
+#         # Tenta pegar da URL da página que enviou o POST
+#         referer = request.headers.get("Referer", "")
+#         if "/raspadinha/" in referer:
+#             usuario_id = referer.split("/raspadinha/")[1].split("/")[0]
 
+#     if not usuario_id or usuario_id == "None":
+#         return jsonify({"error": "Usuário não detectado"}), 400
+    
+#     try:
+#         oid = ObjectId(str(usuario_id))
+#     except:
+#         return jsonify({"error": "ID inválido"}), 400
+
+#     # O restante da lógica de prêmios e banco permanece idêntico
+#     id_premio = dados.get("id_premio")
+#     premio = next((p for p in PREMIOS if str(p.get("id")) == str(id_premio)), None)
+
+#     if not premio:
+#         return jsonify({"valorTexto": "R$ 0,00", "valorNumerico": 0.0})
+
+#     valor_triplicado = float(premio["numero"]) * 100
+#     texto_triplicado = f"R$ {valor_triplicado:.2f}".replace(".", ",")
+
+#     usuario = users_collection.find_one({"_id": oid})
+    
+#     if usuario:
+#         users_collection.update_one(
+#             {"_id": oid},
+#             {
+#                 "$set": {"ganhos": round(float(usuario.get("ganhos", 0.0)) + valor_triplicado, 2)},
+#                 "$push": {"entradas": {"tipo": "raspadinha", "valor": round(valor_triplicado, 2), "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")}}
+#             }
+#         )
+#         msg = f'🎉 {usuario.get("nome", "Usuário")} ganhou {texto_triplicado}!'
+#         usuarios.append({"id": str(usuario_id), "texto": msg})
+#         if len(usuarios) > 8000: usuarios.pop(0)
+#         socketio.emit('notificacao_geral', {'lista': [u["texto"] for u in usuarios]})
+        
+#         # --- CÓDIGO CORRIGIDO AQUI ---
+#         usuario_atualizado = users_collection.find_one({"_id": oid})
+#         saldo_atual = float(usuario_atualizado.get("ganhos", 0.0))
+#         saldo_formatado = f"R$ {saldo_atual:.2f}".replace(".", ",")
+        
+#         return jsonify({
+#             "valorTexto": texto_triplicado, 
+#             "valorNumerico": valor_triplicado,
+#             "novoSaldoTexto": saldo_formatado
+#         })

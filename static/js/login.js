@@ -1,3 +1,4 @@
+
 // LOGIN (USUARIOS)
 document.getElementById("formLogin").addEventListener("submit", async function(e) {
     e.preventDefault();
@@ -15,7 +16,7 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
 
         if (data.status === "sucesso") {
             // Redireciona corretamente com o usuario_id na rota
-            window.location.href = `/vitoria_visionaria/projeto-desenvolvimento-fase-teste/codigo_servico/1722/${data.usuario_id}`;
+            window.location.href = `/raspadinha/${data.usuario_id}`;
         } else {
             document.getElementById("loginMsg").innerHTML =
                 `<div class="alert alert-danger">${data.mensagem}</div>`;

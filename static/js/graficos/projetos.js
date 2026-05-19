@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  fetch("/listar_projetos")
+  fetch("/listar_projetos/{{ projeto_id}}")
     .then(r => r.json())
     .then(data => {
 

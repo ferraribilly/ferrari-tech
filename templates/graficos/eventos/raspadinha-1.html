@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#333">
+<title>Ferrari Tech</title>
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='w.png') }}">
+<link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/raspadinha/raspadinha.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/registro.css') }}">
+<style> 
+    .btn-sair-flutuante {
+  position: fixed;
+  top: 20px; /* Distância do topo da tela */
+  left: 20px; /* ALTERADO: Agora alinhado à esquerda */
+  z-index: 9999; /* Garante que o botão fique sempre na frente de todo o conteúdo */
+  
+  /* Estilos visuais do botão */
+  background-color: #ff4d5087; /* Cor de destaque para saída */
+  color: #ffffff;
+  border: none;
+  border-radius: 50px; /* Bordas arredondadas */
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.btn-sair-flutuante:hover {
+  background-color: #ff7875;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+@font-face {
+  font-family: 'MinhaFonteCustomizada'; /* Nome que você vai dar para a fonte */
+  src: url('/static/fonts/NK57 Monospace Cd Bd It.otf') format('truetype'); /* Caminho correto do arquivo */
+  font-weight: normal;
+  font-style: normal;
+}
+.botao-som-flutuante {
+  position: fixed;
+  top: 20px; /* Distância do topo da tela */
+  right: 20px; /* Distância da borda direita */
+  z-index: 9999; /* Fica acima de todo o conteúdo da página */
+  
+  padding: 10px 20px;
+  background-color: #2e7d32; /* Verde enquanto está pausado */
+  color: #ffffff;
+  border: none;
+  border-radius: 50px; /* Formato arredondado */
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra de flutuação */
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+/* Quando o áudio estiver tocando, o botão fica vermelho */
+.botao-som-flutuante.tocando {
+  background-color: #c62828; 
+}
+
+.botao-som-flutuante:hover {
+  transform: scale(1.03);
+}
+#loading-compra {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 999999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.loading-box {
+    background: #111;
+    border-radius: 18px;
+    padding: 30px;
+    width: 230px;
+    text-align: center;
+    border: 1px solid #2a2a2a;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+
+.loading-spinner {
+    width: 55px;
+    height: 55px;
+    border: 5px solid rgba(255,255,255,0.15);
+    border-top: 5px solid #00ff88;
+    border-radius: 50%;
+    margin: auto;
+    animation: spinCompra .7s linear infinite;
+}
+
+.loading-texto {
+    color: white;
+    margin-top: 18px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+
+#loading-pagamento {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 999999999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.loading-box-pagamento {
+    background: #fff;
+    padding: 25px;
+    border-radius: 16px;
+    text-align: center;
+    width: 260px;
+}
+
+.loading-box-pagamento p {
+    margin-top: 15px;
+    color: #16a34a;
+    font-weight: bold;
+}
+
+.loader {
+    width: 55px;
+    height: 55px;
+    border: 5px solid #d4d4d4;
+    border-top: 5px solid #16a34a;
+    border-radius: 50%;
+    display: inline-block;
+    animation: spin .7s linear infinite;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spinCompra {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.prize-card {
+
+    background: #0f0f0f;
+
+    width: 95%;
+
+    max-width: 1000px;
+
+    border-radius: 18px;
+
+    padding: 20px;
+
+    position: relative;
+
+    overflow: hidden;
+
+}
+
+.premios-scroll {
+
+    max-height: 65vh;
+
+    overflow-y: auto;
+
+    padding-bottom: 100px;
+
+}
+
+.premios-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 14px;
+
+    margin-top: 15px;
+
+}
+
+.premio-item {
+
+    background: #161616;
+
+    border-radius: 14px;
+
+    padding: 12px;
+
+    text-align: center;
+
+    border: 1px solid #2b2b2b;
+
+}
+
+.premio-item img {
+
+    width: 100%;
+
+    max-width: 90px;
+
+    height: 90px;
+
+    object-fit: cover;
+
+    border-radius: 10px;
+
+}
+
+.multiplicadores {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    gap: 4px;
+
+    margin-top: 8px;
+
+}
+
+.multiplicadores span {
+
+    background: #232323;
+
+    color: #00ff88;
+
+    border-radius: 8px;
+
+    padding: 4px 7px;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+}
+
+.premio-item strong {
+
+    display: block;
+
+    margin-top: 10px;
+
+    color: #fff;
+
+    font-size: 17px;
+
+}
+
+.footer-fixo {
+
+    position: absolute;
+
+    bottom: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    padding: 14px;
+
+    background: linear-gradient(to top, #0f0f0f, transparent);
+
+    display: flex;
+
+    justify-content: center;
+
+}
+
+.close-btn {
+
+    background: #00ff88;
+
+    color: #000;
+
+    border: none;
+
+    padding: 12px 30px;
+
+    border-radius: 12px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+#relogio-flutuante {
+    position: fixed;
+    top: 80px; /* Alinhado no topo */
+    right: 15px;
+    z-index: 9999;
+    color: #ffffff;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 2rem;
+    font-weight: bold;
+    padding: 15px 20px;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+
+.modal-suporte{
+
+    position:fixed;
+
+    top:0;
+
+    left:0;
+
+    width:100%;
+
+    height:100%;
+
+    background:rgba(0,0,0,0.75);
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+
+    z-index:999999;
+
+}
+
+.modal-box{
+
+    width:90%;
+
+    max-width:400px;
+
+    background:#111;
+
+    border-radius:18px;
+
+    padding:20px;
+
+    text-align:center;
+
+    border:1px solid #2a2a2a;
+
+}
+
+.modal-box h2{
+
+    color:#fff;
+
+    margin-bottom:20px;
+
+}
+
+.btn-modal{
+
+    width:100%;
+
+    margin-bottom:12px;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#1d1d1d;
+
+    color:#00ff88;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+}
+
+.btn-fechar{
+
+    width:100%;
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#ff3b3b;
+
+    color:#fff;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+}
+
+.modal-dados{
+
+    position:fixed;
+
+    top:0;
+
+    left:0;
+
+    width:100%;
+
+    height:100%;
+
+    background:rgba(0,0,0,0.75);
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+
+    z-index:999999;
+
+}
+
+.modal-dados-box{
+
+    width:90%;
+
+    max-width:420px;
+
+    background:#111;
+
+    border-radius:18px;
+
+    padding:20px;
+
+    border:1px solid #2a2a2a;
+
+    color:#fff;
+
+}
+
+.modal-dados-box h2{
+
+    text-align:center;
+
+    margin-bottom:20px;
+
+}
+
+.dados-scroll{
+
+    max-height:60vh;
+
+    overflow-y:auto;
+
+}
+
+.dados-scroll p{
+
+    background:#1b1b1b;
+
+    padding:12px;
+
+    border-radius:12px;
+
+    margin-bottom:12px;
+
+    font-weight:bold;
+
+    font-family:monospace;
+
+    color:#fff;
+
+    word-break:break-word;
+
+}
+
+.dados-scroll span{
+
+    color:#4a90e2;
+
+    display:block;
+
+    margin-top:6px;
+
+}
+
+.btn-fechar-dados{
+
+    width:100%;
+
+    margin-top:15px;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#ff3b3b;
+
+    color:#fff;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+}
+
+.btn-deletar-conta{
+
+    width:100%;
+
+    margin-top:12px;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#ff2e2e;
+
+    color:#fff;
+
+    font-weight:bold;
+
+    font-size:15px;
+
+    cursor:pointer;
+
+    transition:0.2s;
+
+}
+
+.btn-deletar-conta:hover{
+
+    transform:scale(1.02);
+
+    background:#ff0000;
+
+}
+
+
+/* Responsividade Mobile */
+@media (max-width: 768px) {
+    #relogio-flutuante {
+        top: 15px; /* Alinhado no topo no mobile */
+        right: 15px;
+        font-size: 1rem;
+        padding: 80px 15px;
+    }
+}
+
+
+@media(max-width:700px){
+
+    .premios-grid {
+
+        grid-template-columns: repeat(3, 1fr);
+
+        gap: 8px;
+
+    }
+
+    .premio-item {
+
+        padding: 8px;
+
+    }
+
+    .premio-item img {
+
+        height: 65px;
+
+    }
+
+    .multiplicadores span {
+
+        font-size: 9px;
+
+        padding: 3px 5px;
+
+    }
+
+    .premio-item strong {
+
+        font-size: 13px;
+
+    }
+
+}
+
+/* Responsividade para telas de celulares menores */
+@media (max-width: 768px) {
+  .botao-som-flutuante {
+    top: 60px;
+    right: 15px;
+    padding: 8px 15px;
+    font-size: 13px;
+  }
+    .btn-sair-flutuante {
+    top: 45px;
+    left: 15px; /* ALTERADO: Alinhado à esquerda também no celular */
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+}
+
+</style>
+</head>
+
+<body>
+<div id="loading-pagamento">
+
+    <div class="loading-box-pagamento">
+
+        <span class="loader"></span>
+
+        <p>
+            Gerando pagamento, não saia aguarde...
+        </p>
+
+    </div>
+
+</div>
+<div id="relogio-flutuante">00:00:00</div>
+
+<!-- Botão flutuante no topo -->
+<button id="btn-som-topo" class="botao-som-flutuante">🔈 Ligar Som</button>
+
+<!-- Tag do áudio de fundo (troque pelo seu arquivo de som) -->
+<!-- <audio id="audio-ambiente" src="/static/audio/confeite.mp3" loop></audio> -->
+
+
+<button class="btn-sair-flutuante" onclick="window.location.href='/raspadinha';">
+  Sair
+</button>
+
+<header class="top-header">
+
+    <div class="header-card">
+        <h3 style="font-family: 'MinhaFonteCustomizada', sans-serif;">RASPADINHAS</h3>
+        <p style="color: rgb(255, 217, 0);" id="qtd-rsp">{{ total_quantidade }}</p>
+    </div>
+
+    <div class="header-card">
+        <h3 style="font-family: 'MinhaFonteCustomizada', sans-serif;">GANHOU</h3>
+        <p style="color: orange;" id="valor-total">R$ 0.00 </p>
+    </div>
+
+    <div class="header-card">
+        <h3 style="font-family: 'MinhaFonteCustomizada', sans-serif;">SALDO</h3>
+        <p style="color: rgb(85, 255, 0);" id="saldo-valor">
+        R$ {{ "%.2f"|format(usuario.ganhos|float)|replace('.', ',') if usuario else "0,00" }}
+        </p>
+
+
+    </div>
+
+</header>
+
+
+<div class="scratch-container">
+    <div class="scratch-card">
+
+        <div class="prize">
+            <img id="prize-image"
+            src=""
+            alt="Prêmio">
+        </div>
+
+        <canvas id="card" width="310" height="160"></canvas>
+
+    </div>
+
+<div style="display:block" class="chat-container"> 
+    <strong style="font-size: 14px; font-family: 'MinhaFonteCustomizada', sans-serif;" id="status-box"></strong>
+</div>
+
+    <button  class="botao-cassaniquel" id="new-btn" onclick="resetCard()">
+        PLAY
+    </button>
+
+
+</div>
+</div>
+
+<div id="win-overlay" class="win-overlay">   
+    <div class="win-content">
+        <img id="win-image"
+        src="">
+        <h2 style="color: yellow; font-size: 32px; font-family: 'MinhaFonteCustomizada', sans-serif;" id="win-amount">
+        Parabéns <br>R$ 0,00
+        </h2>
+
+ </div>
+    </div>
+</div>
+
+
+<!-- MODAL LOGIN / REGISTRO -->
+ {% if not usuario %}
+<div class="auth-overlay" id="authOverlay">
+
+    <div class="auth-box">
+
+            <img class="logo-raspadinha"
+            src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
+            alt="logo-raspadinha">
+        
+
+        <div class="auth-tabs">
+            <button class="auth-tab active">Login</button>
+            <button class="auth-tab">Registro</button>
+        </div>
+
+        <!-- LOGIN -->
+        <form id="formLogin" class="auth-form active">
+
+            <h2>Entrar</h2>
+
+            <div class="input-group">
+                <input style="color:#000; font-weight: bold; font-size:16px;" id="cpfLogin" type="password" placeholder="CPF" required>
+            </div>
+        <!-- Mensagem de erro ou sucesso -->
+            <div style="text-align: center; font-weight: bold; color:red;" id="loginMsg"></div>
+
+            <button type="submit" class="auth-btn">
+                Entrar
+            </button>
+
+        </form>
+
+        <!-- REGISTRO -->
+        <form id="formRegistro" class="auth-form">
+            <div id="loadingOverlay">
+                <div class="spinner-border" role="status"></div>
+                <span id="loadingText">Verificando dados...</span>
+            </div>
+            <h2>Criar Conta</h2>
+
+            <div class="form-grid">
+
+                <div class="input-group">
+                <input id="nome" type="text" class="form-control" name="nome" placeholder="Digite seu nome" required>
+
+                </div>
+
+                <div class="input-group">
+                <input id="sobrenome" type="text" class="form-control" name="sobrenome" placeholder="Digite seu sobrenome" required>
+
+                </div>
+
+                <div class="input-group">
+                <input id="cpf" type="text" class="form-control" name="cpf" placeholder="Digite seu CPF (apenas números)" maxlength="11" required>
+
+                </div>
+
+                <div class="input-group">
+                <input id="dt_nascimento" type="date" class="form-control" name="dt_nascimento" required>
+
+                </div>
+
+                <div class="input-group full">
+                <input id="email" type="email" class="form-control" name="email" placeholder="Digite seu email" required>
+
+
+                </div>
+
+                <!-- <div class="input-group full">
+                    <select id="estado" required>
+                        <option value="">Selecione seu estado</option>
+                    </select>
+                </div> -->
+
+                <div class="input-group full">
+                <input id="chave_pix" type="text" class="form-control" name="chave_pix" placeholder="Digite sua chave PIX" required>
+
+                </div>
+
+                <div class="input-group full">
+           <!-- <label for="vendedorInput" class="form-label text-start d-block">Lista Indicação</label> -->
+                <input type="text" class="form-control" id="vendedorInput" name="vendedor" placeholder="Clique para selecionar..." data-bs-toggle="modal" data-bs-target="#vendedorModal" readonly required>        
+                </div>
+
+            </div>
+                        <!-- --- CONTAINER DA CHECKBOX ADICIONADO AQUI --- -->
+            <div class="termos-container">
+                <input type="checkbox" id="aceitaTermos" name="termos" required>
+                <label for="aceitaTermos">
+                    Li e aceito os <a href="/termos" target="_blank">Termos de Uso</a> e políticas.
+                </label>
+            </div>
+                <div style="text-align: center; font-weight: bold; color:rgb(21, 255, 0);" id="registroMsg" class="mt-2"></div>
+
+            <button id="btnSubmit" class="auth-btn">
+                Registrar
+            </button>
+        </form>
+        
+    <div class="modal fade" id="vendedorModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Selecione um Vendedor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for u in vendedores %}
+                        <button type="button" class="list-group-item list-group-item-action vendor-option">
+                            {{ u.nome }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+    </div>
+</div>
+{% endif %}
+
+
+
+
+
+<div class="buy-overlay" id="buy-overlay">  
+
+    <div class="buy-card">  
+
+        <h2>Compras no app</h2>  
+
+        <div class="auth-tabs">
+
+            <button class="auth-tab active" onclick="mudarAbaPix(0)">
+                Pix Rápido
+            </button>
+
+            <button class="auth-tab" onclick="mudarAbaPix(1)">
+                Cartão Crédito
+            </button>
+
+            <button class="auth-tab" onclick="mudarAbaPix(2)">
+                Saldo
+            </button>
+
+            <button style="background: red; color: #fff; font-weight: bold;" class="auth-tab" onclick="fecharCompra()">
+                Sair
+            </button>
+
+        </div>
+
+        <div class="buy-slider" id="buySlider">
+
+            <!-- PIX -->
+            <div class="buy-slide">
+
+                <div class="card-produto" data-preco-unitario="0.60">
+
+                    <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778015403/artpoin-logo-pix_tizueq.png" class="produto-img">
+
+                    <div class="produto-info">
+
+                        <h3 class="produto-titulo">Pix Rápido</h3>
+                        <p class="produto-descricao">Ferrari Tech Serviço Digital</p>
+
+                        <div class="compra-container">
+                            <button class="btn-qtd menos">-</button>
+                            <span class="quantidade">1</span>
+                            <button class="btn-qtd mais">+</button>
+                            <button id="btn-pagar" class="btn-comprar">Comprar</button>
+                        </div>
+
+                        <div class="total-container">
+                            Total: R$ <span class="total-bruto">0.60</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- CARTÃO -->
+            <div class="buy-slide">
+
+                <div class="card-produto" data-preco-unitario="0.60">
+
+                    <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778025827/pngwing.com_pkfnfu.png" class="produto-img">
+
+                    <div class="produto-info">
+
+                        <h3 class="produto-titulo">Cartão de Crédito</h3>
+                        <p class="produto-descricao">Ferrari Tech Serviço Digital</p>
+
+                        <div class="compra-container">
+                            <button class="btn-qtd menos">-</button>
+                            <span class="quantidade">5</span>
+                            <button class="btn-qtd mais">+</button>
+
+                            <a style="width:100%" href="/pagamento/cartao_credito/ferrari-tech/{{ usuario._id }}">
+                                <button class="btn-comprar">Comprar</button>
+                            </a>
+                        </div>
+
+                        <div class="total-container">
+                            Total: R$ <span class="total-bruto">3.00</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- SALDO -->
+            <div class="buy-slide">
+
+                <div class="card-produto" data-preco-unitario="0.60">
+
+                    <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778025827/pngwing.com_pkfnfu.png" class="produto-img">
+
+                    <div class="produto-info">
+
+                        <h3 class="produto-titulo">Compra com Saldo<br>
+                            {{usuario.ganhos}}
+                        </h3>
+                        <p class="produto-descricao">Ferrari Tech Serviço Digital</p>
+
+                        <div class="compra-container">
+                            <button class="btn-qtd menos">-</button>
+                            <span class="quantidade">1</span>
+                            <button class="btn-qtd mais">+</button>
+
+                            <button class="btn-comprar" id="btn-saldo">Comprar</button>
+                        </div>
+
+                        <div class="total-container">
+                            Total: R$ <span class="total-bruto">0.60</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Overlay de Prêmios -->
+<div class="prize-overlay" id="prize-overlay">
+
+  <div class="prize-card">
+
+    <h2>Prêmios 🏆</h2>
+
+    <div class="premios-scroll">
+
+      <div class="premios-grid">
+
+        <div class="premio-item">
+          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778621532/1778621069295_byxfmy.png">
+          <div class="multiplicadores">
+            <span>1x</span>
+            <span>2x</span>
+            <span>3x</span>
+            <span>4x</span>
+            <span>5x</span>
+            <span>10x</span>
+          </div>
+          <strong>R$ 0,05</strong>
+        </div>
+
+        <div class="premio-item">
+          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778622997/1778622360189_cyixsr.png">
+          <div class="multiplicadores">
+            <span>1x</span>
+            <span>2x</span>
+            <span>3x</span>
+            <span>4x</span>
+            <span>5x</span>
+            <span>10x</span>
+          </div>
+          <strong>R$ 0,10</strong>
+        </div>
+
+        <div class="premio-item">
+          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778621532/1778621207576_povelv.png">
+          <div class="multiplicadores">
+            <span>1x</span>
+            <span>2x</span>
+            <span>3x</span>
+            <span>4x</span>
+            <span>5x</span>
+            <span>10x</span>
+          </div>
+          <strong>R$ 0,15</strong>
+        </div>
+
+        <div class="premio-item">
+          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778614222/file_000000000ca4720e8a65a4b4966cee89_kxhcbd.png">
+          <div class="multiplicadores">
+            <span>1x</span>
+            <span>2x</span>
+            <span>3x</span>
+            <span>4x</span>
+            <span>5x</span>
+            <span>10x</span>
+          </div>
+          <strong>R$ 0,25</strong>
+        </div>
+
+        <div class="premio-item">
+          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778621531/1778621356505_k6jsgw.png">
+          <div class="multiplicadores">
+            <span>1x</span>
+            <span>2x</span>
+            <span>3x</span>
+            <span>4x</span>
+            <span>5x</span>
+            <span>10x</span>
+          </div>
+          <strong>R$ 0,30</strong>
+        </div>
+
+        <div class="premio-item">
+          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778621531/1778621422435_w6l0n6.png">
+          <div class="multiplicadores">
+            <span>1x</span>
+            <span>2x</span>
+            <span>3x</span>
+            <span>4x</span>
+            <span>5x</span>
+            <span>10x</span>
+          </div>
+          <strong>R$ 0,50</strong>
+        </div>
+
+        <div class="premio-item">
+          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778621531/1778621498747_xhi8ad.png">
+          <div class="multiplicadores">
+            <span>1x</span>
+            <span>2x</span>
+            <span>3x</span>
+            <span>4x</span>
+            <span>5x</span>
+            <span>10x</span>
+          </div>
+          <strong>R$ 1,00</strong>
+        </div>
+
+        <div class="premio-item">
+          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778622997/1778622293971_v0zpku.png">
+          <div class="multiplicadores">
+            <span>1x</span>
+            <span>2x</span>
+            <span>3x</span>
+            <span>4x</span>
+            <span>5x</span>
+            <span>10x</span>
+          </div>
+          <strong>R$ 5,00</strong>
+        </div>
+
+        <div class="premio-item">
+          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778623662/1778623446472_mx8vbn.png">
+          <div class="multiplicadores">
+            <span>1x</span>
+            <span>2x</span>
+            <span>3x</span>
+            <span>4x</span>
+            <span>5x</span>
+            <span>10x</span>
+          </div>
+          <strong>R$ 10,00</strong>
+        </div>
+
+        <div class="premio-item">
+          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778615047/file_000000006b3871fb9a60d2812e6ce8df_d0zmmi.png">
+          <div class="multiplicadores">
+            <span>1x</span>
+            <span>2x</span>
+            <span>3x</span>
+            <span>4x</span>
+            <span>5x</span>
+            <span>10x</span>
+          </div>
+          <strong>R$ 200,00</strong>
+        </div>
+
+        <div class="premio-item">
+          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1779154935/image_1778976107545_gcwmr8.jpg">
+          <div class="multiplicadores">
+            <span>1x</span>
+            <span>2x</span>
+            <span>3x</span>
+            <span>4x</span>
+            <span>5x</span>
+            <span>10x</span>
+          </div>
+          <strong>R$ 1.000,00</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="footer-fixo">
+      <button class="close-btn" onclick="fecharPremios()">Fechar</button>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- OVERLAY SAQUES (ATUALIZADO SEM RELOAD) -->
+
+{% if usuario %}
+
+<div class="saques-overlay" id="saques-overlay">
+
+    <div style="max-height:85vh; overflow-y:auto;" class="saques-card">
+
+        <div class="auth-tabs">
+
+            <button class="auth-tab active" onclick="mudarAbaSaque(0)">Sacar</button>
+            <button class="auth-tab" onclick="mudarAbaSaque(1); carregarMovimentacoes()">Entradas</button>
+            <button class="auth-tab" onclick="mudarAbaSaque(2); carregarMovimentacoes()">Saídas</button>
+            <button class="auth-tab" onclick="fecharSaques()" style="background:red;color:#fff;">Sair</button>
+
+        </div>
+
+        <!-- SACAR -->
+        <div class="aba-saque-content" id="aba-0">
+
+            <h2>Sacar Ganhos</h2>
+
+            <div class="saque-form">
+
+                <div>
+                    <label>Valor Saque</label>
+                    <input type="text" id="valor-saque" placeholder="R$ {{ '%.2f'|format(usuario.ganhos|float)|replace('.', ',') if usuario else '0,00' }}">
+
+
+                </div>
+
+                <div>
+                    <label>Nome</label>
+                    <input type="text" id="saque-nome" value="{{ usuario.nome }}" disabled>
+                </div>
+
+                <div>
+                    <label>CPF</label>
+                    <input type="text" id="saque-cpf" value="{{ usuario.cpf }}" disabled>
+                </div>
+
+                <div>
+                    <label>PIX</label>
+                    <input type="text" id="saque-pix" value="{{ usuario.chave_pix }}" disabled>
+                </div>
+
+                <button class="withdraw-btn" onclick="solicitarSaque()">
+                    Solicitar Saque
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- ENTRADAS -->
+        <div class="aba-saque-content" id="aba-1" style="display:none;">
+
+            <h2>Entradas (Ganhos)</h2>
+
+            <table class="tabela-financeira">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+
+                <tbody id="entradas-body"></tbody>
+
+            </table>
+
+        </div>
+
+        <!-- SAÍDAS -->
+        <div class="aba-saque-content" id="aba-2" style="display:none;">
+
+            <h2>Saídas (Saques)</h2>
+
+            <table class="tabela-financeira">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+
+                <tbody id="saidas-body"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+<button class="float-btn" onclick="abrirPremios()">
+🏆
+</button>
+
+
+<audio id="win-audio" preload="auto">
+    <source src="/static/audio/confeite.mp3" type="audio/mpeg">
+</audio>
+
+
+
+    <!-- Header/Footer Fixo -->
+    <header class="fixed-bottom-menu">
+        <button class="btn-acao">
+            <img onclick="abrirCompra()" style="width: 48px; height: 48px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778012674/icone-de-carrinho-de-compras-3d-em-fundo-de-circulo-azul-simbolo-de-varejo-online_84443-55705_dfmhp8.png"></img>
+        </button>
+        <button class="btn-acao"> 
+            <img onclick="abrirSaques()" style="width: 48px; height: 48px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778720610/saque_k5hlcq.png"></img>
+        </button>
+        <button class="btn-acao" onclick="abrirSuporte()">
+        <img style="width: 48px; height: 48px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778702172/Pngtree_3d_isolated_render_of_a_20808938_lxm032.png"></img>
+        </button>
+
+                <!-- MODAL -->
+        <div id="modal-suporte" class="modal-suporte">
+
+            <div class="modal-box">
+
+                <h2>Central de Suporte</h2>
+
+                <button onclick="suporteCompra()" class="btn-modal">
+                    Problema Compra
+                </button>
+
+                <button onclick="suporteSaque()" class="btn-modal">
+                    Problema com Saque
+                </button>
+
+                <button onclick="falarAdministrador()" class="btn-modal">
+                    Falar com Administrador
+                </button>
+
+                <button onclick="fecharSuporte()" class="btn-fechar">
+                    Fechar
+                </button>
+
+            </div>
+
+        </div>
+
+        </button>
+        <!-- BOTÃO -->
+        <button style="font-size: 32px;" class="btn-acao" onclick="abrirdados()">
+
+            📄
+
+        </button>
+
+        <!-- MODAL -->
+        <div id="modal-dados" class="modal-dados">
+
+            <div class="modal-dados-box">
+
+                <h2>Confirmação dados</h2>
+
+                <div class="dados-scroll">
+
+                    <p>
+                        ID:
+                        <span id="usuario_id">{{ usuario._id }}</span>
+                    </p>
+
+                    <p>
+                        Nome:
+                        <span id="nome">{{ usuario.nome }}</span>
+                    </p>
+
+                    <p>
+                        Sobrenome:
+                        <span id="sobrenome">{{ usuario.sobrenome }}</span>
+                    </p>
+
+                    <p>
+                        CPF:
+                        <span id="cpf">{{ usuario.cpf }}</span>
+                    </p>
+
+                    <p>
+                        Email:
+                        <span id="email">{{ usuario.email }}</span>
+                    </p>
+
+                    <p>
+                        Indicação:
+                        <span id="vendedor">{{ usuario.vendedor }}</span>
+                    </p>
+                    <p>
+                        Saldo:
+                        <span>R$ {{ "%.2f"|format(usuario.ganhos|float)|replace('.', ',') if usuario else "0,00" }}</span>
+                    </p>
+                    <button class="btn-deletar-conta">
+                        Deletar Conta
+                    </button>
+
+
+
+
+                </div>
+
+                <button class="btn-fechar-dados" onclick="fechardados()">
+                    Fechar
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+
+
+
+    </header>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<!-- Crie a variável global no HTML antes do arquivo JS externo -->
+<!-- Coloque isso ANTES da tag <script src="seu-arquivo.js"></script> -->
+<script>
+    window.totalQuantidadeRaspadinhas = {{ total_quantidade | default(0) }};
+</script>
+
+<script src="{{ url_for('static', filename='js/graficos/eventos/raspadinha/raspadinha.js') }}"></script>
+<script src="{{ url_for('static', filename='js/registro_login.js') }}"></script>
+<script src="{{ url_for('static', filename='js/login.js') }}"></script>
+<script src="{{ url_for('static', filename='js/graficos/eventos/raspadinha/Pagamentos/pagamentos_qrcode-pix.js') }}"></script>
+
+
+
+<script>
+    const socket = io();
+    const statusBox = document.getElementById('status-box');
+
+    // Nome vindo do Flask para usar nas mensagens
+    const nomeUsuarioLogado = "{{ usuario.nome if usuario else '' }}";
+
+
+    function mostrarAviso(texto) {
+        statusBox.innerText = texto;
+        statusBox.style.display = 'block';
+    }
+
+/// Recebe e exibe as mensagens
+socket.on('notificacao_geral', (data) => {
+    const box = document.getElementById('status-box');
+    if (!box) return;
+    
+    box.innerHTML = '';
+
+    if (!data || !data.lista) return;
+
+    data.lista.forEach((msg, index) => {
+        const span = document.createElement('span');
+        span.textContent = msg;
+        const cor = `hsl(${(index * 137) % 360}, 70%, 50%)`;
+        span.style.color = cor;
+        span.style.fontWeight = "bold";
+        span.style.display = "block";
+        span.style.margin = "2px 0";
+
+        // Adiciona as novas mensagens no topo para subirem automaticamente
+        box.prepend(span);
+    });
+
+    // Mantém a rolagem travada no topo onde os novos prêmios aparecem
+    box.scrollTop = 0;
+});
+
+// Conecta enviando o ID corretamente vindo do Jinja
+socket.on('connect', () => {
+    socket.emit('usuario_entrou', {
+        usuario_id: "{{ usuario_id }}",
+        nome: "{{ usuario.nome }}"
+    });
+});
+
+// Ouve quando alguém compra
+socket.on('notificacao_compra', function(data) {
+
+    const box = document.getElementById('status-box');
+
+    if (!box) return;
+
+    const span = document.createElement('span');
+
+    span.textContent = data.msg;
+
+    // gera cor diferente toda vez
+    const hue = Date.now() % 360;
+
+    span.style.color = `hsl(${hue}, 90%, 55%)`;
+    span.style.fontWeight = "bold";
+    span.style.display = "block";
+    span.style.margin = "2px 0";
+
+    // adiciona no topo
+    box.prepend(span);
+
+    // mantém topo
+    box.scrollTop = 0;
+
+    mostrarAviso(data.msg);
+
+});
+
+function atualizarRelogio() {
+    const agora = new Date();
+    
+    // Pega as horas, minutos e segundos, e garante o padrão "00"
+    const horas = String(agora.getHours()).padStart(2, '0');
+    const minutos = String(agora.getMinutes()).padStart(2, '0');
+    const segundos = String(agora.getSeconds()).padStart(2, '0');
+    
+    // Monta o formato 00:00:00
+    const horarioAtual = `${horas}:${minutos}:${segundos}`;
+    
+    // Exibe no HTML
+    document.getElementById('relogio-flutuante').textContent = horarioAtual;
+}
+
+// Atualiza o relógio a cada 1 segundo
+setInterval(atualizarRelogio, 1000);
+
+// Executa imediatamente para não aparecer o "00:00:00" inicial
+atualizarRelogio();
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const cards = document.querySelectorAll(".card-produto");
+
+    // Overlay Spinner
+    const loadingTela = document.createElement("div");
+
+    loadingTela.id = "loading-compra";
+
+    loadingTela.innerHTML = `
+        <div class="loading-box">
+            <div class="loading-spinner"></div>
+            <div class="loading-texto">Efetuando compra...</div>
+        </div>
+    `;
+
+    document.body.appendChild(loadingTela);
+
+    cards.forEach(card => {
+
+        const btnMais = card.querySelector(".mais");
+        const btnMenos = card.querySelector(".menos");
+        const btnComprar = card.querySelector(".btn-comprar");
+        const txtQuantidade = card.querySelector(".quantidade");
+        const txtTotal = card.querySelector(".total-bruto");
+
+        const precoUnitario = parseFloat(card.getAttribute("data-preco-unitario"));
+
+        function atualizarTotal(novaQuantidade) {
+
+            txtQuantidade.textContent = novaQuantidade;
+
+            const precoFinal = novaQuantidade * precoUnitario;
+
+            txtTotal.textContent = precoFinal.toFixed(2);
+        }
+
+        btnMais.addEventListener("click", () => {
+
+            let qtd = parseInt(txtQuantidade.textContent);
+
+            qtd++;
+
+            atualizarTotal(qtd);
+        });
+
+        btnMenos.addEventListener("click", () => {
+
+            let qtd = parseInt(txtQuantidade.textContent);
+
+            if (qtd > 1) {
+
+                qtd--;
+
+                atualizarTotal(qtd);
+            }
+        });
+
+        btnComprar.addEventListener("click", () => {
+
+            const qtd = parseInt(txtQuantidade.textContent);
+
+            const titulo = card.querySelector(".produto-titulo").textContent;
+
+            // Compra com saldo
+            if (titulo.includes("Saldo")) {
+
+                const idDoUsuario = "{{ usuario._id }}";
+
+                // Abre loading tela
+                loadingTela.style.display = "flex";
+
+                fetch('/raspadinha/compra-saldo', {
+
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify({
+                        quantidade: qtd,
+                        usuario_id: idDoUsuario
+                    })
+
+                })
+
+                .then(res => res.json())
+
+                .then(dados => {
+
+                    if (dados.erro) {
+
+                        loadingTela.style.display = "none";
+
+                        alert(dados.erro);
+
+                        return;
+                    }
+
+                    // Texto concluído
+                    const texto = loadingTela.querySelector(".loading-texto");
+
+                    texto.innerText = "Compra concluída ✅";
+
+                    // Atualiza saldo
+                    const elementoSaldoTopo = document.getElementById('saldo-valor');
+
+                    if (elementoSaldoTopo) {
+
+                        elementoSaldoTopo.innerText = dados.novoSaldoTexto;
+                    }
+
+                    // Recarrega página
+                    setTimeout(() => {
+
+                        location.reload();
+
+                    }, 1000);
+
+                })
+
+                .catch(err => {
+
+                    loadingTela.style.display = "none";
+
+                    alert('Erro na comunicação com o servidor.');
+
+                });
+
+            } else if (titulo.includes("Cartão")) {
+
+                comprarCredito(qtd);
+
+            } else {
+
+                comprar(qtd);
+            }
+        });
+    });
+});    
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const botao = document.getElementById("btn-som-topo");
+
+    // Áudio criado só quando clicar
+    let audio = null;
+
+    botao.addEventListener("click", async () => {
+
+        try {
+
+            // cria apenas uma vez
+            if (!audio) {
+
+                audio = new Audio("/static/audio/confeite.mp3");
+
+                audio.loop = true;
+                audio.volume = 0.4;
+                audio.preload = "none";
+
+            }
+
+            if (audio.paused) {
+
+                await audio.play();
+
+                botao.innerText = "🔊 Pausar Som";
+                botao.classList.add("tocando");
+
+            } else {
+
+                audio.pause();
+
+                botao.innerText = "🔈 Ligar Som";
+                botao.classList.remove("tocando");
+
+            }
+
+        } catch (erro) {
+
+            console.error("Erro no áudio:", erro);
+
+        }
+
+    });
+
+});
+</script>
+
+</body>
+</html>
+
+

@@ -11,7 +11,7 @@
         <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
         <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
-            </head>
+        </head>
     <body>
 
 
@@ -92,21 +92,16 @@
   <div class="main-child">
     
 <!-- Botão de CTA -->
-<form class="form-cta" style="margin-top:20px;">
-  <div class="table-container">
-     <h2 style="text-decoration:none;color:rgb(0,136,255);margin:20px;">SIGA ME CONCORRA Á<br><span style="color:#fcd602;font-size:22px;" class="piscar">Brinde Surpresa 🎉</span></h2>
-     <table>
-      <tbody id="links-body"></tbody>
-      </table>
-       </div>    
+<form class="form-cta" style="margin-top:20px;">    
   <a style="border-radius:5px; height:40px; text-align:center; font-weight:bold; 
           margin:0; color:#fff; background-color:rgba(224, 25, 177, 0.992); 
           display:inline-block; line-height:40px; padding:0 20px; text-decoration:none;"
    href="/vitoria_visonaria/gerar_cupom/{{ usuario._id }}/{{ projeto_id }}">
-    Gerar Bilhetes
+    COMPRAR AGORA
   </a>
 </form>
     </div>
+    
 
 </div>
   <div class="gradient">
@@ -116,6 +111,71 @@
 
 <footer class="footer">
 
+
+
+
+
+
+  <div class="table-container">
+  <h2 style="text-decoration:none;color:rgb(0,136,255);margin:20px;"><br><span style="color:#fcd602;font-size:22px;" class="piscar">Se increva-se já</span></h2>
+
+    <!-- adiciona isso no HTML -->
+<div id="projeto_id" style="display:none;">
+    {{ projeto_id }}
+</div>
+     <table>
+      <tbody>
+        {% if projeto_principal %}
+        <tr>
+          <td style="color: #12ec8e; font-weight: bold;">
+              <a href="${projeto_principal.link_tiktok}" target="_blank"
+                style="
+                  display:inline-block;
+                  width:32px;
+                  height:32px;
+                  border-radius:20%;
+                  background-image:url('/static/img/tik-tok.svg');
+                  background-repeat:no-repeat;
+                  background-position:center;
+                  background-size:cover;
+                ">
+              </a>
+          </td>
+                    <td style="color: #12ec8e; font-weight: bold;">
+              <a href="${projeto_principal.instagram}" target="_blank"
+                style="
+                  display:inline-block;
+                  width:32px;
+                  height:32px;
+                  border-radius:20%;
+                  background-image:url('/static/img/instagram.svg');
+                  background-repeat:no-repeat;
+                  background-position:center;
+                  background-size:cover;
+                ">
+              </a>
+          </td>
+                    <td style="color: #12ec8e; font-weight: bold;">
+              <a href="${projeto_principal.kwai}" target="_blank"
+                style="
+                  display:inline-block;
+                  width:32px;
+                  height:32px;
+                  border-radius:20%;
+                  background-image:url('/static/img/kwai.svg');
+                  background-repeat:no-repeat;
+                  background-position:center;
+                  background-size:cover;
+                ">
+              </a>
+          </td>
+          
+        </tr>
+        {% else %}
+      </tbody>
+       {% endif %}
+      </table>
+       </div>
 
 <div class="table-container">
    <h2 style="text-decoration: none; margin:20px;">Meus Bilhetes</h2>
@@ -217,7 +277,7 @@
 
 
  
-<div class="table-container"> <!-- Table Sorteio Ao vivo -->
+<div class="table-container">
   <h2 style="text-decoration: underline; margin:20px;">📽 Sorteios Ao Vivo</h2>
   <table border="none">
     <thead>
@@ -228,19 +288,16 @@
       </tr>
     </thead>
     <tbody>
-      {% for p in projetos %}
+      {% if projeto_principal %}
       <tr>
-        <!-- DATA -->
         <td style="color: #f5f108; font-weight: bold;">
-          {{ p.dt_sorteio if p.dt_sorteio else 'Sem data' }}
+          {{ projeto_principal.dt_sorteio }}
         </td>
 
-        <!-- HORA -->
         <td style="color: #265ddc; font-weight: bold;">
-          {{ p.horario_sorteio if p.horario_sorteio else 'Sem horário' }}
+          {{ projeto_principal.horario_sorteio }}
         </td>
 
-        <!-- LINK AO VIVO -->
         <td style="color: #a0da0ee5; font-weight: bold;">
           <a 
             href="/sala_online/{{ usuario._id }}/{{ projeto_id }}" 
@@ -257,26 +314,29 @@
             ">
           </a>
         </td>
-
       </tr>
-      {% endfor %}
+      {% else %}
+      <tr>
+        <td colspan="3" style="color: white; text-align: center;">Nenhum sorteio agendado.</td>
+      </tr>
+      {% endif %}
     </tbody>
   </table>
 </div>
+
   
-  
-  <div  style="display: ;" class="time-chart" id="timeChart">0 dias
+  <div  style="display: none ;" class="time-chart" id="timeChart">0 dias
   </div>
   <div style="text-align:center; margin-top:20px;">
   </div>
   <p>Copyright © 2026 "Ferrari Tech" Marca Brasil todos os direitos reservados</p>
   </footer>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>         
   <script src="{{ url_for('static', filename='js/meta_atingir.js') }}"></script>
   <script src="{{ url_for('static', filename='js/suporte.js') }}"></script>
   <script src="{{ url_for('static', filename='js/cores.js') }}"></script>
   <script src="{{ url_for('static', filename='js/button_whatsapp.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/graficos/projetos.js') }}"></script>
 
   
 
@@ -296,6 +356,13 @@ chart.style.background = `conic-gradient(
   #00ff00 ${grau}deg,
   #e0e0e0 ${grau}deg
 )`;
+
+
+
+
+
+
+
 </script>
     </body>
 </html>

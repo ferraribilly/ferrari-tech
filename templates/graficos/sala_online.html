@@ -11,7 +11,48 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/motorola-g5-536_largura_360px.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/sansung-a35.css') }}">        
         <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
+<style> 
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
 
+.container {
+    height: 100dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 250px; /* espaço do teclado */
+}
+
+    #resultado {
+  margin-top: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.mensagem {
+  font-size: 16px;
+  color: #f7f4f4;
+  margin-bottom: 10px;
+}
+
+.bilhete-card {
+  border: 1px solid #ccc;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #333;
+  max-width: 320px;
+}
+
+.bilhete-card p {
+  margin: 4px 0;
+}
+
+.bilhete-img {
+  width: 100%;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+</style>
 </head>
 <body>
     <!-- Botão flutuante -->
@@ -25,23 +66,7 @@
 
         <ul class="help-options">     
 
-            <!-- VIDEO -->
-            <li id="openVideo" class="item-icon video">
-                <span  style="color: #000; font-size: 22px;">Video Orientação</span>
-            </li>
 
-            <!-- WHATSAPP -->
-            <li class="item-icon whatsapp">
-                <a href="https://wa.me/5527998031796?text=Preciso%20de%20suporte%20Por%20Favor%20Usuario%20ID%20:%20{{usuario_id}}%20{{projetos}}" target="_blank">
-                    <span style="color: #000; font-size: 22px;">Suporte WhatsApp</span>
-                </a>
-            </li>
-            <!--  -->
-            <li class="item-icon whatsapp">
-                <a href="#" target="_blank">
-                    <span style="color: #000; font-size: 22px;">Ver Bilhetes</span>
-                </a>
-            </li>
         </ul>
     </div>
 
@@ -151,7 +176,13 @@
         <tr><td colspan="10"></td></tr>
         <tr>
            <td colspan="10" class="texto">
-            <div>🚀bolas sorteadas</div>
+            <div id="resultado">
+                <!--id-->
+                <!--nome-->
+                <!--cpf-->
+                <!--numero-->
+                <!--lista_urls_img_bilhetes-->
+            </div>
            </td>
         </tr>
         <tr>
@@ -262,7 +293,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-// Recebe novo número sorteado em tempo real
 socket.on('novo_numero', function(data) {
     const num = data.numero;
     document.getElementById('mostrar_num').innerText = num;
@@ -272,11 +302,28 @@ socket.on('novo_numero', function(data) {
 
     setTimeout(() => {
         marcarBolinhaNaTabela(num);
-
         document.getElementById('ultimo').innerText = historico[0] || '';
         document.getElementById('penultimo').innerText = historico[1] || '';
         document.getElementById('antepenultimo').innerText = historico[2] || '';
         document.getElementById('anteantepenultimo').innerText = historico[3] || '';
+
+        if(data.mensagem){
+            let html = `<p class="mensagem">${data.mensagem}</p>`;
+            if(data.bilhete){
+                html += `
+                    <div class="bilhete-card">
+                        <p><strong>ID:</strong> ${data.bilhete._id}</p>
+                        <p><strong>Nome:</strong> ${data.bilhete.nome_usuario}</p>
+                        <p><strong>CPF:</strong> ${data.bilhete.cpf}</p>
+                        <p><strong>Números:</strong> ${data.bilhete.lista_numeros.join(', ')}</p>
+                        <img src="${data.bilhete.lista_urls_img_bilhetes[0]}" 
+                             alt="Bilhete" 
+                             class="bilhete-img">
+                    </div>
+                `;
+            }
+            document.getElementById('resultado').innerHTML = html;
+        }
     }, 1000);
 });
 
@@ -338,13 +385,4 @@ setTimeout(shoot, 500);
 
 
 </html>
-
-
-
-
-
-
-
-
-
-
+</body>

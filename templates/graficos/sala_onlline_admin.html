@@ -190,11 +190,11 @@ html, body {
                            color: rgb(244, 243, 243);
                            border-radius: 50%;
                            border: 1px solid #000;
-                           background: radial-gradient(circle at 30% 30%, #ff5722, #b71c1c); /* Efeito 3D na cor */
+                           background: radial-gradient(circle at 30% 30%, #0c3eef, #0d33f5); /* Efeito 3D na cor */
                            /* Sombra interna (brilho) + Sombra externa (projeção) */
                            box-shadow: 
-                           inset -5px -5px 10px rgba(0,0,0,0.5), 
-                           3px 5px 8px rgba(0,0,0,0.4);
+                           inset -5px -5px 10px rgba(248, 246, 246, 0.5), 
+                           3px 5px 8px rgba(250, 247, 247, 0.4);
                            display: inline-flex;
                            align-items: center;
                            justify-content: center;
@@ -388,15 +388,6 @@ function dispararSorteio() {
 
 // --- ESCUTAS DE STATUS DO SORTEIO (ADMIN TAMBÉM VÊ) ---
 
-socket.on('vencedor_encontrado', function(data) {
-    const g = data.ganhadores[0];
-    alert("🚨 GANHADOR IDENTIFICADO NO SISTEMA! 🚨\nNome: " + g.nome + "\nBilhete: " + g.numero_bilhete);
-});
-
-socket.on('proxima_rodada', function(data) {
-    console.log(data.mensagem);
-    // Opcional: mostrar um aviso discreto no painel do admin
-});
 
 socket.on('usuarios_atualizados', function(data) {
     const container = document.getElementById('vencedor');
