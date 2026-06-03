@@ -3,8 +3,8 @@
   "short_name": "Ferrari Tech",
   "start_url": "/raspadinha",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#36a2eb",
+  "background_color": "#000",
+  "theme_color": "#000",
   "icons": [
     {
       "src": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png",
