@@ -1,22 +1,29 @@
-// LOGIN (CORRIGIDO)
+
+// LOGIN (USUARIOS)
 document.getElementById("formLogin").addEventListener("submit", async function(e) {
     e.preventDefault();
 
     const cpf = document.getElementById("cpfLogin").value.trim();
 
-    const res = await fetch("/login/vendedores", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cpf: cpf })
-    });
+    try {
+        const res = await fetch("/login/vendedores", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cpf: cpf })
+        });
 
-    const data = await res.json();
+        const data = await res.json();
 
-    if (data.status === "sucesso") {
-        window.location.href = `/graficos/resumo/sistema/detalhes`;
-    } else {
+        if (data.status === "sucesso") {
+            // Redireciona corretamente com o usuario_id na rota
+            window.location.href = `/admin/${data.vendedor_id}`;
+        } else {
+            document.getElementById("loginMsg").innerHTML =
+                `<div class="alert alert-danger">${data.mensagem}</div>`;
+        }
+    } catch (error) {
         document.getElementById("loginMsg").innerHTML =
-            `<div class="alert alert-danger">${data.mensagem}</div>`;
+            `<div class="alert alert-danger">Erro de conexão</div>`;
     }
 });
 

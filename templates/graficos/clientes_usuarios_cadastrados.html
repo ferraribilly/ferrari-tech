@@ -11,7 +11,7 @@
 <style>
 /* 🔥 ESPAÇAMENTO ENTRE BLOCOS */
 .analysis {
-    margin: 30px auto;       /* espaço entre tabelas */
+    margin: 80px auto;       /* espaço entre tabelas */
     padding: 15px;           /* espaço interno */
     max-width: 95%;
 }
@@ -102,16 +102,16 @@
 
   <nav class="navbar">
     <ul>
-      <li><a href="/graficos/resumo/sistema/detalhes">VOLTAR PAINEL</a></li>
+      <button onclick="history.back()">Voltar</button>
     </ul>
   </nav>
 </header>
 
 <header>
-  <h1>CLIENTES CADASTRADOS - FERRARI TECH</h1>
+  <h1>Player Registrados - FERRARI TECH</h1>
 </header>
 <div class="analysis">
-  <h3 style="text-align: center; font-family: monospace;">📋 Buscar  Cliente</h3>
+  <h3 style="text-align: center; font-family: monospace;">📋 Buscar  Player</h3>
 <div class="filter-container">
   <label style="color:#000;font-weight: bold; ">Filtrar por CPF:</label>
   <input type="text" id="dados-filter" class="dados-input">
@@ -142,7 +142,7 @@
       <th style=" background-color:#DC143C;">Email</th>
       <th style="background-color:#DC143C;">Saldo</th>
       <th style="background-color:#DC143C;">Chave Pix</th>
-      <th style="background-color:#DC143C;">Vendedor</th>
+      <th style="background-color:#DC143C;">Indicação</th>
 </tr>
 </thead>
 
@@ -160,7 +160,7 @@
 
 <div class="analysis">
 
-<h3 style="text-align: center; font-family: monospace;">📋 Cadastrar Novo Cliente</h3>
+<h3 style="text-align: center; font-family: monospace;">📋 Cadastrar Novo Player</h3>
 
 <table id="tableRegistro" border="1">
 
@@ -173,7 +173,7 @@
       <th style="background-color:#DC143C;">Email</th>
       <th style="background-color:#DC143C;">Saldo</th>
       <th style="background-color:#DC143C;">Chave Pix</th>
-      <th style="background-color:#DC143C;">Vendedor</th>
+      <th style="background-color:#DC143C;">Indicação</th>
       <th style="background-color: #FFFF00; color: #000;">Ações</th>
     </tr>
   </thead>
@@ -276,7 +276,7 @@ font-family:monospace;
 <div class="analysis">
 
  
-<h3 style="text-align: center; font-family: monospace;">📋 Todos os Clientes Cadastrados</h3>
+<h3 style="text-align: center; font-family: monospace;">📋 Todos os Players Cadastrados</h3>
 
 <table border="1">
 
@@ -291,7 +291,7 @@ font-family:monospace;
       <th style="background-color:#DC143C;">Saldo</th>
       <th style="background-color:#DC143C;">Saques</th>
       <th style="background-color:#DC143C;">Chave Pix</th>
-      <th style="background-color:#DC143C;">Vendedor</th>
+      <th style="background-color:#DC143C;">Indicação</th>
       <th style="background-color: #FFFF00; color: #000;">Ações</th>
     </tr>
   </thead>
@@ -323,11 +323,11 @@ font-family:monospace;
     </td>
 
 <!-- ✅ CORRETO AGORA -->
-    <td contenteditable="true" data-field="estado" data-id="{{ u._id }}">
+    <td contenteditable="true" data-field="ganhos" data-id="{{ u._id }}">
      {{ u.ganhos }}
     </td>      
 
-    <td contenteditable="true" data-field="estado" data-id="{{ u._id }}">
+    <td contenteditable="true" data-field="saques" data-id="{{ u._id }}">
      {{ u.saques }}
     </td>          
 

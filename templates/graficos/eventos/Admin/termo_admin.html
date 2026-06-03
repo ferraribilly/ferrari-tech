@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Programa de Influenciadores FerrariTech</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    background:#0f172a;
+    padding:20px;
+    color:#fff;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+}
+
+.card{
+    background:#1e293b;
+    border-radius:20px;
+    padding:25px;
+    margin-bottom:20px;
+    border:1px solid rgba(255,255,255,.1);
+    box-shadow:0 0 20px rgba(0,0,0,.25);
+}
+
+.header{
+    text-align:center;
+    padding:30px 20px;
+}
+
+.header h1{
+    font-size:2rem;
+    margin-bottom:10px;
+}
+
+.header p{
+    opacity:.9;
+    line-height:1.6;
+}
+
+.badge{
+    display:inline-block;
+    background:#16a34a;
+    color:#fff;
+    padding:8px 15px;
+    border-radius:50px;
+    margin-bottom:15px;
+    font-weight:bold;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:15px;
+}
+
+.item{
+    background:#0f172a;
+    padding:20px;
+    border-radius:15px;
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.item i{
+    font-size:30px;
+    color:#22c55e;
+    margin-bottom:10px;
+}
+
+.item h3{
+    margin-bottom:8px;
+}
+
+.item p{
+    color:#cbd5e1;
+    line-height:1.6;
+}
+
+.highlight{
+    background:linear-gradient(135deg,#16a34a,#22c55e);
+    color:white;
+}
+
+.highlight h2{
+    margin-bottom:15px;
+}
+
+ul{
+    padding-left:20px;
+}
+
+ul li{
+    margin-bottom:10px;
+    line-height:1.6;
+}
+
+.comissao{
+    display:flex;
+    flex-wrap:wrap;
+    gap:15px;
+    margin-top:15px;
+}
+
+.box{
+    flex:1;
+    min-width:250px;
+    background:#0f172a;
+    border-radius:15px;
+    padding:20px;
+    text-align:center;
+}
+
+.box h3{
+    font-size:2rem;
+    color:#22c55e;
+}
+.btn-voltar {
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 20px;
+    transition: 0.3s;
+}
+
+.btn-voltar:hover {
+    background: var(--accent-color);
+    color: #000;
+}
+.footer{
+    text-align:center;
+    opacity:.8;
+    margin-top:20px;
+    font-size:.9rem;
+}
+
+@media(max-width:600px){
+    .header h1{
+        font-size:1.5rem;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="card header">
+        <div class="badge">
+            <i class="fa-solid fa-star"></i>
+            Programa Oficial de Influenciadores
+        </div>
+
+        <h1>🚀 Parceria FerrariTech</h1>
+
+        <p>
+            Faça parte do time oficial de divulgação da FerrariTech e ganhe
+            comissões recorrentes através das suas indicações e da sua audiência.
+        </p>
+    </div>
+
+    <div class="card">
+        <h2><i class="fa-solid fa-gift"></i> Sobre a Plataforma</h2>
+        <br>
+
+        <div class="grid">
+
+            <div class="item">
+                <i class="fa-solid fa-ticket"></i>
+                <h3>Raspadinhas</h3>
+                <p>
+                    Todas as raspadinhas possuem valor único de R$ 0,60.
+                </p>
+            </div>
+
+            <div class="item">
+                <i class="fa-solid fa-coins"></i>
+                <h3>Premiações</h3>
+                <p>
+                    O jogador sempre recebe algum retorno em cada raspadinha.
+                </p>
+            </div>
+
+            <div class="item">
+                <i class="fa-solid fa-money-bill-transfer"></i>
+                <h3>Transferências</h3>
+                <p>
+                    Usuários podem transferir valores para outros jogadores.
+                </p>
+            </div>
+
+            <div class="item">
+                <i class="fa-solid fa-wallet"></i>
+                <h3>Saques</h3>
+                <p>
+                    Saques disponíveis a partir de R$ 3,00.
+                </p>
+            </div>
+
+            <div class="item">
+                <i class="fa-brands fa-pix"></i>
+                <h3>Pagamentos</h3>
+                <p>
+                    Pix, cartão e checkout transparente.
+                </p>
+            </div>
+
+            <div class="item">
+                <i class="fa-solid fa-lock"></i>
+                <h3>Segurança</h3>
+                <p>
+                    Ambiente protegido com tecnologias de criptografia e segurança.
+                </p>
+            </div>
+
+            <div class="item">
+                <i class="fa-solid fa-comments"></i>
+                <h3>Chat Integrado</h3>
+                <p>
+                    Interaja com os jogadores em tempo real através do chat da plataforma.
+                </p>
+            </div>
+
+            <div class="item">
+                <i class="fa-solid fa-video"></i>
+                <h3>Lives</h3>
+                <p>
+                    Ideal para transmissões ao vivo e interação com seguidores.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card highlight">
+        <h2><i class="fa-solid fa-sack-dollar"></i> Ganhos da Parceria</h2>
+
+        <div class="comissao">
+
+            <div class="box">
+                <h3>30%</h3>
+                <p>
+                    Comissão sobre o lucro líquido gerado pelos jogadores indicados por você.
+                </p>
+            </div>
+
+            <div class="box">
+                <h3>20%</h3>
+                <p>
+                    Comissão adicional sobre influenciadores indicados por você.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card">
+        <h2><i class="fa-solid fa-users"></i> Sistema de Indicações</h2>
+        <br>
+
+        <ul>
+            <li>Você recebe um link exclusivo de divulgação.</li>
+            <li>Recebe comissão dos jogadores que entram através dele.</li>
+            <li>Pode indicar outros influenciadores.</li>
+            <li>Recebe participação sobre os resultados gerados por eles.</li>
+            <li>Constrói uma rede própria de divulgação.</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2><i class="fa-solid fa-user-shield"></i> Área Administrativa</h2>
+        <br>
+
+        <ul>
+            <li>Acompanhamento de ganhos.</li>
+            <li>Visualização de estatísticas.</li>
+            <li>Controle das indicações.</li>
+            <li>Painel exclusivo para parceiros.</li>
+            <li>Alguns recursos permanecem restritos por motivos de segurança.</li>
+        </ul>
+    </div>
+    <div class="text-center">
+        <a href="javascript:window.close();" class="btn-voltar"><i class="fa-solid fa-arrow-left"></i> Fechar e Voltar</a>
+    </div>
+    <div class="footer">
+        FerrariTech © Programa de Influenciadores
+    </div>
+
+</div>
+
+</body>
+</html>

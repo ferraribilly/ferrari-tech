@@ -100,6 +100,7 @@ document.getElementById("formRegistro").addEventListener("submit", async functio
     // const estado = document.getElementById("estado").value;
 
     const vendedor = document.getElementById("vendedorInput").value;
+    const vendedor_id = document.getElementById("vendedorInput").value;
 
     // 1. Iniciar Animação
 
@@ -162,6 +163,7 @@ document.getElementById("formRegistro").addEventListener("submit", async functio
         // estado: estado,
 
         vendedor: vendedor || "Plataforma Ferrari Tech",
+        vendedor_id: vendedor_id || "",
 
         chave_pix: document.getElementById("chave_pix").value.trim()
 

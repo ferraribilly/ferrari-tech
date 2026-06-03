@@ -1,7 +1,7 @@
 {
-  "name": "Dia das Maes",
+  "name": "Service Digital",
   "short_name": "Ferrari Tech",
-  "start_url": "/",
+  "start_url": "/raspadinha",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#36a2eb",
@@ -12,7 +12,7 @@
       "type": "image/png"
     },
     {
-      "src": "/static/w.png",
+      "src": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png",
       "sizes": "512x512",
       "type": "image/png"
     }

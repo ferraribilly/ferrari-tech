@@ -1,0 +1,1861 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#121212">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='w.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
+    <title>Dashboard Financeiro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+    html, body {
+    overscroll-behavior-y: none;
+    }
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            padding: 80px 15px 15px 15px; /* Adicionado padding superior para compensar o header fixo */
+            padding-bottom: 80px;
+            min-height: 100vh;
+            height: auto;
+        }
+
+        /* --- ESTILIZAÇÃO DO HEADER --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 65px;
+            background: #111;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            border-bottom: 1px solid #222;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-logo {
+            height: 35px;
+            width: 35px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        .navbar-brand h1 {
+            font-size: 1.2rem;
+            color: #fff;
+        }
+
+        .menu-btn {
+            background: #222;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .menu-btn:hover {
+            background: #333;
+        }
+
+        /* --- ESTILIZAÇÃO DO MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: #111;
+            border: 1px solid #222;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 10px;
+        }
+
+        .modal-header h2 {
+            font-size: 1.3rem;
+            color: #fff;
+            text-align: left;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: #fff;
+        }
+
+        .modal-menu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            list-style: none;
+        }
+
+        .modal-menu-item a {
+            display: block;
+            background: #1a1a1a;
+            color: #eee;
+            padding: 14px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .modal-menu-item a:hover {
+            background: #222;
+            color: #fff;
+            border-left-color: #2ecc71;
+            padding-left: 22px;
+        }
+
+        /* --- ESTILIZAÇÃO DOS CARDS --- */
+        .cards-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: #111;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.02);
+            border-left: 4px solid #333;
+        }
+
+        .card.faturamento { border-left-color: #2ecc71; }
+        .card.saques { border-left-color: #e74c3c; }
+        .card.ganhos { border-left-color: #3498db; }
+
+        .card p {
+            font-size: 0.85rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* --- GRID DOS GRÁFICOS --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .chart-container {
+            background: #111;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.05);
+            position: relative;
+            width: 100%;
+            height: 300px; 
+        }
+
+        h2 {
+            color: #e0e0e0;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        /* --- BLOCO ANÁLISE DE VENDAS --- */
+        .analysis {
+            background: #111;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.05);
+            margin-top: 30px;
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .analysis h3 {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            color: #fff;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: #1a1a1a;
+            color: #fff;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        table th, table td {
+            border: 1px solid #333;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        table th {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .fixed-bottom-menu {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        background-color: #333;
+        display: flex;
+        justify-content: space-around; /* Distribui os botões */
+        align-items: center;
+        box-shadow: 0 10px 10px 4px #f6f6f6, 0 0 20px 8px rgba(248, 247, 248, 0.935);
+
+        z-index: 1000; /* Garante que fique por cima de tudo */
+    }
+
+        .btn-acao {
+            flex: 1; /* Faz botões terem tamanhos iguais */
+            height: 100%;
+            border: none;
+            background: transparent;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-acao:hover {
+            background-color: #555;
+        }
+
+        /* FORMULARIO*/
+        /* Estilos para o formulário de saque */
+        .saque-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .saque-form label {
+            color: #aaa;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .saque-form input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #222;
+            color: #fff;
+            box-sizing: border-box;
+        }
+
+        .withdraw-btn {
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: 10px;
+            background: #00b894;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .withdraw-btn:hover {
+            background: #009477;
+        }
+
+        .saques-btn {
+            background: #ff7675; /* Cor para o botão de sacar na home */
+        }
+
+
+        @keyframes zoom{
+            0%{
+                transform:scale(.5);
+                opacity:0;
+            }
+            100%{
+                transform:scale(1);
+                opacity:1;
+            }
+        }
+
+
+        .auth-overlay{
+            display: flex;
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,.8);
+            z-index:9999;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .auth-box {
+            width: 90%;
+            max-width: 400px;
+            background: #22222211;
+            border-radius: 15px;
+            padding: 20px;
+            box-sizing: border-box;
+            font-weight: bold;
+            box-shadow: 0 0 10px 2px #ffffff, 0 0 20px 8px rgba(250, 249, 250, 0.935);
+            
+            /* --- CORREÇÃO APLICADA AQUI --- */
+            max-height: 90vh; /* Limita a altura para 90% do tamanho da tela */
+            overflow-y: auto; /* Cria uma barra de rolagem se o form for muito grande */
+        }
+
+        .termos-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin: 15px 0 5px 0;
+        width: 100%;
+        }
+
+        .termos-container input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        }
+
+        .termos-container label {
+        font-size: 14px;
+        color: #ffffff; /* Ajuste para a cor do texto do seu modal */
+        cursor: pointer;
+        user-select: none;
+        }
+
+        .termos-container label a {
+        color: yellow; /* Destaca o link dos termos */
+        text-decoration: underline;
+        }
+
+        .logo-raspadinha {
+            display: block; /* Garante que respeite o margin auto */
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #fff;
+            margin: 10px auto 20px auto; /* Centraliza horizontalmente e dá espaço embaixo */
+            animation: pulsarLento 3s infinite ease-in-out;
+        }
+
+        @keyframes pulsarLento {
+        0% { scale: 1.5; opacity: 1; }
+        50% { scale: 1.26; opacity: 0.8; }
+        100% { scale: 1.2; opacity: 1; }
+        }
+
+
+        @keyframes authFade{
+            from{
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to{
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-tabs{
+            display: flex;
+            background: #f5f5f54e;
+            border-radius: 14px;
+            padding: 4px;
+            margin-bottom: 22px;
+        }
+
+        .auth-tab{
+            flex: 1;
+            height: 46px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .auth-tab.active{
+            background: #433333;
+            color: #fff;
+        }
+
+        .auth-form{
+            display: none;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .auth-form.active{
+            display: flex;
+        }
+
+        .auth-form h2{
+            margin: 0 0 8px;
+            font-size: 24px;
+            color: #f5f0f0;
+            text-align: center;
+        }
+
+        .form-grid{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .input-group{
+            width: 100%;
+        }
+
+        .input-group.full{
+            grid-column: span 2;
+        }
+
+        .input-group input,
+        .input-group select{
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #333;
+            color: #fff;
+            box-sizing: border-box;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus{
+            border-color: #000;
+            background: #554848;
+        }
+
+        .auth-form ::placeholder{
+            color:#fff;
+        }
+
+        .auth-btn{
+            width: 100%;
+            height: 54px;
+            border: none;
+            border-radius: 14px;
+            background: #039ffa;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+
+
+        
+
+        .modal-suporte{
+
+            position:fixed;
+
+            top:0;
+
+            left:0;
+
+            width:100%;
+
+            height:100%;
+
+            background:rgba(0,0,0,0.75);
+
+            display:none;
+
+            align-items:center;
+
+            justify-content:center;
+
+            z-index:999999;
+
+        }
+
+        .modal-box{
+
+            width:90%;
+
+            max-width:400px;
+
+            background:#111;
+
+            border-radius:18px;
+
+            padding:20px;
+
+            text-align:center;
+
+            border:1px solid #2a2a2a;
+
+        }
+
+        .modal-box h2{
+
+            color:#fff;
+
+            margin-bottom:20px;
+
+        }
+
+        .btn-modal{
+
+            width:100%;
+
+            margin-bottom:12px;
+
+            padding:14px;
+
+            border:none;
+
+            border-radius:12px;
+
+            background:#1d1d1d;
+
+            color:#00ff88;
+
+            font-weight:bold;
+
+            cursor:pointer;
+
+            font-size:15px;
+
+        }
+
+        .btn-fechar{
+
+            width:100%;
+
+            padding:12px;
+
+            border:none;
+
+            border-radius:12px;
+
+            background:#ff3b3b;
+
+            color:#fff;
+
+            font-weight:bold;
+
+            cursor:pointer;
+
+        }
+
+        .modal-dados{
+
+            position:fixed;
+
+            top:0;
+
+            left:0;
+
+            width:100%;
+
+            height:100%;
+
+            background:rgba(0,0,0,0.75);
+
+            display:none;
+
+            align-items:center;
+
+            justify-content:center;
+
+            z-index:999999;
+
+        }
+
+        .modal-dados-box{
+
+            width:90%;
+
+            max-width:420px;
+
+            background:#111;
+
+            border-radius:18px;
+
+            padding:20px;
+
+            border:1px solid #2a2a2a;
+
+            color:#fff;
+
+        }
+
+        .modal-dados-box h2{
+
+            text-align:center;
+
+            margin-bottom:20px;
+
+        }
+
+        .dados-scroll{
+
+            max-height:60vh;
+
+            overflow-y:auto;
+
+        }
+
+        .dados-scroll p{
+
+            background:#1b1b1b;
+
+            padding:12px;
+
+            border-radius:12px;
+
+            margin-bottom:12px;
+
+            font-weight:bold;
+
+            font-family:monospace;
+
+            color:#fff;
+
+            word-break:break-word;
+
+        }
+
+        .dados-scroll span{
+
+            color:#4a90e2;
+
+            display:block;
+
+            margin-top:6px;
+
+        }
+
+        .btn-fechar-dados{
+
+            width:100%;
+
+            margin-top:15px;
+
+            padding:14px;
+
+            border:none;
+
+            border-radius:12px;
+
+            background:#ff3b3b;
+
+            color:#fff;
+
+            font-weight:bold;
+
+            cursor:pointer;
+
+        }
+
+        .btn-deletar-conta{
+
+            width:100%;
+
+            margin-top:12px;
+
+            padding:14px;
+
+            border:none;
+
+            border-radius:12px;
+
+            background:#ff2e2e;
+
+            color:#fff;
+
+            font-weight:bold;
+
+            font-size:15px;
+
+            cursor:pointer;
+
+            transition:0.2s;
+
+        }
+
+        .btn-deletar-conta:hover{
+
+            transform:scale(1.02);
+
+            background:#ff0000;
+
+        }
+
+        /* Estilo do Loader de Verificação */
+        #loadingOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            color: #198754; /* Cor verde do Bootstrap */
+        }
+        #loadingText {
+            margin-top: 15px;
+            font-family: monospace;
+            font-weight: bold;
+            color: #333;
+        }
+
+            /* Container que faz a mágica da responsividade */
+        .table-container {
+            position: sticky;
+            width: 100%;
+            overflow-x: auto; /* Adiciona rolagem horizontal apenas se necessário */
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(252, 67, 0, 0.785); /* Opcional: melhora visualização */
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 300px; /* Impede que a tabela encolha demais e fique ilegível */
+            background-color: rgba(254, 254, 254, 0);
+            font-family: monospace;
+            
+        }
+
+        th, td {
+            background-color: #00040702;
+            text-align: left;
+            padding: 12px;
+            /* border-bottom: 1px solid #ddd; */
+            white-space: nowrap; /* Impede que o texto quebre linhas, mantendo a colunas organizadas */
+            text-align: center;
+            
+            
+        
+        }
+
+        thead {
+            background-color: #00020300;
+        }
+
+        
+            /* VALORES */
+        .valor-positivo {
+            color: #16a34a; /* verde */
+            font-weight: bold;
+        }
+
+        .valor-negativo {
+            color: #dc2626; /* vermelho */
+            font-weight: bold;
+        }
+
+        /* STATUS */
+        .status {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Approved → verde */
+        .status-pago {
+            background-color: #dcfce7;
+            color: #16a34a;
+        }
+
+        /* Pending → laranja */
+        .status-pendente {
+            background-color: #ffedd5;
+            color: #f97316;
+        }
+
+        /* Canceled → vermelho */
+        .status-cancelado {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+        /* Container principal com Flexbox para responsividade */
+        .filter-container {
+        display: flex;
+        flex-direction: column; /* Pilha os itens no mobile */
+        gap: 10px;
+        width: 100%; /* Largura máxima para desktop */
+        margin: 20px auto;
+        padding: 15px;
+        border-radius: 8px;
+        font-family: Arial, sans-serif;
+        }
+
+        /* Estilização do Input de Data */
+        .dados-input {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 16px;
+        /* Garante que o input ocupe a largura total do container */
+        width: 100%;
+        box-sizing: border-box;
+        font-weight: bold;
+        }
+
+        /* Estilização do Botão */
+        .filter-btn {
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        }
+
+        .filter-btn:hover {
+        background-color: #0056b3;
+        }
+        
+        .saques-overlay{
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,.8);
+            z-index:9999;
+            justify-content:center;
+            align-items:center;
+        }
+
+
+        .saques-card{
+            width:100%;
+            max-width:100%;
+            background:#0f0000;
+            border-radius:15px;
+            padding:20px;
+            box-sizing:border-box;
+            font-weight: bold;
+            box-shadow: 0 0 10px 2px #ffffff, 0 0 20px 8px rgba(250, 249, 250, 0.935);
+        }
+
+        .saques-card h2{
+            color:#fff;
+            text-align:center;
+            margin-top:0;
+        }
+        .tabela-financeira {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            color:#3fff;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .tabela-financeira
+        th, .tabela-financeira td {
+            border-bottom: 1px solid #444;
+            padding: 10px;
+        }
+
+        .tabela-financeira th {
+            background: rgb(4, 25, 255);
+        }
+
+        /* corpo rola “por trás” visualmente */
+
+        /* cada aba vira uma janela de scroll */
+        .aba-saque-content {
+            max-height: 60vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+
+        /* cabeçalho fica por cima (não participa do fluxo) */
+        .tabela-financeira-extratos thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background:rgb(1, 101, 251);
+        }
+
+        /* corpo rola “por trás” visualmente */
+        .tabela-financeira-extratos tbody {
+            
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+
+
+        .tabela-input{
+            width:100%;
+            border:none;
+            outline:none;
+            background:transparent;
+            color:white;
+            padding:5px;
+        }
+
+        .video-container {
+            width: 100%;
+            height: 100%;
+            max-width: 800px;
+            margin: 0 auto;            
+            position: relative;
+            padding-bottom: 100%;
+            padding-top: 25px;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+           
+        }
+
+        /* Responsividade: Ajustes para telas maiores (Desktop) */
+        @media (min-width: 600px) {
+        .filter-container {
+            flex-direction: row; /* Coloca os itens lado a lado */
+            width: 100%;
+            align-items: center;
+        }
+        
+        .dados-input {
+            flex-grow: 1; /* Input ocupa o espaço restante */
+        }
+        }
+        
+        @media(max-width: 520px){
+
+            .auth-box{
+                border-radius: 18px;
+                padding: 18px;
+            }
+
+            .form-grid{
+                grid-template-columns: 1fr;
+            }
+
+            .input-group.full{
+                grid-column: span 1;
+            }
+
+            .auth-form h2{
+                font-size: 21px;
+            }
+
+            .input-group input,
+            .input-group select{
+                height: 50px;
+                font-size: 14px;
+            }
+
+        }
+
+        /* Ajustes para telas maiores */
+        @media (min-width: 768px) {
+            body { padding: 95px 30px 30px 30px; }
+            .navbar { padding: 0 30px; }
+            .navbar-brand h1 { font-size: 1.5rem; }
+            
+            .cards-grid { flex-direction: row; }
+            .card { flex: 1; }
+
+            .dashboard-grid { grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 25px; }
+            .chart-container { padding: 20px; height: 400px; }
+            h2 { font-size: 1.2rem; }
+
+            .analysis { margin-top: 40px; }
+            .analysis h3 { text-align: left; }
+
+            
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;" ondragstart="return false;" onselectstart="return false;">
+
+<!-- MODAL LOGIN / REGISTRO -->
+{% if not vendedor_id %}
+<div class="auth-overlay" id="authOverlay">
+
+    <div class="auth-box">
+
+        <img class="logo-raspadinha"
+             src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
+             alt="logo-raspadinha">
+
+        <div class="auth-tabs">
+            <button type="button" class="auth-tab active">Login</button>
+            <button type="button" class="auth-tab">Registro</button>
+        </div>
+
+        <!-- LOGIN -->
+        <form id="formLogin" class="auth-form active">
+
+            <h2>Entrar</h2>
+
+            <div class="input-group">
+                <input
+                    style="color:#000; font-weight:bold; font-size:16px;"
+                    id="cpfLogin"
+                    type="password"
+                    placeholder="CPF"
+                    required
+                >
+            </div>
+
+            <!-- Mensagem de erro ou sucesso -->
+            <div
+                style="text-align:center; font-weight:bold; color:red;"
+                id="loginMsg">
+            </div>
+
+            <button type="submit" class="auth-btn">
+                Entrar
+            </button>
+
+        </form>
+
+        <!-- REGISTRO -->
+        <form id="formRegistro" class="auth-form">
+
+            <div id="loadingOverlay">
+                <div class="spinner-border" role="status"></div>
+                <span id="loadingText">Verificando dados...</span>
+            </div>
+
+            <h2>Criar Conta</h2>
+
+            <div class="form-grid">
+
+                <div class="input-group">
+                    <input
+                        id="nome"
+                        type="text"
+                        class="form-control"
+                        name="nome"
+                        placeholder="Digite seu nome"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <input
+                        id="sobrenome"
+                        type="text"
+                        class="form-control"
+                        name="sobrenome"
+                        placeholder="Digite seu sobrenome"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <input
+                        id="cpf"
+                        type="text"
+                        class="form-control"
+                        name="cpf"
+                        placeholder="Digite seu CPF (apenas números)"
+                        maxlength="11"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <input
+                        id="dt_nascimento"
+                        type="date"
+                        class="form-control"
+                        name="dt_nascimento"
+                        required
+                    >
+                </div>
+
+                <div class="input-group full">
+                    <input
+                        id="email"
+                        type="email"
+                        class="form-control"
+                        name="email"
+                        placeholder="Digite seu email"
+                        required
+                    >
+                </div>
+
+                <div class="input-group full">
+                    <input
+                        id="chave_pix"
+                        type="text"
+                        class="form-control"
+                        name="chave_pix"
+                        placeholder="Digite sua chave PIX"
+                        required
+                    >
+                </div>
+
+                <!-- CAMPO COMISSÃO ADICIONADO -->
+                <div class="input-group full">
+                    <select
+                        id="comissao"
+                        class="form-control"
+                        name="comissao"
+                        required
+                    >
+                        <option value="30%">30%</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- TERMOS -->
+            <div class="termos-container">
+
+                <input
+                    type="checkbox"
+                    id="aceitaTermos"
+                    name="termos"
+                    required
+                >
+
+                <label for="aceitaTermos">
+                    Li e aceito os
+                    <a href="/termos_contrato" target="_blank">
+                        Termos de Uso
+                    </a>
+                    e políticas.
+                </label>
+
+            </div>
+
+            <div
+                style="text-align:center; font-weight:bold; color:rgb(21, 255, 0);"
+                id="registroMsg"
+                class="mt-2">
+            </div>
+
+            <button
+                id="btnSubmit"
+                type="submit"
+                class="auth-btn"
+            >
+                Registrar
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+{% endif %}
+
+<!-- OVERLAY SAQUES (ATUALIZADO SEM RELOAD) -->
+
+<div class="saques-overlay" id="saques-overlay">
+
+    <div class="saques-card">
+
+        <div class="auth-tabs">
+
+            <button class="auth-tab active" onclick="mudarAbaSaque(0)">Sacar</button>
+            <button class="auth-tab" onclick="mudarAbaSaque(1); carregarMovimentacoes()">Extrato</button>
+            <button class="auth-tab" onclick="mudarAbaSaque(2); carregarMovimentacoes()">Cadastrar Conta</button>
+            <button class="auth-tab" onclick="fecharSaques()">Sair</button>
+
+        </div>
+
+        <!-- SACAR -->
+        <div class="aba-saque-content" id="aba-0">
+
+        <div class="filter-container">
+        <label for="dados-filter">Buscar Favorecido por CPF:</label>
+        <input type="text" id="dados-filter" name="dados-filter" class="dados-input">
+        <button type="button" class="filter-btn" onclick="buscarDados()">Buscar</button>
+        </div>
+
+        
+
+      <h2 style="text-align: center; font-family: monospace;">Saídas Conta Geral</h2>
+
+        <table border="1" class="tabela-financeira">
+
+        <thead>
+        <tr>
+        <th>Chave</th>
+        <th>Valor</th>
+        <th>Descrição</th>
+        <th>Nome</th>  
+        <th>CPF</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Ações</th>
+        </tr>
+        </thead>
+
+        <tbody id="tabela-favorecido">
+        <tr>
+        <td></td>
+
+        <td>
+            <input type="text" class="tabela-input">
+        </td>
+
+        <td>
+            <input type="text" class="tabela-input">
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>Saque</td>
+        
+        <td>
+        <button
+         style="margin-top:10px; padding:8px 12px; background:gray; color:#fff; border:none; border-radius:5px;"
+         type="button" class="saque-btn btn-confirmar"  onclick="abrirModal('efetuandoSaque', this)">Confirmar</button>
+        </td>
+        
+        </tr>
+        </tbody>
+        </table>
+
+
+
+    </div>
+
+
+        <!-- ENTRADAS -->
+        <div class="aba-saque-content" id="aba-1" style="display:none;">
+
+            <h2 >Acompanhamento Pagamentos</h2>
+
+            <table class="tabela-financeira">
+                <thead>
+                    <tr>
+                        <th>Saldo Anterior</th>
+                        <th>Entradas</th>
+                        <th>Pendentes</th>
+                        <th>Cancelados</th>
+                        <th>Saques</th>
+                        <th>Taxas</th>
+                        <th>Saldo Conta</th>                        
+                    </tr>
+                </thead>
+
+                <tbody>
+            <tr>
+                <td id="saldo-anterior" style="color: #12ec8e; font-weight: bold;">R$ 0,00</td>
+                <td id="total-aprovado" style="color: #12ec8e; font-weight: bold;">R$ 0,00</td>
+                <td id= "total-pendente" style="color: #ccde01; font-weight: bold;">R$ 0,00</td>
+                <td id="total-cancelado" style="color:#ff0505; font-weight: bold;">R$ 0,00</td>
+                <td id="total-saques" style="color: #ff0505; font-weight: bold;">R$ 0,00</td>
+                <td id="taxa-mp" style="color: #ff0505; font-weight: bold;">R$ 0,00</td>
+                <td id="saldo-atual" style="color: #011fde; font-weight: bold;">R$ 0,00</td>                       
+            </tr>
+                </tbody>
+
+            </table>
+
+
+            <table  class="tabela-financeira-extratos">
+            <h2 style="margin: 10px auto;">Extrato</h2>
+            <thead>
+            <tr>
+                <th>Identificação</th>
+                <th>Data</th>
+                <th>Hora</th>
+                <th>Descrição</th>
+                <th>Movimentações</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody id="extrato-body"></tbody>
+            </table>
+
+
+        </div>
+
+        <!-- SAÍDAS -->
+        <div class="aba-saque-content" id="aba-2" style="display:none;">
+
+            <h2>Cadastrar Novas Contas Bancária<br>Chaves Produção</h2>
+            <h2>Link indrodução como acessar tokens e criar aplicação<br><a  style="color: yellow; font-weight: bold;" href="#"># Click aqui ser direcionado</a></h2>
+            <div class="video-container">
+            <!-- <iframe src="/static/video/Screen_Recording_20260522_144738_Chrome.mp4" frameborder="0" allowfullscreen></iframe> -->
+            </div>
+            <h2>Criar Token por aqui<br><a  style="color: yellow; font-weight: bold;" href="https://www.mercadopago.com.br/developers/pt">https://www.mercadopago.com.br/developers/pt</a></h2>
+
+
+            <h2>Adcionar url webhook<br><a  style="color: yellow; font-weight: bold;" href="https://www.mercadopago.com.br/developers/pt">https://www.mercadopago.com.br/developers/pt/notification</a></h2>
+            <h2>Obsevação pelo celular clique 3 pontinhos configuração e coloca modo computador que fuciona</h2>
+
+            <table class="tabela-financeira">
+                <thead>
+                    <tr>
+                        <th>Bancos</th>
+                        <th>Conta</th>
+                        <th>Agencia</th>
+                        <th>Titular Conta</th>
+                        <th>Access Token</th>
+                        <th>Public Key</th>
+                        <th>Assinatura Secreta</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <td>
+                        Mercado Pago
+                    </td>
+
+                    <td>
+                        <input type="text" class="tabela-input">
+                    </td>                    
+
+                    <td>
+                        <input type="text" class="tabela-input">
+                    </td>                    
+
+                    <td>
+                        <input type="text" class="tabela-input">
+                    </td>                    
+
+                    <td>
+                        <input type="text" class="tabela-input">
+                    </td>                    
+
+
+                    <td>
+                        <input type="text" class="tabela-input">
+                    </td>      
+                    
+                    <td>
+                        <input type="text" class="tabela-input">
+                    </td>
+                    
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="saques-overlay" id="modalSenha">
+  <div style="background:#333; padding:20px; border-radius:10px; width:300px; text-align:center;">
+    <h3>Token Secret</h3>
+    <input type="password" id="senhaInput" placeholder="Digite a senha "
+           style="width:90%; padding:8px; margin-top:10px; border-radius: 8px;">
+    <button onclick="confirmarAcao()"
+            style="margin-top:10px; padding:8px 12px; background:blue; color:#fff; border:none; border-radius:5px;">
+      Confirmar
+    </button>
+    <button onclick="fecharModal()"
+            style="margin-top:10px; padding:8px 12px; background:gray; color:#fff; border:none; border-radius:5px;">
+      Cancelar
+    </button>
+  </div>
+</div>
+
+</div>
+
+    <!-- NAV BAR SUPERIOR COM LOGO E BOTÃO -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png" alt="Logo" class="navbar-logo">
+            <h1>Painel Financeiro</h1>
+        </div>
+        <button class="menu-btn" id="openMenuBtn">
+            ☰ Menu
+        </button>
+    </nav>
+
+    <!-- INTERFACE DO MODAL (OCULTO POR PADRÃO) -->
+    <div class="modal-overlay" id="menuModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Navegação</h2>
+                <button class="close-btn" id="closeMenuBtn">&times;</button>
+            </div>
+            <ul class="modal-menu-list">
+                <li style="text-align: center;" class="modal-menu-item"><a href="/galeria/acesso/afiliados/4f8c2d7e1a9b6f3d5c8e2a7d1f4b9c6e3a8d5f2c7b1e9a4d6f3c8b2e7a5d1f9/{{ vendedor_id }}">&#128176;&#128286; Galeria de Jogos &#128176;&#128286;</a></li>
+                <li style="text-align: center;" class="modal-menu-item"><a href="/afiliados/register/acesso/afiliados/4f8c2d7e1a9b6f3d5c8e2a7d1f4b9c6e3a8d5f2c7b1e9a4d6f3c8b2e7a5d1f9/{{ vendedor_id }}">👔 Afiliados Cadastrados</a></li>
+                <li style="text-align: center;" class="modal-menu-item"><a href="/players/register/acesso/afiliados/4f8c2d7e1a9b6f3d5c8e2a7d1f4b9c6e3a8d5f2c7b1e9a4d6f3c8b2e7a5d1f9/{{ vendedor_id }}">👥 Players Cadastrados</a></li>
+                <li style="text-align: center;" class="modal-menu-item"><a href="/sala/privaty/acesso/afiliados//sorteios/4f8c2d7e1a9b6f3d5c8e2a7d1f4b9c6e3a8d5f2c7b1e9a4d6f3c8b2e7a5d1f9/{{ vendedor_id }}">Sala sorteio rifas "admin</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Seção de Resumos em Cards -->
+    <div class="cards-grid">
+
+        <div class="card faturamento">
+            <p style="color: green;">Faturamento Bruto</p>
+            <h3>R$ <span style="color: green;">  {{ "%.2f"|format(resumo.faturamento) }}</span></h3>
+        </div>
+
+         <div class="card ganhos">
+            <p>Quantidade Colaboradores Afiliados</p>
+            <h3>{{resumo.vendedores_total}}</h3>
+        </div>            
+                  
+        <div class="card faturamento">
+            <p>lucro liquido Plataforma</p>
+            <h3>R$ <span style="color:green;"> {{ "{:,.2f}".format(resumo.lucro).replace(",", "X").replace(".", ",").replace("X", ".") }}<span></span></h3>
+        </div>
+    </div>
+
+    <!-- Seção de Gráficos -->
+    <div class="dashboard-grid">
+        <!-- Gráfico de Faturamento -->
+        <div  style="margin: 20px auto;" class="chart-container">
+            <h2>Faturamento Diário</h2>
+            <canvas id="faturamentoChart"></canvas>
+        </div>
+
+        <!-- Gráfico de Saques e Pagamentos -->
+        <div  style="margin: 20px auto;" class="chart-container">
+            <h2>Saques Diários vs Pagamentos</h2>
+            <canvas id="saquesPagamentosChart"></canvas>
+        </div>
+
+        <div class="card ganhos">
+            <p>Quantidade Usuarios Cadastrados</p>
+            <h3>{{resumo.usuarios}}</h3>
+        </div>             
+
+        <div class="card ganhos">
+            <p>Quantidade Raspadinhas Vendidas</p>
+            <h3>{{resumo.quantidade_raspadinhas}}</h3>
+        </div>   
+        <div class="card saques">
+            <p style="color:red;">Saques Solicitados</p>
+            <h3>- R$ <span style="color: red;"> {{resumo.total_saques}}</span></h3>
+        </div>
+        <div class="card saques">
+            <p style="color:rgba(255, 140, 0, 0.981);">Imposto Futuro (CBS + IBS) 30%</p>
+            <h3>- R$ <span style="color: red;"> {{ "{:,.2f}".format(resumo.fiscal.imposto_futuro).replace(",", "X").replace(".", ",").replace("X", ".") }}</span></h3>
+        </div>      
+        
+                
+        <div class="card saques">
+            <p style="color:rgba(255, 140, 0, 0.981);">Imposto transicao 2026  (CBS + IBS) 27%</p>
+            <h3>- R$ <span style="color: red;"> {{ "{:,.2f}".format(resumo.fiscal.imposto_transicao).replace(",", "X").replace(".", ",").replace("X", ".") }}</span></h3>
+        </div>         
+    </div>
+
+    <!-- VENDAS VENDEDORES -->
+    <div style="margin: 20px auto;" class="chart-container">
+        <h2>Análise Relatório Colaboradores</h2>
+        <div class="table-container">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th style="background-color: #2e80cc;">Colaboradores</th>
+                    <th style="background-color: #2e80cc;">Qtd. vendidas</th>
+                    <th style="background-color: #2e80cc;">Vlr. vendas</th>
+                    <th style="background-color: #2e80cc;">Retirados</th>
+                    <th style="background-color: #2e80cc;">Jogo Andamentos</th>
+                    <th style="background-color: #2e80cc;">Comissão</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for vendedor, dados in resumo.vendedores.items() %}
+
+            {% if vendedor 
+                and vendedor != "vendedores"
+                and vendedor != "vendedor"
+                and vendedor != dados.get('vendedor_id')
+            %}
+
+            <tr style="text-align: center;">
+
+                <td style="color:#fff; font-weight: bold;">
+                    {{ vendedor }}
+                </td>
+
+                <td style="color: rgb(0, 72, 255); font-weight: bold;">
+                    {{ dados.quantidade_raspadinhas }}
+                    <span style="color:#fff; font-weight: bold;">*</span>
+                    0.60
+                </td>
+
+                <td style="color: gold; font-weight: bold;">
+                    = R$ {{ "%.2f"|format(dados.approved) }}
+                </td>
+
+                <td style="color: red; font-weight: bold;">
+                    - R$ {{ "%.2f"|format(dados.saques) }}
+                </td>
+
+                <td style="color: orange; font-weight: bold;">
+                    - R$ {{ "%.2f"|format(dados.ganhos) }}
+                </td>
+
+                <td style="color: green; font-weight: bold;">
+                    = R$ {{ "%.2f"|format(dados.comissao) }}
+                </td>
+
+            </tr>
+
+            {% endif %}
+
+            {% endfor %}
+        </table>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+    <!-- Header/Footer Fixo -->
+    <header class="fixed-bottom-menu">
+        <!-- <button class="btn-acao">
+            <img onclick="abrirCompra()" style="width: 32px; height: 32px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778012674/icone-de-carrinho-de-compras-3d-em-fundo-de-circulo-azul-simbolo-de-varejo-online_84443-55705_dfmhp8.png"></img>
+        </button> -->
+        <button class="btn-acao"> 
+            <img onclick="abrirSaques()" style="width: 32px; height: 32px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778720610/saque_k5hlcq.png"></img>
+        </button>
+        <button class="btn-acao "onclick="location.href='/chat/vendedor/{{ vendedor_id }}'">
+        <img style="width: 32px; height: 32px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778702172/Pngtree_3d_isolated_render_of_a_20808938_lxm032.png"></img>
+        </button>
+
+                <!-- MODAL -->
+        <div id="modal-suporte" class="modal-suporte">
+            <div class="modal-box">
+
+               <button onclick="fecharSuporte()" class="btn-fechar">
+                    Fechar
+                </button>
+            </div>
+
+        </div>
+
+        <!-- BOTÃO -->
+        <button style="font-size: 22px;" class="btn-acao" onclick="abrirdados()">
+            📄
+        </button>
+
+            </div>
+        </div>
+
+
+    </header>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/graficos/extratos_mercado_pago.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/graficos/saques_projeto.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/registro_login_vendedores.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/login_vendedores.js') }}"></script>
+
+    <!-- LÓGICA JAVASCRIPT DOS GRÁFICOS E DO MODAL -->
+    <script>
+        document.addEventListener('keydown', function(e) {
+            // Bloqueia o Print Screen
+            if (e.key == 'PrintScreen') {
+                e.preventDefault();
+                alert('A captura de tela não é permitida neste site.');
+            }
+            
+            // Bloqueia comandos comuns como Ctrl+S (Salvar) ou Ctrl+I (Inspecionar)
+            if (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'i')) {
+                e.preventDefault();
+            }
+        });
+
+        
+        // --- LÓGICA DE ABRIR E FECHAR O MODAL ---
+        const modal = document.getElementById('menuModal');
+        const openBtn = document.getElementById('openMenuBtn');
+        const closeBtn = document.getElementById('closeMenuBtn');
+
+        openBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        // Fecha se clicar fora da caixinha do modal
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+
+        // --- CONFIGURAÇÃO DOS GRÁFICOS CHART.JS ---
+        Chart.defaults.color = '#999';
+        Chart.defaults.borderColor = '#222';
+
+        async function inicializarGraficos() {
+            try {
+                const response = await fetch('/api/dados-dashboard');
+                const dados = await response.json();
+
+                // 1. Gráfico Faturamento (Linha)
+                const ctxFaturamento = document.getElementById('faturamentoChart').getContext('2d');
+                new Chart(ctxFaturamento, {
+                    type: 'line',
+                    data: {
+                        labels: dados.faturamento.labels,
+                        datasets: [{
+                            label: 'Faturamento (R$)',
+                            data: dados.faturamento.data,
+                            borderColor: '#2ecc71',
+                            backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: '#fff' } } },
+                        scales: { y: { beginAtZero: true, ticks: { callback: (value) => 'R$ ' + value } } }
+                    }
+                });
+
+                // 2. Gráfico Saques e Pagamentos (Barra)
+                const ctxSaquesPagamentos = document.getElementById('saquesPagamentosChart').getContext('2d');
+                new Chart(ctxSaquesPagamentos, {
+                    type: 'bar',
+                    data: {
+                        labels: dados.semanal.labels, // 'Seg', 'Ter', etc.
+                        datasets: [
+                            {
+                                label: 'Pagamentos Recebidos (R$)',
+                                data: dados.semanal.pagamentos, // Array correto vindo do Python
+                                backgroundColor: '#3498db',
+                                borderRadius: 4
+                            },
+                            {
+                                label: 'Saques Realizados (R$)',
+                                data: dados.semanal.saques, // Array correto vindo do Python
+                                backgroundColor: '#e74c3c',
+                                borderRadius: 4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: '#fff' } } },
+                        scales: { y: { beginAtZero: true, ticks: { callback: (value) => 'R$ ' + value } } }
+                    }
+                });
+
+            } catch (error) {
+                console.error("Erro ao carregar dados dos gráficos do MongoDB:", error);
+            }
+        }
+
+        inicializarGraficos();
+
+
+
+
+    
+        // =========================
+        // ABAS LOGIN
+        // =========================
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.auth-tab');
+            const forms = document.querySelectorAll('.auth-form');
+
+            tabs.forEach((tab, index) => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    forms.forEach(f => f.classList.remove('active'));
+                    tab.classList.add('active');
+                    if (forms[index]) forms[index].classList.add('active');
+                });
+            });
+        });
+
+        // =========================
+        // OVERLAYS
+        // =========================
+        function abrirSuporte() {
+            document.getElementById('modal-suporte').style.display = 'flex';
+        }
+
+        function fecharSuporte() {
+            document.getElementById('modal-suporte').style.display = 'none';
+        }
+
+        function abrirPremios() {
+            document.getElementById('prize-overlay').style.display = 'flex';
+        }
+
+        function fecharPremios() {
+            document.getElementById('prize-overlay').style.display = 'none';
+        }
+
+        function abrirSaques() {
+            document.getElementById('saques-overlay').style.display = 'flex';
+        }
+
+        function fecharSaques() {
+            document.getElementById('saques-overlay').style.display = 'none';
+        }
+
+        async function buscarDados() {
+        const cpf = document.getElementById("dados-filter").value;
+
+        if (!cpf) {
+            alert("Informe o CPF");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/clientes/vendedores/saque?cpf=${cpf}`);
+            const dados = await response.json();
+
+            if (dados.error) {
+            alert(dados.error);
+            return;
+            }
+
+            const linha = document.querySelector("#tabela-favorecido tr");
+            const colunas = linha.querySelectorAll("td");
+
+            // 🔹 chave pix (NÃO sobrescreve mais)
+            const chavePix = dados.chavePixVendedor || dados.chavePixUsuario || "";
+            colunas[0].innerText = chavePix;
+
+            // 🔹 dados (prioridade usuário, fallback vendedor)
+            colunas[3].innerText = dados.nomeUsuario || dados.nomeVendedor || "";
+            colunas[4].innerText = dados.cpf || "";
+            colunas[5].innerText = dados.emailUsuario || dados.emailVendedor || "";
+
+            linha.setAttribute("data-pix", chavePix);
+
+        } catch (err) {
+            alert("Erro ao buscar dados do cliente.");
+        }
+        }
+        // =========================
+        // ABA SAQUE
+        // =========================
+        function mudarAbaSaque(index) {
+            const abas = document.querySelectorAll('.aba-saque-content');
+            const botoes = document.querySelectorAll('.saques-card .auth-tab');
+
+            abas.forEach((aba, i) => {
+                aba.style.display = (i === index) ? 'block' : 'none';
+                if (botoes[i]) botoes[i].classList.toggle('active', i === index);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,855 @@
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+        }            
+        
+
+        body{
+            background:#222;
+            height:100vh;
+            overflow:hidden;
+            max-width: 100%; /* Simula tela de celular */
+            margin: 0 auto;
+            border-left: 1px solid #eaeaea;
+            border-right: 1px solid #eaeaea;            
+            position: relative;
+            min-height: 100vh;
+            padding-bottom: 80px;            
+        }
+        /* Header */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 16px 10px 16px;
+            background-color: #333;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 20px;
+            color: #111b21;
+        }
+
+        .header-actions span {
+            cursor: pointer;
+            font-size: 26px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            color: #aebac1;
+        }
+        
+ 
+ 
+        .badge-msg{
+
+            background: rgb(24, 110, 0);
+
+            color: white;
+
+            border-radius: 50%;
+
+            min-width: 20px;
+            height: 20px;
+
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            font-size: 11px;
+
+            margin-left: 8px;
+
+            padding: 2px 6px;
+
+            font-weight: bold;
+        }
+        
+        .navbar{
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:65px;
+            background:#222;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:0 20px;
+            border-bottom:1px solid #22222200;
+            z-index:10;
+        }
+
+        .navbar-brand{
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+
+        .navbar-logo{
+            width:35px;
+            height:35px;
+            border-radius:6px;
+        }
+
+        .navbar-brand h1{
+            color:#fff;
+            font-size:18px;
+            font-weight: bold;
+        }
+
+        .menu-btn{
+            background:#333;
+            border:none;
+            color:red;
+            padding:10px 14px;
+            border-radius:8px;
+            cursor:pointer;
+        }
+
+        .main-wrapper{
+            display:flex;
+            height:100dvh;
+            padding-top:65px; /* altura do header */
+        }
+
+        
+        .sidebar{
+            width:100%;
+            background:#111;
+            border-right:1px solid #22222200;
+            display:flex;
+            flex-direction:column;
+            height:100vh;
+            overflow:hidden;
+            transition:0.3s;
+            z-index:0;
+           
+        }
+
+        .sidebar.closed{
+            margin-left:-100%;
+        }
+
+        /* .sidebar-title{
+            padding:15px;
+            border-bottom:1px solid #22222200;
+        } */
+
+        .sidebar-title p{
+            color:#fff;
+            font-size:13px;
+            margin-bottom:6px;
+        }
+
+        .contacts-list{
+
+            list-style:none;
+
+            flex:1;
+
+            overflow-y:auto;
+
+            padding-bottom:80px;
+
+        }
+
+        .contact-item{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            padding:14px;
+            text-decoration:none;
+            color:#fff;
+            border-bottom:1px solid #f8f3f300;
+            transition:0.2s;
+        }
+
+        .contact-item:hover{
+            background:#ede9e9;
+        }
+
+        .contact-avatar{
+            width:45px;
+            height:45px;
+            border-radius:50%;
+            background:#00a884;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            font-weight:bold;
+            color:#fff;
+            flex-shrink:0;
+        }
+
+        .contact-info{
+            display:flex;
+            flex-direction:column;
+        }
+
+        .contact-info small{
+            color:#999;
+        }
+        /* Botão Flutuante (Floating Action Button) */
+        .floating-btn {
+            position: absolute;
+            bottom: 90px;
+            right: 20px;
+            background-color: #111b21;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+
+
+
+        .chat-container{
+            flex:1;
+            display:flex;
+            flex-direction:column;
+            background:#222;
+            position:relative;
+        }
+
+        .action-sheet-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .action-sheet {
+            position: absolute;
+            bottom: 0; width: 100%;
+            background: white;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+        .sheet-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .sheet-item { 
+            display: flex; flex-direction: column; align-items: center; 
+            border: none; background: none; gap: 5px; cursor: pointer; 
+        }
+        @keyframes slideUp { from { bottom: -100%; } to { bottom: 0; } }
+
+        #mensagens{
+            flex:1;
+            overflow-y: auto;
+            padding:20px;
+            display:flex;
+            flex-direction:column;
+            gap:12px;
+            padding-bottom:140px;
+        }
+
+        .bolha {
+            max-width: 75%;
+            padding: 10px 14px;
+            word-break: break-word;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        /* --- ENVIADA (DIREITA) --- */
+        .enviada {
+            align-self: flex-end;
+            background-color:  rgb(255, 255, 255);  /* Fundo branco com transparência */
+            backdrop-filter: blur(5px);                  /* Efeito de desfoque no fundo */
+            box-shadow: 0 4px 6px rgba(250, 221, 1, 0.916);   /* Sombra para dar profundidade */
+            color: #000;
+            font-weight: bold;
+            border-radius: 12px 0px 12px 12px; /* Topo direito zerado para encaixar a ponta */
+            margin-right: 12px;
+        }
+
+        .enviada::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: -10px; /* Força a saída para a direita */
+            width: 10px;
+            height: 12px;
+            background-color: rgb(255, 255, 255); /* Fundo branco com transparência */
+            backdrop-filter: blur(5px);                  /* Efeito de desfoque no fundo */
+            box-shadow: 0 4px 6px rgba(250, 221, 1, 0.916);    /* Sombra para dar profundidade */
+            /* Faz o desenho exato da curva/ponta do WhatsApp */
+            clip-path: polygon(0 0, 100% 0, 0 100%);
+        }
+
+        /* --- RECEBIDA (ESQUERDA) --- */
+        .recebida {
+            align-self: flex-start;
+            background: #012f78;
+            backdrop-filter: blur(5px);                  /* Efeito de desfoque no fundo */
+            box-shadow: 0 4px 6px rgba(249, 248, 248, 0.916);    /* Sombra para dar profundidade */            
+            color: #fff;
+            font-weight: bold;
+            border-radius: 0px 12px 12px 12px; /* Topo esquerdo zerado para encaixar a ponta */
+            margin-left: 12px;
+        }
+
+        .recebida::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -10px; /* Força a saída para a esquerda */
+            width: 10px;
+            height: 12px;
+            background: #012f78;
+            backdrop-filter: blur(5px);                  /* Efeito de desfoque no fundo */
+            box-shadow: 0 4px 6px rgba(249, 248, 248, 0.916);    /* Sombra para dar profundidade */            
+            /* Faz o desenho exato da curva/ponta do WhatsApp invertida */
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
+        }
+
+        /* Container que segura a hora e o check juntos na base */
+        .status-msg {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 4px;
+            align-self: flex-end;
+        }
+
+        /* O ícone de duplo check padrão (cinza) */
+        .double-check {
+            color: #8696a0; /* Cinza do WhatsApp */
+            font-weight: bold;
+            letter-spacing: -3px; /* Cola os dois checks um no outro */
+        }
+
+        /* Quando a mensagem for lida, essa classe entra e pinta de azul */
+        .lida .double-check {
+            color: #53bdeb; /* Azul do WhatsApp */
+        }
+
+        .audio-bubble{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            border-radius: 7.5px;
+            box-shadow: 0 4px 6px rgba(252, 252, 251, 0.916);    /* Sombra para dar profundidade */
+
+            max-width: 280px;
+            position: relative;
+        }
+
+        .audio-bubble::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        width: 8px;
+        height: 15px;
+        }
+
+        .bolha.enviada .audio-bubble{
+            background-color: #2a6200;
+            box-shadow: 0 4px 6px rgba(250, 221, 1, 0.916);    /* Sombra para dar profundidade */
+
+            color:#fff;
+        }
+
+        .bolha.recebida .audio-bubble{
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(250, 221, 1, 0.916);    /* Sombra para dar profundidade */
+
+            color:#000;
+        }
+
+        .play-btn{
+            width:40px;
+            height:40px;
+            border:none;
+            border-radius:50%;
+            cursor:pointer;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:rgba(255,255,255,.2);
+            color:inherit;
+        }
+
+        .audio-track{
+            flex:1;
+        }
+
+        .audio-track audio{
+            display:none;
+        }
+
+        .waveforms{
+            display:flex;
+            align-items:flex-end;
+            gap:2px;
+            height:30px;
+        }
+
+        .wave{
+            width:4px;
+            height:10px;
+            border-radius:10px;
+            background:currentColor;
+            opacity:.7;
+        }
+
+        .wave.playing{
+            animation:waveAnim .5s infinite alternate;
+        }
+
+        .wave:nth-child(1){animation-delay:.1s;}
+        .wave:nth-child(2){animation-delay:.2s;}
+        .wave:nth-child(3){animation-delay:.3s;}
+        .wave:nth-child(4){animation-delay:.4s;}
+        .wave:nth-child(5){animation-delay:.5s;}
+        .wave:nth-child(6){animation-delay:.2s;}
+        .wave:nth-child(7){animation-delay:.3s;}
+        .wave:nth-child(8){animation-delay:.4s;}
+        .wave:nth-child(9){animation-delay:.5s;}
+        .wave:nth-child(10){animation-delay:.6s;}
+
+        @keyframes waveAnim{
+            from{
+                height:8px;
+            }
+            to{
+                height:28px;
+            }
+        }
+
+        .audio-time {
+            font-size: 11px;
+            color: rgb(4, 0, 0);
+            align-self: flex-end;
+            margin-left: 5px;
+            font-weight: bold;
+        }
+
+        /* .wave{
+            width:4px;
+            border-radius:3px;
+            background:currentColor;
+            opacity:.8;
+        } */
+
+       
+
+            /* Bottom Sheet (Menu Inferior Aberto) */
+        .bottom-sheet {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #1f2c34;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
+        }
+
+        .sheet-handle {
+            width: 40px;
+            height: 4px;
+            background-color: #3b4a54;
+            border-radius: 2px;
+            margin: 10px auto;
+        }
+
+        /* Grid de Ícones do Painel */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px 10px;
+            padding: 10px 20px 20px 20px;
+            text-align: center;
+        }
+
+        .action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            color: #aeafb2;
+            font-size: 12px;
+        }
+
+        .icon-wrapper {
+            width: 52px;
+            height: 32px;
+            border-radius: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .icon-wrapper .material-icons-outlined {
+            font-size: 24px;
+        }
+
+
+        /* Cores específicas dos botões do WhatsApp Business */
+        .violet { background-color: #7f66ff; }
+        .blue { background-color: #2b72ff; }
+        .teal { background-color: #00bfa5; }
+        .navy { background-color: #4b6584; }
+        .orange { background-color: #ff9f43; }
+        .green { background-color: #2ecc71; }
+        .light-blue { background-color: #3498db; }
+        .yellow { background-color: #f1c40f; }
+        .pink { background-color: #ff6b81; }
+
+        /* Carrossel de Galeria Inferior */
+        .gallery-section {
+            display: flex;
+            gap: 6px;
+            padding: 10px;
+            background-color: #111b21;
+            overflow-x: auto;
+        }
+
+        .gallery-item {
+            min-width: 100px;
+            height: 75px;
+            border-radius: 4px;
+            overflow: hidden;
+            background-color: #232d36;
+            flex-shrink: 0;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .uid{
+            font-size:11px;
+            opacity:.7;
+            color:#000;
+            margin-bottom:5px;
+        }
+
+        .texto{
+            font-size:15px;
+            line-height:1.4;
+        }
+
+        .input-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            align-items: center;
+            padding: 12px;
+            background: #222;
+            border-top: 1px solid #22222200;
+            display: flex;
+            gap: 10px;
+            box-sizing: border-box; /* Garante que o padding não quebre a largura em 100% */
+        }
+
+        #mensagemInput {
+            flex: 1;
+            outline: none;
+            background: #ffffff;
+            font-weight: bold;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 24px; /* Bordas arredondadas estilo WhatsApp */
+            font-size: 14px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+            
+            /* CORREÇÃO AQUI: padding-left padrão e padding-right esticado para 160px 
+            para o texto quebrar linha ou parar ANTES de chegar nos botões da direita */
+            padding: 12px 100px 12px 16px; 
+        }
+
+        #btnEnviar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 22px;
+            border: none;
+            background: rgb(0, 98, 255);
+            cursor: pointer;
+            font-weight: bold;
+            flex-shrink: 0; /* Impede o botão de achatar em telas menores */
+        }
+
+        .botao-anexo {
+            position: absolute;
+            /* Ajustado para alinhar perfeitamente no lado direito em relação à input-area */
+            right: 115px; 
+            top: 50%;
+            transform: translateY(-50%); /* Centraliza verticalmente */
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000609;
+            padding: 0;
+            z-index: 10; /* Garante que fique clicável por cima do input */
+        }
+
+        .botao-anexo:hover {
+            color: #667781;
+        }
+
+        .botao-camera {
+            position: absolute;
+            /* Ajustado para alinhar colado ao lado do anexo */
+            right: 75px; 
+            top: 50%;
+            transform: translateY(-50%); /* Centraliza verticalmente */
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000609;
+            padding: 0;
+            z-index: 10; /* Garante que fique clicável por cima do input */
+        }
+
+        .botao-camera:hover {
+            color: #667781;
+        }
+
+        #mensagens{
+            overflow-y:auto;
+            scroll-behavior:smooth;
+        }
+
+        .topo-msg{
+        display:flex;
+        align-items:center;
+        gap:8px;
+        margin-bottom:8px;
+        }
+
+        .topo-msg img{
+            width:32px;
+            height:32px;
+            border-radius:50%;
+            object-fit:cover;
+        }
+
+        .topo-msg span{
+            font-size:13px;
+            font-weight:bold;
+            color:#0b0000;
+        }
+
+        .recebida span{
+            font-size:13px;
+            font-weight:bold;
+            color:#fff;            
+        }
+
+        /* ANIMAÇÃO DIGITANDO */
+        .digitando {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 12px 14px;
+            background: #03a1fd;
+            border-radius: 16px;
+            width: fit-content;
+            margin-bottom: 10px;
+        }
+
+        .digitando span {
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            border-radius: 50%;
+            animation: digitando 1.4s infinite;
+        }
+
+        .digitando span:nth-child(2){
+            animation-delay: .2s;
+        }
+
+        .digitando span:nth-child(3){
+            animation-delay: .4s;
+        }
+
+        @keyframes digitando {
+
+            0%{
+                transform: translateY(0);
+                opacity: .3;
+            }
+
+            50%{
+                transform: translateY(-5px);
+                opacity: 1;
+            }
+
+            100%{
+                transform: translateY(0);
+                opacity: .3;
+            }
+
+        }
+
+                
+        /* .chat-input input[type="text"]{
+            flex:1;
+            border:none;
+            padding:10px 14px;
+            border-radius:20px;
+            outline:none;
+            background:#f0f0f0;
+        } */
+
+        .btn-circle{
+            width:42px;
+            height:42px;
+            border-radius:50%;
+            border:none;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            cursor:pointer;
+            font-size:18px;
+        }
+
+        /* .btn-attach{ background:#f7f9f8b2;
+            background-image: url("https://res.cloudinary.com/dptprh0xk/image/upload/v1779936658/stickers_mzstm4.svg");
+            background-position:center;
+            background-size:cover;
+            background-repeat: no-repeat;                       
+         } */
+    
+ 
+        p{
+            color:#fff;
+        }
+
+        .btn-img{
+            background:#333;
+            color:#fff;
+        }
+
+        /* PREVIEW */
+        .image-preview-container{
+
+            display:none;
+
+            position:fixed;
+
+            top:50%;
+            left:50%;
+
+            transform:translate(-50%, -50%);
+
+            width:90%;
+            max-width:400px;
+
+            background:#1111113b;
+
+            padding:15px;
+
+            border-radius:15px;
+
+            z-index:999999;
+
+            text-align:center;
+
+            box-shadow:0 0 25px rgba(250, 249, 249, 0.7);
+        }
+
+        /* IMAGEM */
+        #image-preview{
+
+            max-width:100%;
+
+            max-height:300px;
+
+            display:block;
+
+            margin:0 auto 15px;
+
+            border-radius:10px;
+        }
+
+        /* BOTÃO */
+        #remove-image{
+
+            background:#ff4d4d;
+
+            border-radius:50%;
+
+            width:50px;
+
+            height:50px;
+
+            color:#fff;
+
+            border:none;
+
+            cursor:pointer;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            margin:0 auto;
+        }
+
+        input[type="file"]{
+            display:none;
+        }
+                @media(max-width:768px){
+
+                    .sidebar{
+                        position:absolute;
+                        left:0;
+                        top:65px;
+                        height:calc(100vh - 65px);
+                        z-index:999;
+                    }
+
+                    .chat-container{
+                        width:100%;
+                    }
+                }
+

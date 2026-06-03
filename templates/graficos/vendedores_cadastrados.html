@@ -11,7 +11,7 @@
 <style>
 /* 🔥 ESPAÇAMENTO ENTRE BLOCOS */
 .analysis {
-    margin: 30px auto;       /* espaço entre tabelas */
+    margin: 80px auto;       /* espaço entre tabelas */
     padding: 15px;           /* espaço interno */
     max-width: 95%;
 }
@@ -99,16 +99,16 @@
 
   <nav class="navbar">
     <ul>
-      <li><a href="/graficos/resumo/sistema/detalhes">VOLTAR PAINEL</a></li>
+      <li><button onclick="history.back()">Voltar</button></li>
     </ul>
   </nav>
 </header>
 
 <header>
-  <h1>VENDEDORES CADASTRADOS - FERRARI TECH</h1>
+  <h1>Afiliados CADASTRADOS - FERRARI TECH</h1>
 </header>
 <div class="analysis">
-  <h3 style="text-align: center; font-family: monospace;">📋 Buscar Vendedor Cadastrado</h3>
+  <h3 style="text-align: center; font-family: monospace;">📋 Buscar Afiliado Cadastrado</h3>
 <div class="filter-container">
   <label style="color:#000;font-weight: bold; ">Filtrar por CPF:</label>
   <input type="text" id="dados-filter" class="dados-input">
@@ -152,7 +152,7 @@
 </div>
 <div class="analysis">
 <table id="tableRegistro" border="1">
-<h3 style="text-align: center; font-family: monospace;">📋 Cadastrar Novo Vendedor</h3>
+<h3 style="text-align: center; font-family: monospace;">📋 Cadastrar Novo Afiliado</h3>
   <thead>
     <tr>
       <th style="background-color: #00BFFF;">Nome</th>
@@ -203,7 +203,7 @@
 <!-- TODOS OS VENDEDORES -->
 <div class="analysis">
 
-  <h3 style="text-align: center; font-family: monospace;">📋 Todos os Vendedor Cadastrados</h3>
+  <h3 style="text-align: center; font-family: monospace;">📋 Todos os Afiliados Cadastrados</h3>
 
   <table border="1">
 

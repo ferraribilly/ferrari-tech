@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Clone</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+<style>
+/* Configurações Gerais Estilo WhatsApp */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #ffffff;
+    color: #111b21;
+    max-width: 500px; /* Simula tela de celular */
+    margin: 0 auto;
+    border-left: 1px solid #eaeaea;
+    border-right: 1px solid #eaeaea;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Impede a tela inteira de rolar */
+    position: relative;
+}
+
+/* Container do Topo Fixo */
+.top-fixed-container {
+    background-color: #ffffff;
+    z-index: 10;
+    flex-shrink: 0; /* Não deixa o topo achatar */
+}
+
+/* Header */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 16px 10px 16px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #000000;
+}
+
+.header-actions {
+    display: flex;
+    gap: 20px;
+    color: #111b21;
+}
+
+.header-actions span {
+    cursor: pointer;
+    font-size: 26px;
+}
+
+/* Caixa de Pesquisa */
+.search-container {
+    padding: 10px 16px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: #f0f2f5;
+    padding: 10px 16px;
+    border-radius: 25px;
+}
+
+.search-icon {
+    color: #667781;
+    margin-right: 10px;
+    font-size: 20px;
+}
+
+.search-box input {
+    border: none;
+    background: transparent;
+    width: 100%;
+    font-size: 16px;
+    outline: none;
+}
+
+/* Filtros de Categoria */
+.filters-container {
+    display: flex;
+    gap: 8px;
+    padding: 10px 16px 15px 16px;
+    overflow-x: auto;
+}
+
+.filters-container::-webkit-scrollbar {
+    display: none;
+}
+
+.filter-badge {
+    border: 1px solid #e9edef;
+    background-color: #f0f2f5;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: #667781;
+    white-space: nowrap;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.filter-badge.active {
+    background-color: #e7f5ec;
+    color: #0c8540;
+    border-color: #e7f5ec;
+    font-weight: 500;
+}
+
+.badge-count {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+/* Linha Arquivadas */
+.archive-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+}
+
+.archive-left {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.archive-icon {
+    color: #0c8540;
+    font-size: 24px;
+    margin-left: 8px;
+}
+
+.archive-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: #111b21;
+}
+
+.archive-count {
+    font-size: 13px;
+    color: #0c8540;
+    font-weight: 500;
+}
+
+/* Lista de Mensagens com Rolagem Independente */
+.chat-list {
+    flex: 1; /* Ocupa todo o espaço restante do meio */
+    overflow-y: auto; /* Só a lista rola de forma independente */
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-item {
+    display: flex;
+    padding: 12px 16px;
+    cursor: pointer;
+    align-items: center;
+}
+
+.chat-item:hover {
+    background-color: #f5f6f6;
+}
+
+.avatar-container {
+    margin-right: 15px;
+    position: relative;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.status-typing-dot {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 14px;
+    height: 14px;
+    background-color: #25d366;
+    border: 2px solid white;
+    border-radius: 50%;
+}
+
+/* Cores dos Avatares */
+.bg-purple { background-color: #673ab7; }
+
+.chat-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-bottom: 1px solid #f0f2f5;
+    padding-bottom: 12px;
+}
+
+.chat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: #111b21;
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-time {
+    font-size: 12px;
+    color: #667781;
+}
+
+.chat-preview {
+    font-size: 14px;
+    color: #667781;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 280px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.micro-icon {
+    font-size: 16px !important;
+}
+
+.chat-meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.unread-badge {
+    background-color: #25d366;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 2px 7px;
+    border-radius: 50%;
+    min-width: 18px;
+    text-align: center;
+    display: inline-block;
+}
+
+/* Menu de Navegação Inferior Fixo */
+.bottom-nav {
+    flex-shrink: 0; /* Impede que achate */
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    border-top: 1px solid #f0f2f5;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #667781;
+    cursor: pointer;
+    font-size: 12px;
+    gap: 4px;
+}
+
+.nav-item.active {
+    color: #111b21;
+    font-weight: bold;
+}
+
+.nav-icon-wrapper {
+    position: relative;
+}
+
+.nav-badge {
+    position: absolute;
+    top: -4px;
+    right: -8px;
+    background-color: #25d366;
+    color: white;
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 10px;
+}
+
+</style>
+</head>
+<body>
+
+    <div class="top-fixed-container">
+        <header class="main-header">
+            <h1 class="logo">Ferrai Tech</h1>
+            <div class="header-actions">
+                <span class="material-symbols-outlined">photo_camera</span>
+                <span class="material-symbols-outlined">more_vert</span>
+            </div>
+        </header>
+
+        <div class="search-container">
+            <div class="search-box">
+                <span class="material-symbols-outlined search-icon">search</span>
+                <input type="text" placeholder="Pesquisar...">
+            </div>
+        </div>
+
+        <div class="filters-container">
+            <button class="filter-badge active">Todas</button>
+            <button class="filter-badge">Não lidas <span class="badge-count">(0)</span></button>
+            <button class="filter-badge">Favoritos</button>
+            <button class="filter-badge">Grupos <span class="badge-count">(0)</span></button>
+        </div>
+    </div>
+
+    <main class="chat-list" id="lista-conversas">
+        
+        <div class="archive-row">
+            <div class="archive-left">
+                <span class="material-symbols-outlined archive-icon">archive</span>
+                <span class="archive-text">Arquivadas</span>
+            </div>
+            <span class="archive-count">0</span>
+        </div>
+
+        {% for usuario in usuarios %}
+        <div class="chat-item" data-id="{{ usuario._id }}" onclick="abrirConversa('{{ usuario._id }}')">
+            <div class="avatar-container">
+                <div class="avatar bg-purple">{{ usuario.nome[:2].upper() }}</div>
+                <span class="status-typing-dot" id="typing_dot_{{ usuario._id }}" style="display: none;"></span>
+            </div>
+            <div class="chat-info">
+                <div class="chat-row">
+                    <span class="chat-name">{{ usuario.nome }} {{ usuario.sobrenome }}</span>
+                    <span class="chat-time" id="tempo_{{ usuario._id }}">--:--</span>
+                </div>
+                <div class="chat-row">
+                    <span class="chat-preview" id="preview_{{ usuario._id }}">Nenhuma mensagem</span>
+                    <div class="chat-meta">
+                        <span class="unread-badge" id="notif_{{ usuario._id }}" style="display: none;">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div style="text-align: center; color: gray; margin-top: 30px; font-size: 14px;">
+            Nenhum cliente cadastrado.
+        </div>
+        {% endfor %}
+
+    </main>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active">
+            <div class="nav-icon-wrapper">
+                <span class="material-symbols-outlined">chat</span>
+                <span class="nav-badge">0</span>
+            </div>
+            <span class="nav-label">Conversas</span>
+        </div>
+        <div class="nav-item">
+           <span class="material-symbols-outlined">call</span>
+            <span class="nav-label">Ligações</span>
+        </div>
+        <div class="nav-item">
+           <span class="material-symbols-outlined">change_circle</span>
+            <span class="nav-label">Atualizações</span>
+        </div>
+        <div class="nav-item">
+            <span class="material-symbols-outlined">store</span>
+            <span class="nav-label">Ferramentas</span>
+        </div>
+    </nav>
+
+</body>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script> 
+    // 1. INICIALIZAÇÃO DO SOCKET
+    const socket = io();
+
+    // Dados Globais vindos da rota Flask
+    const meu_id = "{{ vendedor._id }}";
+    const tipo = "vendedor";
+    let id_conversa_ativa = "";
+
+    // Conecta o vendedor na sua sala privada ao carregar
+    socket.on("connect", () => {
+        socket.emit("register", { tipo: tipo, id: meu_id });
+    });
+
+    // 2. ESCUTAR MENSAGENS EM TEMPO REAL (SOCKET)
+    socket.on("new_message", (data) => {
+        const remetenteId = data.from_id;
+        const destinatarioId = data.to_id;
+
+        // Descobre qual linha da lista lateral deve ser atualizada
+        const chatAlvoId = (remetenteId === meu_id) ? destinatarioId : remetenteId;
+
+        // Se o chat com essa pessoa estiver aberto na tela agora, renderiza o balão em tempo real
+        if (id_conversa_ativa === chatAlvoId) {
+            const containerMensagens = document.getElementById("lista-conversas") || document.getElementById("mensagens");
+            
+            if (containerMensagens) {
+                // Se veio de mim é 'sent' (direita), se veio do usuário é 'received' (esquerda)
+                const classeBalao = (remetenteId === meu_id) ? "message sent" : "message received";
+                let conteudoMensagem = data.mensagem;
+                
+                if (data.arquivo_tipo === "imagem") {
+                    conteudoMensagem = `<img src="${data.arquivo_url}" style="max-width:250px; border-radius:8px;" />`;
+                } else if (data.arquivo_tipo === "video") {
+                    conteudoMensagem = `<video src="${data.arquivo_url}" controls style="max-width:250px; border-radius:8px;"></video>`;
+                } else if (data.arquivo_tipo === "audio") {
+                    conteudoMensagem = `<audio src="${data.arquivo_url}" controls></audio>`;
+                }
+
+                const novoBalaoHTML = `
+                    <div class="${classeBalao}" style="display: flex; margin-bottom: 10px; justify-content: ${(remetenteId === meu_id) ? 'flex-end' : 'flex-start'}; padding: 0 16px;">
+                        <div class="message-content" style="background-color: ${(remetenteId === meu_id) ? '#d9fdd3' : '#ffffff'}; padding: 8px 12px; border-radius: 8px; max-width: 70%; box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);">
+                            <p style="margin: 0; font-size: 15px; color: #111b21;">${conteudoMensagem.replace(/\n/g, "<br>")}</p>
+                            <span style="font-size: 11px; color: #667781; display: block; text-align: right; margin-top: 4px;">${data.hora}</span>
+                        </div>
+                    </div>
+                `;
+                
+                containerMensagens.insertAdjacentHTML("beforeend", novoBalaoHTML);
+                containerMensagens.scrollTop = containerMensagens.scrollHeight;
+            }
+        }
+
+        // ATUALIZAÇÃO DO PREVIEW CINZA NA LISTA LATERAL
+        if (remetenteId !== meu_id) {
+            if (id_conversa_ativa !== chatAlvoId) {
+                const badge = document.getElementById(`notif_${chatAlvoId}`);
+                if (badge) {
+                    badge.style.display = "inline-block";
+                    let atual = parseInt(badge.innerText) || 0;
+                    badge.innerText = atual + 1;
+                    atualizarFiltroNaoLidas();
+                }
+            }
+        }
+
+        const previewArea = document.getElementById(`preview_${chatAlvoId}`);
+        const tempoArea = document.getElementById(`tempo_${chatAlvoId}`);
+        
+        if (previewArea) {
+            const prefixo = (remetenteId === meu_id) ? "✓ " : "";
+            if (data.arquivo_tipo === "imagem") {
+                previewArea.innerHTML = `${prefixo}<span class="material-symbols-outlined micro-icon">image</span> Imagem`;
+            } else {
+                const textoMensagem = data.mensagem.length > 25 ? data.mensagem.substring(0, 25) + "..." : data.mensagem;
+                previewArea.innerText = prefixo + textoMensagem;
+            }
+        }
+
+        if (tempoArea) {
+            tempoArea.innerText = data.hora;
+        }
+    });
+
+    // 3. FUNÇÃO DO CLIQUE NA CONVERSA: CARREGA O HISTÓRICO COMPLETO
+    function abrirConversa(contatoId) {
+        id_conversa_ativa = contatoId;
+        
+        // Limpa a bolinha de notificações da lista lateral
+        const badge = document.getElementById(`notif_${contatoId}`);
+        if (badge) {
+            badge.innerText = "0";
+            badge.style.display = "none";
+            atualizarFiltroNaoLidas();
+        }
+
+        // Pega a área onde as mensagens devem ser renderizadas (coloquei o ID 'mensagens')
+        const mensagensDiv = document.getElementById("mensagens") || document.getElementById("lista-conversas");
+        if (!mensagensDiv) return;
+
+        mensagensDiv.innerHTML = `<div style="text-align:center; padding:20px; color:gray;">Carregando mensagens...</div>`;
+
+        // Busca o histórico de mensagens direto na sua rota do backend
+        fetch(`/saques/mensagens/${contatoId}`)
+            .then(res => res.json())
+            .then(data => {
+                mensagensDiv.innerHTML = ""; // Limpa o "Carregando..."
+
+                // Loop para renderizar cada mensagem do histórico antigo
+                data.mensagens.forEach(msg => {
+                    const div = document.createElement("div");
+                    
+                    // Verifica se a mensagem antiga foi enviada por você ou pelo cliente
+                    // Se o seu backend retornar quem enviou em 'msg.from_id', usamos isso. Caso contrário, assume-se a classe padrão.
+                    const souEu = (msg.from_id === meu_id);
+                    
+                    div.style.display = "flex";
+                    div.style.marginBottom = "10px";
+                    div.style.justify = souEu ? "flex-end" : "flex-start";
+                    div.style.padding = "0 16px";
+
+                    let textoFinal = msg.texto || msg; // Suporta tanto string direta quanto objeto {texto: "..."}
+
+                    div.innerHTML = `
+                        <div class="message-content" style="background-color: ${souEu ? '#d9fdd3' : '#ffffff'}; padding: 8px 12px; border-radius: 8px; max-width: 70%; box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);">
+                            <p style="margin: 0; font-size: 15px; color: #111b21;">${textoFinal.replace(/\n/g, "<br>")}</p>
+                            <span style="font-size: 11px; color: #667781; display: block; text-align: right; margin-top: 4px;">${msg.hora || '--:--'}</span>
+                        </div>
+                    `;
+
+                    mensagensDiv.appendChild(div);
+                });
+
+                // Move a rolagem para o final do chat
+                mensagensDiv.scrollTop = mensagensDiv.scrollHeight;
+            })
+            .catch(err => {
+                console.error("Erro ao carregar histórico:", err);
+                mensagensDiv.innerHTML = `<div style="text-align:center; padding:20px; color:red;">Erro ao carregar mensagens.</div>`;
+            });
+    }
+
+    // 4. CONTROLADOR DOS STATUS DE DIGITAÇÃO
+    socket.on("user_typing", (data) => {
+        const previewArea = document.getElementById(`preview_${data.from_id}`);
+        const typingDot = document.getElementById(`typing_dot_${data.from_id}`);
+        
+        if (data.is_typing) {
+            if (previewArea) {
+                if (!previewArea.hasAttribute("data-old-text")) {
+                    previewArea.setAttribute("data-old-text", previewArea.innerHTML);
+                }
+                previewArea.innerHTML = `<span style="color: #00a884; font-weight: bold;">Digitando...</span>`;
+            }
+            if (typingDot) typingDot.style.display = "block";
+        } else {
+            if (previewArea && previewArea.hasAttribute("data-old-text")) {
+                previewArea.innerHTML = previewArea.getAttribute("data-old-text");
+                previewArea.removeAttribute("data-old-text");
+            }
+            if (typingDot) typingDot.style.display = "none";
+        }
+    });
+
+    // Calcula o total de não lidas do topo
+    function atualizarFiltroNaoLidas() {
+        let totalNaoLidas = 0;
+        document.querySelectorAll(".unread-badge").forEach(b => {
+            if (b.style.display !== "none") {
+                totalNaoLidas += parseInt(b.innerText) || 0;
+            }
+        });
+        
+        const filtroBadge = document.querySelector(".filter-badge .badge-count");
+        if (filtroBadge) {
+            filtroBadge.innerText = `(${totalNaoLidas})`;
+        }
+    }
+</script>
+</html>

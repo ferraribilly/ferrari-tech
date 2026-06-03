@@ -18,7 +18,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const dt_nascimento = linha.querySelector("#dt_nascimento")?.value;
         const cpf = linha.querySelector("#cpf")?.innerText.trim();
         const email = linha.querySelector("#email")?.innerText.trim();
-        const estado = linha.querySelector("#estado")?.value;
+        const ganhos = linha.querySelector("#ganhos")?.value;
+        // const estado = linha.querySelector("#estado")?.value;
         const chave_pix = linha.querySelector("#chave_pix")?.innerText.trim();
         const vendedor = linha.querySelector("#vendedor")?.innerText.trim();
 
@@ -28,12 +29,13 @@ document.addEventListener("DOMContentLoaded", function () {
             dt_nascimento,
             cpf,
             email,
-            estado,
+            ganhos,
+            // estado,
             chave_pix,
             vendedor: vendedor || "ADMIN"
         };
 
-        if (!nome || !sobrenome || !dt_nascimento || !cpf || !email || !estado || !chave_pix) {
+        if (!nome || !sobrenome || !dt_nascimento || !cpf || !email || !ganhos || !chave_pix) {
             alert("Preencha todos os campos");
             return;
         }

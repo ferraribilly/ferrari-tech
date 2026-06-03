@@ -11,138 +11,66 @@ fetch("/支付列表")
     let totalTaxa = 0;
     let totalSaques = 0;
 
-    data.pagamentos.forEach(p => {
+    // 🔥 FUNÇÃO PRA ARRUMAR DATA
+    function formatarData(dataString) {
 
-        const valorNum = Number(p.valor || 0);
-        const taxaNum = Number(p.taxa_mp || 0); // 🔥 PEGA TAXA DO BACKEND
-
-        const dataObj = new Date(p.data_criacao);
-        const dataFormatada = dataObj.toLocaleDateString("pt-BR");
-
-        const horaFormatada = dataObj.toLocaleTimeString("pt-BR", {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit"
-        });
-
-        const descricao = "Números: " + (p.lista_numeros ? p.lista_numeros.join(", ") : "-");
-
-        const valor = valorNum.toFixed(2).replace(".", ",");
-        const taxaFormatada = taxaNum.toFixed(2).replace(".", ",");
-
-        let valorClass = "";
-        let sinal = "";
-        let statusClass = "";
-        let statusTexto = "";
-
-        if (p.status === "approved") {
-
-            valorClass = "valor-positivo";
-            sinal = "+";
-            statusClass = "status-pago";
-            statusTexto = "Pago";
-
-            totalAprovado += valorNum;
-            totalTaxa += taxaNum;
-
-        } else if (p.status === "pending") {
-
-            valorClass = "valor-negativo";
-            sinal = "-";
-            statusClass = "status-pendente";
-            statusTexto = "Pendente";
-
-            totalPendente += valorNum;
-
-        } else {
-
-            valorClass = "valor-negativo";
-            sinal = "-";
-            statusClass = "status-cancelado";
-            statusTexto = "Cancelado";
-
-            totalCancelado += valorNum;
+        if (!dataString) {
+            return {
+                data: "-",
+                hora: "-"
+            };
         }
 
-        const tr = document.createElement("tr");
+        try {
 
-        tr.innerHTML = `
-            <td>${p._id || "-"}</td>
-            <td>${dataFormatada}</td>
-            <td>${horaFormatada}</td>
-            <td>${descricao}</td>
-            <td class="${valorClass}">${sinal} R$ ${valor}</td>
-            <td>R$ ${taxaFormatada}</td> <!-- 🔥 TAXA NA TABELA -->
-            <td><span class="status ${statusClass}">${statusTexto}</span></td>
-        `;
+            // 🔥 EXEMPLO:
+            // Wed, 20 de May de 2026 21:26:45 GMT
 
-        tbody.appendChild(tr);
-    });
+            const limpa = dataString
+                .replace(/ de /g, " ")
+                .replace("GMT", "")
+                .trim();
 
-    data.saques.forEach(s => {
+            const dataObj = new Date(limpa);
 
-        const valorNum = Number(s.valor_saque || 0);
-        totalSaques += valorNum;
+            if (isNaN(dataObj.getTime())) {
 
-        const dataObj = new Date(s.criado_em);
-        const dataFormatada = dataObj.toLocaleDateString("pt-BR");
-        const horaFormatada = dataObj.toLocaleTimeString("pt-BR");
+                return {
+                    data: "-",
+                    hora: "-"
+                };
+            }
 
-        const tr = document.createElement("tr");
+            return {
+                data: dataObj.toLocaleDateString("pt-BR"),
+                hora: dataObj.toLocaleTimeString("pt-BR", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit"
+                })
+            };
 
-        tr.innerHTML = `
-            <td>${s.identificacao}</td>
-            <td>${dataFormatada}</td>
-            <td>${horaFormatada}</td>
-            <td>${s.descricao}</td>
-            <td class="valor-negativo">- R$ ${valorNum.toFixed(2).replace(".", ",")}</td>
-            <td>-</td>
-            <td><span class="status status-cancelado">Saque</span></td>
-        `;
+        } catch (e) {
 
-        tbody.appendChild(tr);
-    });
-
-    const formatar = v => "R$ " + v.toFixed(2).replace(".", ",");
-
-    document.getElementById("total-aprovado").innerText = formatar(totalAprovado);
-    document.getElementById("total-cancelado").innerText = formatar(totalCancelado);
-    document.getElementById("total-pendente").innerText = formatar(totalPendente);
-    document.getElementById("taxa-mp").innerText = formatar(totalTaxa);
-    document.getElementById("total-saques").innerText = formatar(totalSaques);
-
-    const saldoAtual = totalAprovado - totalTaxa - totalSaques;
-    document.getElementById("saldo-atual").innerText = formatar(saldoAtual);
-
-})
-.catch(err => console.error("Erro:", err));fetch("/支付列表")
-.then(res => res.json())
-.then(data => {
-
-    const tbody = document.getElementById("extrato-body");
-    tbody.innerHTML = "";
-
-    let totalAprovado = 0;
-    let totalCancelado = 0;
-    let totalPendente = 0;
-    let totalTaxa = 0;
-    let totalSaques = 0;
+            return {
+                data: "-",
+                hora: "-"
+            };
+        }
+    }
 
     data.pagamentos.forEach(p => {
 
         const valorNum = Number(p.valor || 0);
         const taxaNum = Number(p.taxa_mp || 0);
 
-        const dataObj = new Date(p.data_criacao);
-        const dataFormatada = dataObj.toLocaleDateString("pt-BR");
+        const dataInfo = formatarData(p.data_criacao);
 
-        const horaFormatada = dataObj.toLocaleTimeString("pt-BR", {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit"
-        });
-
-        const descricao = "Números: " + (p.lista_numeros ? p.lista_numeros.join(", ") : "-");
+        const descricao = "Números: " + (
+            p.lista_numeros
+                ? p.lista_numeros.join(", ")
+                : "-"
+        );
 
         const valor = valorNum.toFixed(2).replace(".", ",");
 
@@ -180,13 +108,13 @@ fetch("/支付列表")
             totalCancelado += valorNum;
         }
 
-        // 🔥 LINHA DO PAGAMENTO
+        // 🔥 LINHA PAGAMENTO
         const trPagamento = document.createElement("tr");
 
         trPagamento.innerHTML = `
             <td>${p._id || "-"}</td>
-            <td>${dataFormatada}</td>
-            <td>${horaFormatada}</td>
+            <td>${dataInfo.data}</td>
+            <td>${dataInfo.hora}</td>
             <td>${descricao}</td>
             <td class="${valorClass}">${sinal} R$ ${valor}</td>
             <td><span class="status ${statusClass}">${statusTexto}</span></td>
@@ -194,18 +122,22 @@ fetch("/支付列表")
 
         tbody.appendChild(trPagamento);
 
-        // 🔥 LINHA DA TAXA (SEPARADA)
+        // 🔥 LINHA TAXA
         if (p.status === "approved" && taxaNum > 0) {
 
             const trTaxa = document.createElement("tr");
 
             trTaxa.innerHTML = `
                 <td>${p._id}</td>
-                <td>${dataFormatada}</td>
-                <td>${horaFormatada}</td>
+                <td>${dataInfo.data}</td>
+                <td>${dataInfo.hora}</td>
                 <td>Taxa Mercado Pago</td>
-                <td class="valor-negativo">- R$ ${taxaNum.toFixed(2).replace(".", ",")}</td>
-                <td><span class="status status-cancelado">Taxa</span></td>
+                <td class="valor-negativo">
+                    - R$ ${taxaNum.toFixed(2).replace(".", ",")}
+                </td>
+                <td>
+                    <span class="status status-cancelado">Taxa</span>
+                </td>
             `;
 
             tbody.appendChild(trTaxa);
@@ -216,36 +148,53 @@ fetch("/支付列表")
     data.saques.forEach(s => {
 
         const valorNum = Number(s.valor_saque || 0);
+
         totalSaques += valorNum;
 
-        const dataObj = new Date(s.criado_em);
-        const dataFormatada = dataObj.toLocaleDateString("pt-BR");
-        const horaFormatada = dataObj.toLocaleTimeString("pt-BR");
+        const dataInfo = formatarData(s.criado_em);
 
         const tr = document.createElement("tr");
 
         tr.innerHTML = `
             <td>${s.identificacao}</td>
-            <td>${dataFormatada}</td>
-            <td>${horaFormatada}</td>
+            <td>${dataInfo.data}</td>
+            <td>${dataInfo.hora}</td>
             <td>${s.descricao}</td>
-            <td class="valor-negativo">- R$ ${valorNum.toFixed(2).replace(".", ",")}</td>
-            <td><span class="status status-cancelado">Saque</span></td>
+            <td class="valor-negativo">
+                - R$ ${valorNum.toFixed(2).replace(".", ",")}
+            </td>
+            <td>
+                <span class="status status-cancelado">Saque</span>
+            </td>
         `;
 
         tbody.appendChild(tr);
+
     });
 
-    const formatar = v => "R$ " + v.toFixed(2).replace(".", ",");
+    const formatar = v =>
+        "R$ " + v.toFixed(2).replace(".", ",");
 
-    document.getElementById("total-aprovado").innerText = formatar(totalAprovado);
-    document.getElementById("total-cancelado").innerText = formatar(totalCancelado);
-    document.getElementById("total-pendente").innerText = formatar(totalPendente);
-    document.getElementById("taxa-mp").innerText = formatar(totalTaxa);
-    document.getElementById("total-saques").innerText = formatar(totalSaques);
+    document.getElementById("total-aprovado").innerText =
+        formatar(totalAprovado);
 
-    const saldoAtual = totalAprovado - totalTaxa - totalSaques;
-    document.getElementById("saldo-atual").innerText = formatar(saldoAtual);
+    document.getElementById("total-cancelado").innerText =
+        formatar(totalCancelado);
+
+    document.getElementById("total-pendente").innerText =
+        formatar(totalPendente);
+
+    document.getElementById("taxa-mp").innerText =
+        formatar(totalTaxa);
+
+    document.getElementById("total-saques").innerText =
+        formatar(totalSaques);
+
+    const saldoAtual =
+        totalAprovado - totalTaxa - totalSaques;
+
+    document.getElementById("saldo-atual").innerText =
+        formatar(saldoAtual);
 
 })
 .catch(err => console.error("Erro:", err));

@@ -37,14 +37,17 @@
     }
 
     if (acaoAtual === "salvar") {
-      const estado = linhaAtual.querySelector('[data-field="estado"]')?.innerText.trim();
+     const ganhos = parseFloat(
+      linhaAtual.querySelector('[data-field="ganhos"]')?.innerText.trim()
+    ) || 0;
+      // const estado = linhaAtual.querySelector('[data-field="estado"]')?.innerText.trim();
       const email = linhaAtual.querySelector('[data-field="email"]')?.innerText.trim();
       const chave_pix = linhaAtual.querySelector('[data-field="chave_pix"]')?.innerText.trim();
 
       const res = await fetch("/editar-usuario", {
         method: "PUT",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ id, senha, estado, email, chave_pix })
+        body: JSON.stringify({ id, senha, ganhos, email, chave_pix })
       });
       const data = await res.json();
       if (data.sucesso) {

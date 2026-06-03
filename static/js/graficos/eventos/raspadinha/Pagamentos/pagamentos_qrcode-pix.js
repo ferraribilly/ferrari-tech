@@ -24,6 +24,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const email = document.getElementById("email")?.innerText || "";
 
+            const vendedor = document.getElementById("vendedor")?.innerText || "";
+
             const quantidade = parseInt(
                 document.querySelector(".buy-slide .quantidade")?.innerText || "1"
             );
@@ -34,6 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     `/payment_qrcode_pix/pagamento_pix/ferrari-tech/{{ usuario_id }}`
                     + `?nome=${encodeURIComponent(nome)}`
                     + `&sobrenome=${encodeURIComponent(sobrenome)}`
+                    + `&vendedor=${encodeURIComponent(vendedor)}`
                     + `&cpf=${encodeURIComponent(cpf)}`
                     + `&email=${encodeURIComponent(email)}`
                     + `&quantidade=${quantidade}`;

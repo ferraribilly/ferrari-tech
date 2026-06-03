@@ -34,6 +34,8 @@ from models import projetos_collection
 from models import criar_saque, saques_collection
 from models import get_all_saques
 from models import db  # Puxa a conexão direta do seu arquivo de modelos
+from models import salvar_mensagem 
+from models import MensagemModel
 from flask_cors import CORS
 from datetime import datetime, timezone
 from datetime import datetime, date
@@ -53,6 +55,7 @@ client = MongoClient(os.getenv("MONGO_URI"))
 pagamento_model = PagamentoModel()
 bilhete_model = BilheteModel()
 raspadinha_model = RaspadinhaModel()
+mensagem_model = MensagemModel()
 socketio = SocketIO(app, cors_allowed_origins="*")
 app.secret_key = os.getenv("APP_SECRET_KEY")
 notification_url = os.getenv("NOTIFICATION_URL")
@@ -567,7 +570,7 @@ def limpar_cpf(cpf):
 #=================================================================================
 # PAGINA INICIAL DO USUARIOS OPÇOES
 #/ferrari-tech/tecnlogia
-@app.route("/vitoria-visonaria_franca-sp")
+@app.route("/access/interacao/84729163509817263549081726354908172635490817263549081726354908172635")
 def options():
     return render_template("opcoes.html")
 #---------------------------------------------------------------------------------
@@ -608,6 +611,10 @@ def validar_maioridade(dt_nascimento_str):
     except ValueError:
         return False
 
+# =========================
+# ROUTE /registrar
+# =========================
+
 @app.route("/registrar", methods=["POST"])
 def registrar():
 
@@ -633,7 +640,82 @@ def registrar():
                 "mensagem": "Usuário deve ser maior de 18 anos."
             }), 400
 
-        # ------------------
+        # =========================
+        # IP
+        # =========================
+        ip_usuario = request.headers.get("X-Forwarded-For", request.remote_addr)
+
+        # =========================
+        # USER AGENT
+        # =========================
+        user_agent_string = request.headers.get("User-Agent", "")
+        user_agent = parse(user_agent_string)
+        ua = user_agent_string.lower()
+
+        # =========================
+        # DETECÇÃO DE APARELHO
+        # =========================
+        aparelho = "Desconhecido"
+
+        if "sm-a356" in ua:
+            aparelho = "Samsung Galaxy A35"
+        elif "sm-a346" in ua:
+            aparelho = "Samsung Galaxy A34"
+        elif "sm-a546" in ua:
+            aparelho = "Samsung Galaxy A54"
+        elif "sm-s918" in ua:
+            aparelho = "Samsung Galaxy S23 Ultra"
+        elif "sm-s926" in ua:
+            aparelho = "Samsung Galaxy S24+"
+        elif "sm-g990" in ua:
+            aparelho = "Samsung Galaxy S21 FE"
+        elif "sm-" in ua:
+            aparelho = "Samsung"
+        elif "2201117tg" in ua:
+            aparelho = "Xiaomi Redmi Note 11"
+        elif "22101316g" in ua:
+            aparelho = "Xiaomi Redmi Note 12"
+        elif "2312draf3" in ua:
+            aparelho = "Xiaomi Redmi Note 13"
+        elif "redmi" in ua or "xiaomi" in ua:
+            aparelho = "Xiaomi"
+        elif "moto g54" in ua:
+            aparelho = "Motorola Moto G54"
+        elif "moto g84" in ua:
+            aparelho = "Motorola Moto G84"
+        elif "moto" in ua:
+            aparelho = "Motorola"
+        elif "iphone" in ua:
+            aparelho = "iPhone"
+        elif "ipad" in ua:
+            aparelho = "iPad"
+        elif "huawei" in ua:
+            aparelho = "Huawei"
+        elif "asus" in ua:
+            aparelho = "Asus"
+        elif "lg-" in ua:
+            aparelho = "LG"
+        elif "realme" in ua:
+            aparelho = "Realme"
+        elif "oppo" in ua:
+            aparelho = "Oppo"
+        elif "vivo" in ua:
+            aparelho = "Vivo"
+        elif "nokia" in ua:
+            aparelho = "Nokia"
+        elif "windows nt" in ua:
+            aparelho = "PC Windows"
+        elif "macintosh" in ua or "mac os" in ua:
+            aparelho = "MacBook / iMac"
+        elif "linux" in ua and "android" not in ua:
+            aparelho = "PC Linux"
+        else:
+            aparelho = f"{user_agent.device.family} | {user_agent.os.family}"
+
+        # =========================
+        # NAVEGADOR
+        # =========================
+        navegador = user_agent.browser.family
 
         usuario = criar_usuario(
             data.get("nome", ""),
@@ -642,16 +724,19 @@ def registrar():
             dt_nascimento,
             data.get("email", ""),
             data.get("vendedor", "Plataforma Ferrari Tech"),
-            data.get("chave_pix", "")
+            data.get("chave_pix", ""),
+            ip_usuario,
+            aparelho,
+            navegador
         )
 
-        # GARANTIA DOS CAMPOS (caso versão antiga do banco exista sem eles)
         users_collection.update_one(
             {"_id": ObjectId(usuario["_id"])},
             {
                 "$setOnInsert": {
                     "ganhos": 0.00,
-                    "saques": 0.00
+                    "saques": 0.00,
+                    "status": "online"
                 }
             },
             upsert=True
@@ -673,6 +758,9 @@ def registrar():
             "mensagem": str(e)
         }), 400
 #---------------------------------------------------------------------------------
+@app.route("/reconhecimento_facial")
+def face():
+    return render_template("graficos/eventos/Admin/reconhecimento_facial.html")
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
@@ -691,7 +779,15 @@ def login():
         usuario = users_collection.find_one({"cpf": cpf})
 
         if not usuario:
-            return jsonify({"status": "erro", "mensagem": "CPF não encontrado"}), 404
+            return jsonify({
+                "status": "erro",
+                "mensagem": "CPF não encontrado"
+            }), 404
+
+        users_collection.update_one(
+            {"_id": usuario["_id"]},   # já é string
+            {"$set": {"status": "online"}}
+        )
 
         return jsonify({
             "status": "sucesso",
@@ -699,8 +795,52 @@ def login():
         }), 200
 
     except Exception as e:
-        return jsonify({"status": "erro", "mensagem": str(e)}), 400
+        return jsonify({
+            "status": "erro",
+            "mensagem": str(e)
+        }), 400
 #---------------------------------------------------------------------------------
+@app.route("/logout", methods=["POST"])
+def logout_user():
+    try:
+        data = request.json
+
+        # Recebe o ID do usuário que quer deslogar
+        usuario_id = str(data["usuario_id"]).strip()
+
+        if not usuario_id:
+            return jsonify({
+                "status": "erro",
+                "mensagem": "ID do usuário não fornecido"
+            }), 400
+
+        # Busca o usuário para garantir que ele existe
+        usuario = users_collection.find_one({"_id": usuario_id})
+
+        if not usuario:
+            return jsonify({
+                "status": "erro",
+                "mensagem": "Usuário não encontrado"
+            }), 404
+
+        # Atualiza o status para offline
+        users_collection.update_one(
+            {"_id": usuario["_id"]},
+            {"$set": {"status": "offline"}}
+        )
+
+        return jsonify({
+            "status": "sucesso",
+            "mensagem": "Logout realizado com sucesso"
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "status": "erro",
+            "mensagem": str(e)
+        }), 400
+
+
 #=================================================================================
 #=================================================================================
 # INTERFACE REGISTRO>HTML 
@@ -1415,8 +1555,16 @@ def fechamento():
 #---------------------------------------------------------------------------------    
 #---------------------------------------------------------------------------------
 # PLANILHA USUARIO
-@app.route("/clientes", methods=["GET"])
-def clientes_usuarios_cadastrados():
+@app.route("/players/register/acesso/afiliados/4f8c2d7e1a9b6f3d5c8e2a7d1f4b9c6e3a8d5f2c7b1e9a4d6f3c8b2e7a5d1f9/<vendedor_id>", methods=["GET"])
+def clientes_usuarios_cadastrados(vendedor_id=None):
+    # ========================================
+    # VENDEDOR LOGADO
+    # ========================================
+    vendedor = vendedores_collection.find_one({
+        "_id": ObjectId(vendedor_id)
+    })
+
+
     usuarios = list(users_collection.find())
     quantidade_usuarios = len(usuarios)
 
@@ -1451,6 +1599,7 @@ def clientes_usuarios_cadastrados():
     return render_template(
         "graficos/clientes_usuarios_cadastrados.html",
         usuarios=usuarios_formatados,
+        vendedor_id=vendedor_id,
         resumo=resumo
     )
 #---------------------------------------------------------------------------------
@@ -1553,14 +1702,15 @@ def editar_usuario():
             return jsonify({"sucesso": False, "erro": "ID inválido"}), 400
 
 
-        estado = data.get("estado", "").strip()
+        ganhos = float(data.get("ganhos", 0))
         email = data.get("email", "").strip()
         chave_pix = data.get("chave_pix", "").strip()
+
 
         users_collection.update_one(
             {"_id": ObjectId(user_id)},
             {"$set": {
-                "estado": estado,
+                "ganhos": ganhos,
                 "email": email,
                 "chave_pix": chave_pix
             }}
@@ -1992,7 +2142,14 @@ def listar_usuarios():
                 "ganhos": u.get("ganhos", ""),
                 "saques": u.get("saques", ""),
                 "vendedor": u.get("vendedor", ""),
-                "chave_pix": u.get("chave_pix", "")
+                "chave_pix": u.get("chave_pix", ""),
+                "ip_usuario": u.get("ip_usuario", ""),
+                "aparelho": u.get("aparelho", ""),
+                "navegador": u.get("navegador", ""),
+                "mensagem_saques": u.get("mensagem_saques", ""),
+                "status": u.get("status", ""),
+                "vendedor_id": u.get("vendedor_id", "")
+
                 
             })
 
@@ -2672,7 +2829,7 @@ def update_pagamento(pagamento_id):
 
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
-#----------------------------------------------------------------------------------------------------------------------------------------------------
+
 # =========================
 # DELETE
 # =========================
@@ -2698,6 +2855,111 @@ def registrar_vendedor():
         data = request.get_json(force=True)
         print("CHEGOU NO BACK:", data)
 
+        cpf = data.get("cpf", "")
+        dt_nascimento = data.get("dt_nascimento", "")
+
+        # --- VALIDAÇÕES ---
+        if not validar_cpf(cpf):
+            return jsonify({
+                "status": "erro",
+                "mensagem": "CPF inválido."
+            }), 400
+
+        if not validar_maioridade(dt_nascimento):
+            return jsonify({
+                "status": "erro",
+                "mensagem": "Usuário deve ser maior de 18 anos."
+            }), 400
+
+        # =========================
+        # IP
+        # =========================
+        ip_usuario = request.headers.get("X-Forwarded-For", request.remote_addr)
+
+        # =========================
+        # USER AGENT
+        # =========================
+        user_agent_string = request.headers.get("User-Agent", "")
+        user_agent = parse(user_agent_string)
+        ua = user_agent_string.lower()
+
+        # =========================
+        # DETECÇÃO DE APARELHO
+        # =========================
+        aparelho = "Desconhecido"
+
+        if "sm-a356" in ua:
+            aparelho = "Samsung Galaxy A35"
+        elif "sm-a346" in ua:
+            aparelho = "Samsung Galaxy A34"
+        elif "sm-a546" in ua:
+            aparelho = "Samsung Galaxy A54"
+        elif "sm-s918" in ua:
+            aparelho = "Samsung Galaxy S23 Ultra"
+        elif "sm-s926" in ua:
+            aparelho = "Samsung Galaxy S24+"
+        elif "sm-g990" in ua:
+            aparelho = "Samsung Galaxy S21 FE"
+        elif "sm-" in ua:
+            aparelho = "Samsung"
+        elif "2201117tg" in ua:
+            aparelho = "Xiaomi Redmi Note 11"
+        elif "22101316g" in ua:
+            aparelho = "Xiaomi Redmi Note 12"
+        elif "2312draf3" in ua:
+            aparelho = "Xiaomi Redmi Note 13"
+        elif "redmi" in ua or "xiaomi" in ua:
+            aparelho = "Xiaomi"
+        elif "moto g54" in ua:
+            aparelho = "Motorola Moto G54"
+        elif "moto g84" in ua:
+            aparelho = "Motorola Moto G84"
+        elif "moto" in ua:
+            aparelho = "Motorola"
+        elif "iphone" in ua:
+            aparelho = "iPhone"
+        elif "ipad" in ua:
+            aparelho = "iPad"
+        elif "huawei" in ua:
+            aparelho = "Huawei"
+        elif "asus" in ua:
+            aparelho = "Asus"
+        elif "lg-" in ua:
+            aparelho = "LG"
+        elif "realme" in ua:
+            aparelho = "Realme"
+        elif "oppo" in ua:
+            aparelho = "Oppo"
+        elif "vivo" in ua:
+            aparelho = "Vivo"
+        elif "nokia" in ua:
+            aparelho = "Nokia"
+        elif "windows nt" in ua:
+            aparelho = "PC Windows"
+        elif "macintosh" in ua or "mac os" in ua:
+            aparelho = "MacBook / iMac"
+        elif "linux" in ua and "android" not in ua:
+            aparelho = "PC Linux"
+        else:
+            aparelho = f"{user_agent.device.family} | {user_agent.os.family}"
+
+        # =========================
+        # NAVEGADOR
+        # =========================
+        navegador = user_agent.browser.family
+
+        # =========================
+        # LOCALIZAÇÃO (Tratando Lat/Lng enviadas do Front)
+        # =========================
+        lat = data.get("latitude")
+        lng = data.get("longitude")
+        
+        if lat and lng:
+            localizacao = f"Lat: {lat}, Lng: {lng}"
+        else:
+            localizacao = "Não autorizada / Não capturada"
+
+        # Criando o vendedor com a variável localizacao preenchida
         vendedor = criar_vendedor(
             data.get("nome", ""),
             data.get("sobrenome", ""),
@@ -2705,7 +2967,11 @@ def registrar_vendedor():
             data.get("dt_nascimento", ""),
             data.get("email", ""),
             data.get("chave_pix", ""),
-            data.get("comissao", "30%")
+            data.get("comissao", "30%"),
+            ip_usuario,
+            aparelho,
+            localizacao, # <--- Agora está definida!
+            navegador
         )
 
         return jsonify({"status": "sucesso", "vendedor": vendedor}), 201
@@ -2715,6 +2981,17 @@ def registrar_vendedor():
         return jsonify({"status": "erro", "mensagem": str(e)}), 400
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
+@app.route("/termos_contrato")
+def politica_uso():
+    return render_template("graficos/eventos/Admin/termo_admin.html")   
+
+@app.route("/galeria/acesso/afiliados/4f8c2d7e1a9b6f3d5c8e2a7d1f4b9c6e3a8d5f2c7b1e9a4d6f3c8b2e7a5d1f9/<vendedor_id>")
+def galeria(vendedor_id=None):
+    return render_template("graficos/eventos/galeria.html", vendedor_id=vendedor_id)
+
+@app.route("/black/acesso/afiliados/4f8c2d7e1a9b6f3d5c8e2a7d1f4b9c6e3a8d5f2c7b1e9a4d6f3c8b2e7a5d1f9/<vendedor_id>")
+def roleta_black_jack(vendedor_id=None):
+    return render_template("graficos/eventos/roleta_black_jack.html", vendedor_id=vendedor_id)
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
@@ -2730,7 +3007,19 @@ def login_vendedor():
         vendedor = vendedores_collection.find_one({"cpf": cpf})
 
         if not vendedor:
-            return jsonify({"status": "erro", "mensagem": "CPF não encontrado"}), 404
+            return jsonify({
+                "status": "erro",
+                "mensagem": "CPF não encontrado"
+            }), 404
+
+        vendedores_collection.update_one(
+            {"cpf": cpf},
+            {
+                "$set": {
+                    "status": "online"
+                }
+            }
+        )
 
         return jsonify({
             "status": "sucesso",
@@ -2738,7 +3027,39 @@ def login_vendedor():
         }), 200
 
     except Exception as e:
-        return jsonify({"status": "erro", "mensagem": str(e)}), 400
+        return jsonify({
+            "status": "erro",
+            "mensagem": str(e)
+        }), 400
+
+
+# LOGOUT VENDEDOR
+@app.route("/logout/vendedor", methods=["POST"])
+def logout_vendedor():
+    try:
+
+        data = request.json
+        vendedor_id = data["vendedor_id"]
+
+        vendedores_collection.update_one(
+            {"_id": ObjectId(vendedor_id)},
+            {
+                "$set": {
+                    "status": ["visto por último"],
+                    "ultima_atividade": datetime.utcnow()
+                }
+            }
+        )
+
+        return jsonify({
+            "status": "sucesso"
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "status": "erro",
+            "mensagem": str(e)
+        }), 400        
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
@@ -2759,7 +3080,14 @@ def listar_vendedor():
                 "cpf": u.get("cpf", ""),
                 "email": u.get("email", ""),
                 "dt_nascimento": u.get("dt_nascimento", ""),
-                "chave_pix": u.get("chave_pix", "")
+                "chave_pix": u.get("chave_pix", ""),
+                "bloqueado": u.get("bloqueado", ""),
+                "mensagem_usuarios": u.get("mensagem_usuarios", ""),
+                "ip_usuario": u.get("ip_usuario", ""),
+                "aparelho": u.get("aparelho", ""),
+                "navegador": u.get("navegador", ""),
+                "localizacao": u.get("localizacao", ""),
+                "status": u.get("status", "")
             })
         return jsonify({"status": "sucesso", "vendedores": vendedores}), 200
     except Exception as e:
@@ -2772,8 +3100,14 @@ def listar_vendedor():
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------   
 # PLANILHA VENDEDORES
-@app.route("/vendedores", methods=["GET"])
-def vendedores_usuarios_cadastrados():
+@app.route("/afiliados/register/acesso/afiliados/4f8c2d7e1a9b6f3d5c8e2a7d1f4b9c6e3a8d5f2c7b1e9a4d6f3c8b2e7a5d1f9/<vendedor_id>", methods=["GET"])
+def vendedores_usuarios_cadastrados(vendedor_id=None):
+    # ========================================
+    # VENDEDOR LOGADO
+    # ========================================
+    vendedor = vendedores_collection.find_one({
+        "_id": ObjectId(vendedor_id)
+    })    
     vendedores = list(vendedores_collection.find())
 
     quantidade_vendedores = len(vendedores)
@@ -3065,8 +3399,6 @@ def atualizar_dados(id):
 # EXTRATOS DETALHADO MOVIMENTAÇOES SISTEMA (COM TAXA MP + SAQUES)
 @app.route("/extratos")
 def extratos():
-    usuarios = list(users_collection.find())
-    vendedores = list(vendedores_collection.find())
     pagamentos = pagamento_model.get_all_pagamentos() or []
     saques = get_all_saques() or []  # 🔥 SAQUES
 
@@ -3076,90 +3408,12 @@ def extratos():
     for s in saques:
         s["_id"] = str(s.get("_id"))
 
-    quantidade_usuarios = len(usuarios)
-    quantidade_vendedores = len(vendedores)
-
-    usuarios_map = {u.get("email"): u for u in usuarios}
-
     total_pagamentos_pending = Decimal("0")
     total_pagamentos_approved = Decimal("0")
     total_pagamentos_cancelled = Decimal("0")
 
     total_saques = Decimal("0")  # 🔥 NOVO
     total_taxa_mp = Decimal("0")
-
-    numeros_aprovados = []
-    vendedores = {}
-
-    faturamento_por_mes = {
-        "Jan": Decimal("0"), "Fev": Decimal("0"), "Mar": Decimal("0"),
-        "Abr": Decimal("0"), "Mai": Decimal("0"), "Jun": Decimal("0"),
-        "Jul": Decimal("0"), "Ago": Decimal("0"), "Set": Decimal("0"),
-        "Out": Decimal("0"), "Nov": Decimal("0"), "Dez": Decimal("0")
-    }
-
-    meses_map = {
-        1: "Jan", 2: "Fev", 3: "Mar", 4: "Abr",
-        5: "Mai", 6: "Jun", 7: "Jul", 8: "Ago",
-        9: "Set", 10: "Out", 11: "Nov", 12: "Dez"
-    }
-
-    # 🔥 PAGAMENTOS
-    for p in pagamentos:
-        valor = Decimal(str(p.get("valor", 0)))
-        status = p.get("status")
-        email = p.get("email_usuario")
-
-        usuario = usuarios_map.get(email, {})
-        vendedor = usuario.get("vendedor", "sem_vendedor")
-
-        if vendedor not in vendedores:
-            vendedores[vendedor] = {
-                "pending": Decimal("0"),
-                "approved": Decimal("0"),
-                "cancelled": Decimal("0"),
-                "numeros": 0,
-                "taxa_mp": Decimal("0")
-            }
-
-        if status == "pending":
-            total_pagamentos_pending += valor
-            vendedores[vendedor]["pending"] += valor
-
-        elif status == "approved":
-            total_pagamentos_approved += valor
-            vendedores[vendedor]["approved"] += valor
-
-            # 🔥 TAXA MP (do banco)
-            taxa_mp = Decimal(str(p.get("taxa_mp", 0)))
-            total_taxa_mp += taxa_mp
-            vendedores[vendedor]["taxa_mp"] += taxa_mp
-
-            # 🔥 FATURAMENTO MÊS
-            data_str = p.get("data_criacao")
-            if data_str:
-                try:
-                    data = datetime.strptime(data_str, "%a, %d %b %Y %H:%M:%S GMT")
-                    mes_nome = meses_map[data.month]
-                    faturamento_por_mes[mes_nome] += valor
-                except:
-                    pass
-
-            lista = p.get("lista_numeros", [])
-
-            if isinstance(lista, str):
-                try:
-                    lista = json.loads(lista)
-                except:
-                    lista = []
-
-            if isinstance(lista, list):
-                numeros_aprovados.extend(lista)
-                vendedores[vendedor]["numeros"] += len(lista)
-
-        elif status == "cancelled":
-            total_pagamentos_cancelled += valor
-            vendedores[vendedor]["cancelled"] += valor
 
     # 🔥 SAQUES
     for s in saques:
@@ -3169,39 +3423,19 @@ def extratos():
         except:
             pass
 
-    vendedores_formatado = {
-        v: {
-            "pending": float(d["pending"]),
-            "approved": float(d["approved"]),
-            "cancelled": float(d["cancelled"]),
-            "numeros": d["numeros"],
-            "taxa_mp": float(d["taxa_mp"]),
-        } for v, d in vendedores.items()
-    }
-
-    faturamento_por_mes = {k: float(v) for k, v in faturamento_por_mes.items()}
-
     resumo = {
-        "usuarios": quantidade_usuarios,
-        "vendedores": quantidade_vendedores,
         "pagamentos": {
             "pending": float(total_pagamentos_pending),
             "approved": float(total_pagamentos_approved),
             "cancelled": float(total_pagamentos_cancelled)
         },
-        "faturamento": float(total_pagamentos_approved),
         "taxa_mp_total": float(total_taxa_mp),
         "total_saques": float(total_saques),
-        "numeros_aprovados": len(numeros_aprovados),
-        "lista_numeros_aprovados": numeros_aprovados,
-        "vendedores": vendedores_formatado,
-        "faturamento_mensal": faturamento_por_mes
     }
 
     return render_template(
         "graficos/extratos_mercado_pago.html",
         usuarios=usuarios,
-        vendedores=vendedores,
         resumo=resumo
     )
 #---------------------------------------------------------------------------------
@@ -3438,18 +3672,18 @@ def sala_ao_vivo_usuarios(usuario_id, projeto_id):
 #---------------------------------------------------------------------------------------------
 # SALA ONLINE ADMIN SALA SORTEIO RESTRITA DOS USUÁRIOS
 
-@app.route("/sala_online/admin/<projeto_id>")
-def sala_ao_vivo_admin(projeto_id):
+@app.route("/sala/privaty/acesso/afiliados//sorteios/4f8c2d7e1a9b6f3d5c8e2a7d1f4b9c6e3a8d5f2c7b1e9a4d6f3c8b2e7a5d1f9/<vendedor_id>")
+def sala_ao_vivo_admin(vendedor_id=None):
 
-    projeto = projetos_collection.find_one({
-        "_id": ObjectId(projeto_id)
-    })
+    # projeto = projetos_collection.find_one({
+    #     "_id": ObjectId(projeto_id)
+    # })
 
-    if not projeto:
-        return "Projeto não encontrado", 404
+    # if not projeto:
+    #     return "Projeto não encontrado", 404
 
-    # trazer nome_projeto
-    nome_projeto = projeto.get("nome_projeto")
+    # # trazer nome_projeto
+    # nome_projeto = projeto.get("nome_projeto")
 
     bilhetes = BilheteModel().get_all_bilhetes() or []
 
@@ -3461,9 +3695,10 @@ def sala_ao_vivo_admin(projeto_id):
     return render_template(
         "graficos/sala_onlline_admin.html",
         bilhetes=bilhetes,
-        projeto_id=projeto_id,
-        projeto=projeto,
-        nome_projeto=nome_projeto
+        # projeto_id=projeto_id,
+        # projeto=projeto,
+        vendedor_id=vendedor_id
+        # nome_projeto=nome_projeto
     )
 
 
@@ -3763,16 +3998,30 @@ def add_income(usuario_id):
 @app.route('/raspadinha', defaults={'usuario_id': None})
 @app.route('/raspadinha/<usuario_id>')
 def raspadinhas(usuario_id):
-    vendedores = list(vendedores_collection.find({}, {"nome": 1}))
-    
-    usuario = None
-    if usuario_id:
-        usuario = users_collection.find_one({"_id": ObjectId(usuario_id)}) 
 
-    # Apenas CPF, como deve ser, sem e-mail
+    vendedores = list(
+        vendedores_collection.find({}, {
+            "nome": 1,
+            "vendedor_id": 1
+        })
+    )
+
+    usuario = None
+    vendedor_id = None
+
+    if usuario_id:
+        usuario = users_collection.find_one({
+            "_id": ObjectId(usuario_id)
+        })
+
+        if usuario:
+            vendedor_id = usuario.get("vendedor_id")
+
+    # Apenas CPF
     cpf = limpar_cpf(usuario.get("cpf", "")) if usuario else ""
 
     raspadinhas_all = raspadinha_model.get_all_raspadinhas() or []
+
     raspadinhas = [
         r for r in raspadinhas_all
         if (
@@ -3781,75 +4030,206 @@ def raspadinhas(usuario_id):
         )
     ]
 
-    # No seu arquivo Python, antes do return:
-    total_quantidade = sum(int(r.get("quantidade_raspadinhas", 0)) for r in raspadinhas)
+    total_quantidade = sum(
+        int(r.get("quantidade_raspadinhas", 0))
+        for r in raspadinhas
+    )
+    # =========================
+    # IP
+    # =========================
+    ip_usuario = request.headers.get("X-Forwarded-For", request.remote_addr)
 
-    return render_template("graficos/eventos/raspadinha-1.html", 
-                        raspadinhas=raspadinhas, 
-                        total_quantidade=total_quantidade, 
-                        vendedores=vendedores, 
-                        usuario=usuario, 
-                        usuario_id=usuario_id)
+    # =========================
+    # USER AGENT
+    # =========================
+    user_agent_string = request.headers.get("User-Agent", "")
+    user_agent = parse(user_agent_string)
+    ua = user_agent_string.lower()
 
+    # =========================
+    # DETECÇÃO DE APARELHO
+    # =========================
+    aparelho = "Desconhecido"
 
+    if "sm-a356" in ua:
+        aparelho = "Samsung Galaxy A35"
+    elif "sm-a346" in ua:
+        aparelho = "Samsung Galaxy A34"
+    elif "sm-a546" in ua:
+        aparelho = "Samsung Galaxy A54"
+    elif "sm-s918" in ua:
+        aparelho = "Samsung Galaxy S23 Ultra"
+    elif "sm-s926" in ua:
+        aparelho = "Samsung Galaxy S24+"
+    elif "sm-g990" in ua:
+        aparelho = "Samsung Galaxy S21 FE"
+    elif "sm-" in ua:
+        aparelho = "Samsung"
+    elif "2201117tg" in ua:
+        aparelho = "Xiaomi Redmi Note 11"
+    elif "22101316g" in ua:
+        aparelho = "Xiaomi Redmi Note 12"
+    elif "2312draf3" in ua:
+        aparelho = "Xiaomi Redmi Note 13"
+    elif "redmi" in ua or "xiaomi" in ua:
+        aparelho = "Xiaomi"
+    elif "moto g54" in ua:
+        aparelho = "Motorola Moto G54"
+    elif "moto g84" in ua:
+        aparelho = "Motorola Moto G84"
+    elif "moto" in ua:
+        aparelho = "Motorola"
+    elif "iphone" in ua:
+        aparelho = "iPhone"
+    elif "ipad" in ua:
+        aparelho = "iPad"
+    elif "huawei" in ua:
+        aparelho = "Huawei"
+    elif "asus" in ua:
+        aparelho = "Asus"
+    elif "lg-" in ua:
+        aparelho = "LG"
+    elif "realme" in ua:
+        aparelho = "Realme"
+    elif "oppo" in ua:
+        aparelho = "Oppo"
+    elif "vivo" in ua:
+        aparelho = "Vivo"
+    elif "nokia" in ua:
+        aparelho = "Nokia"
+    elif "windows nt" in ua:
+        aparelho = "PC Windows"
+    elif "macintosh" in ua or "mac os" in ua:
+        aparelho = "MacBook / iMac"
+    elif "linux" in ua and "android" not in ua:
+        aparelho = "PC Linux"
+    else:
+        aparelho = f"{user_agent.device.family} | {user_agent.os.family}"
+
+    # =========================
+    # NAVEGADOR
+    # =========================
+    navegador = user_agent.browser.family
+
+    # =========================
+    # CIDADE PELO IP
+    # =========================
+    cidade = "Desconhecida"
+    try:
+        resposta = requests.get(f"http://ip-api.com/json/{ip_usuario}").json()
+        cidade = f"{resposta.get('city', '')} - {resposta.get('regionName', '')}"
+    except:
+        pass
+
+    return render_template(
+        "graficos/eventos/raspadinha-1.html",
+        raspadinhas=raspadinhas,
+        total_quantidade=total_quantidade,
+        vendedores=vendedores,
+        usuario=usuario,
+        vendedor_id=vendedor_id,
+        usuario_id=usuario_id,
+        ip_usuario=ip_usuario,
+        cidade=cidade,
+        aparelho=aparelho,
+        navegador=navegador        
+    )
+
+import random
+from flask import jsonify
+
+# Lista corrigida com foco em prêmios pequenos (0.05 a 0.30) saindo muito mais fácil
 PREMIOS = [
-    {"id": 1, "valor": "R$ 0,05", "numero": 0.05, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778621532/1778621069295_byxfmy.png", "probabilidade": 0.2},
-    {"id": 2, "valor": "R$ 0,10", "numero": 0.10, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778622997/1778622360189_cyixsr.png", "probabilidade": 0.2},
-    {"id": 3, "valor": "R$ 0,25", "numero": 0.25, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778614222/file_000000000ca4720e8a65a4b4966cee89_kxhcbd.png", "probabilidade": 0.2},
-    {"id": 4, "valor": "R$ 0.30", "numero": 0.30, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778621531/1778621356505_k6jsgw.png", "probabilidade": 0.2},
-    {"id": 5, "valor": "R$ 0.50", "numero": 0.50, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778621531/1778621422435_w6l0n6.png", "probabilidade": 0.5},
-    {"id": 6, "valor": "R$ 1.00", "numero": 1.00, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778621531/1778621498747_xhi8ad.png", "probabilidade": 0.5},
-    {"id": 7, "valor": "R$ 5.00", "numero": 5.00, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778622997/1778622293971_v0zpku.png", "probabilidade": 0.5},
-    {"id": 8, "valor": "R$ 10.00", "numero": 10.00, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778623662/1778623446472_mx8vbn.png", "probabilidade": 0.5},
-    {"id": 9, "valor": "R$ 1.000.00", "numero": 1000, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1779154935/image_1778976107545_gcwmr8.jpg", "probabilidade": 0.5}
+    # Sem prêmio (Essencial para equilibrar o custo de R$ 0,60)
+    {"id": 0, "valor": "R$ 0,00", "numero": 0.00, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1780455026/Gemini_Generated_Image_yern2fyern2fyern_a3p5r2.png", "probabilidade": 35.0},
     
+    # Prêmios Pequenos (MUITO FÁCEIS - Totalizam 55% de chance)
+    {"id": 1, "valor": "R$ 0,05", "numero": 0.05, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778621532/1778621069295_byxfmy.png", "probabilidade": 25.0},
+    {"id": 2, "valor": "R$ 0,10", "numero": 0.10, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778622997/1778622360189_cyixsr.png", "probabilidade": 18.0},
+    {"id": 3, "valor": "R$ 0,25", "numero": 0.25, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778614222/file_000000000ca4720e8a65a4b4966cee89_kxhcbd.png", "probabilidade": 8.0},
+    {"id": 4, "valor": "R$ 0.30", "numero": 0.30, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778621531/1778621356505_k6jsgw.png", "probabilidade": 4.0},
+    
+    # Prêmios Médios (MÉDIOS/RAROS - Totalizam 7.4% de chance)
+    {"id": 5, "valor": "R$ 0.50", "numero": 0.50, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778621531/1778621422435_w6l0n6.png", "probabilidade": 4.0},
+    {"id": 6, "valor": "R$ 1.00", "numero": 1.00, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778621531/1778621498747_xhi8ad.png", "probabilidade": 2.0},
+    {"id": 7, "valor": "R$ 5.00", "numero": 5.00, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778622997/1778622293971_v0zpku.png", "probabilidade": 1.0},
+    {"id": 8, "valor": "R$ 10.00", "numero": 10.00, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778623662/1778623446472_mx8vbn.png", "probabilidade": 0.4},
+    
+    # Grandes Prêmios (MUITO RAROS - Totalizam 0.6% de chance)
+    {"id": 9, "valor": "R$ 20.00", "numero": 20.00, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1779221189/file_0000000063ac720e965131493b7e6f41_u1oc0r.png", "probabilidade": 0.2},
+    {"id": 10, "valor": "R$ 30.00", "numero": 30.00, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1779218486/file_000000008a7c71f5bac286bab3ba1f1a_smqhkr.png", "probabilidade": 0.1},
+    {"id": 11, "valor": "R$ 50.00", "numero": 50.00, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1779222836/file_00000000d3ec71fbbd04e208192b8157_moyivw.png", "probabilidade": 0.1},
+    {"id": 12, "valor": "R$ 100.00", "numero": 100.00, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1779217595/file_00000000514c71fbacfcc7e2d6ab0f1b_bib4aa.png", "probabilidade": 0.1},
+    {"id": 13, "valor": "R$ 200.00", "numero": 200.00, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1778615047/file_000000006b3871fb9a60d2812e6ce8df_d0zmmi.png", "probabilidade": 0.09},
+    {"id": 14, "valor": "R$ 1.000.00", "numero": 1000.00, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1779217595/file_0000000013b471f9a0c8b0e9e02ccb7a_udhftc.png", "probabilidade": 0.01}
 ]
 
+# Nota: Corrigi também erros de digitação nos campos "numero" dos IDs 12 e 13 da sua lista original.
 
-
 #---------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------
-# NOVA RASPADINHA
+# NOVA RASPADINHA AQUI 
 @app.route('/raspadinha/novo')
 def nova_raspadinha():
+    # Sorteia o prêmio baseado nas novas probabilidades (Soma exata de 100)
     sorteado = random.choices(PREMIOS, weights=[p["probabilidade"] for p in PREMIOS], k=1)[0]
-    return jsonify({"imagem": sorteado["imagem"], "id_premio": sorteado["id"]})
+    
+    return jsonify({
+        "id_premio": sorteado["id"],
+        "valor": sorteado["valor"],
+        "imagem": sorteado["imagem"]
+    })
+
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
 # Lista global simplificada apenas para armazenar os logs recentes de atividades
 usuarios = []
 
+
 @socketio.on('usuario_entrou')
 def handle_usuario_entrou(data):
     usuario_id = data.get("usuario_id")
+
     if not usuario_id or not ObjectId.is_valid(usuario_id):
         return
 
-    usuario = users_collection.find_one({"_id": ObjectId(usuario_id)})
+    usuario = users_collection.find_one({
+        "_id": ObjectId(usuario_id)
+    })
+
     if not usuario:
-        return   
+        return
 
     nome_usuario = usuario.get("nome", "Usuário")
-    mensagem = f'🔥 {nome_usuario} entrou no jogo'
 
-    # Remove duplicados
-    usuarios[:] = [u for u in usuarios if u.get("id") != usuario_id]
-    
-    # Adiciona novo registro
+    # AQUI VAI O HTML DA IMAGEM
+    mensagem = f'''
+    <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
+         style="width:32px;height:32px;vertical-align:middle;margin-right:5px;">
+
+    {nome_usuario} entrou no jogo
+    '''
+
+    # REMOVE DUPLICADOS
+    usuarios[:] = [
+        u for u in usuarios
+        if u.get("id") != usuario_id
+    ]
+
+    # ADICIONA
     usuarios.append({
         "id": usuario_id,
         "texto": mensagem
     })
 
-    # Limita 15 mensagens
+    # LIMITE
     if len(usuarios) > 8000:
         usuarios.pop(0)
 
-    # Envia só os textos
-    socketio.emit('notificacao_geral', {'lista': [u["texto"] for u in usuarios]})
-
+    # ENVIA
+    socketio.emit('notificacao_geral', {
+        'lista': [u["texto"] for u in usuarios]
+    })
 
 @socketio.on('disconnect')
 def usuario_saiu_jogo():
@@ -3861,10 +4241,6 @@ def usuario_saiu_jogo():
     socketio.emit('notificacao_geral', {'lista': [u["texto"] for u in usuarios]})
 
 
-
-#---------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------
 
 @app.route('/raspadinha/resultado', methods=['POST'])
 def resultado_raspadinha():
@@ -3927,7 +4303,12 @@ def resultado_raspadinha():
         }
     )
 
-    msg = f'🎉 {usuario.get("nome", "Usuário")} ganhou {texto_triplicado}!'
+    msg = f'''
+    <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1765407065/bitcoin_pjo40b.png"
+        style="width:32px;height:32px;vertical-align:middle;margin-right:5px;">
+
+    {usuario.get("nome", "Usuário")} ganhou {texto_triplicado}!
+    '''
     usuarios.append({"id": str(usuario_id), "texto": msg})
     if len(usuarios) > 8000: usuarios.pop(0)
     socketio.emit('notificacao_geral', {'lista': [u["texto"] for u in usuarios]})
@@ -3954,81 +4335,227 @@ def resultado_raspadinha():
 # =========================
 @app.route('/saque', methods=['POST'])
 def saque():
+
     dados = request.get_json() or {}
+
     valor_saque = float(dados.get("valor", 0))
 
     # Sistema de segurança triplo para capturar o ID correto
     usuario_id = session.get("usuario_id") or dados.get("usuario_id")
     
     if not usuario_id or usuario_id == "None" or isinstance(usuario_id, dict):
+
         # Fallback: pega o ID da URL da página anterior
         referer = request.headers.get("Referer", "")
+
         if "/raspadinha/" in referer:
+
             usuario_id = referer.split("/raspadinha/")[1].split("/")[0]
 
     if not usuario_id or usuario_id == "None" or not ObjectId.is_valid(str(usuario_id)):
-        return jsonify({"erro": "Usuário inválido ou não autenticado"}), 400
+
+        return jsonify({
+            "erro": "Usuário inválido ou não autenticado"
+        }), 400
 
     oid = ObjectId(str(usuario_id))
-    usuario = users_collection.find_one({"_id": oid})
+
+    usuario = users_collection.find_one({
+        "_id": oid
+    })
     
     if not usuario:
-        return jsonify({"erro": "Usuário não encontrado no banco de dados"}), 404
+
+        return jsonify({
+            "erro": "Usuário não encontrado no banco de dados"
+        }), 404
 
     ganhos = float(usuario.get("ganhos", 0.0))
 
-    # Validações de valores
+    # =========================
+    # VALIDAÇÕES
+    # =========================
     if valor_saque < 3:
-        return jsonify({"erro": "Valor mínimo é R$ 3,00"}), 400
+
+        return jsonify({
+            "erro": "Valor mínimo é R$ 3,00"
+        }), 400
 
     if valor_saque > ganhos:
-        return jsonify({"erro": "Saldo insuficiente"}), 400
 
-    # Atualiza banco de dados usando o ID validado
+        return jsonify({
+            "erro": "Saldo insuficiente"
+        }), 400
+
+    # =========================
+    # DADOS USUÁRIO
+    # =========================
+    nome_usuario = usuario.get("nome", "Usuário")
+
+    cpf_usuario = usuario.get("cpf", "")
+
+    email_usuario = usuario.get("email", "")
+
+    pix_usuario = usuario.get("pix", "")
+
+    data_saque = datetime.now(timezone.utc)
+
+    # =========================
+    # SALVA HISTÓRICO SAQUE
+    # =========================
+    mensagem_saque = f'''
+    💰 SOLICITAÇÃO DE SAQUE 💰
+
+    🆔 ID: {usuario_id}
+
+    👤 Nome: {nome_usuario}
+
+    🪪 CPF: {cpf_usuario}
+
+    🏦 PIX: {pix_usuario}
+
+    💵 Valor: R$ {f"{valor_saque:.2f}".replace(".", ",")}
+
+    📅 Data/Hora: {data_saque.strftime("%d/%m/%Y %H:%M:%S")}
+    '''
+
+    criar_saque(
+
+        nome_favorecido=nome_usuario,
+
+        cpf_favorecido=cpf_usuario,
+
+        email_favorecido=email_usuario,
+
+        valor_saque=valor_saque,
+
+        identificacao=usuario_id,
+
+        descricao="Solicitação de saque",
+
+        status="pendente"
+    )
+
+    # SALVA MENSAGEM DENTRO DA COLLECTION
+    saques_collection.update_one(
+
+        {
+            "identificacao": str(usuario_id)
+        },
+
+        {
+            "$push": {
+                "mensagens_solicitando_saques": mensagem_saque
+            }
+        }
+    )
+
+    # =========================
+    # ATUALIZA USUÁRIO
+    # =========================
     users_collection.update_one(
-        {"_id": oid},
+
+        {
+            "_id": oid
+        },
+
         {
             "$inc": {
+
                 "ganhos": -valor_saque,
+
                 "saques": valor_saque
             },
+
             "$push": {
+
                 "saidas": {
-                    "tipo": "saque",
+
+                    "status": "pendente",
+
                     "valor": round(valor_saque, 2),
-                    "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")
+
+                    "data": data_saque.strftime("%d/%m/%Y %H:%M:%S")
                 }
             }
         }
     )
 
-    usuario_atualizado = users_collection.find_one({"_id": oid})
+    usuario_atualizado = users_collection.find_one({
+        "_id": oid
+    })
 
-    # Notificação do Socket.io no feed geral
-    nome_usuario = usuario.get("nome", "Usuário")
-    msg_saque = f'💸 {nome_usuario} solicitou saque de R$ {valor_saque:.2f}'.replace(".", ",")
-    
+    # =========================
+    # SOCKET FEED
+    # =========================
+    msg_saque = f'''
+    <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778720610/saque_k5hlcq.png"
+        style="width:32px;height:32px;vertical-align:middle;margin-right:5px;">
+
+    {nome_usuario} solicitou saque de R$ {f"{valor_saque:.2f}".replace(".", ",")}
+    '''
+
     usuarios.append({
+
         "id": str(usuario_id),
+
         "texto": msg_saque
     })
+
     if len(usuarios) > 15:
+
         usuarios.pop(0)
 
     lista_texto = [u["texto"] for u in usuarios]
-    socketio.emit('notificacao_geral', {'lista': lista_texto})
 
-    return jsonify({
-        "success": True,
-        "ganhos": float(usuario_atualizado.get("ganhos", 0.0)),
-        "saques": float(usuario_atualizado.get("saques", 0.0))
+    socketio.emit('notificacao_geral', {
+
+        'lista': lista_texto
     })
 
-#--------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------
+    # =========================
+    # RETORNO
+    # =========================
+    return jsonify({
+
+        "success": True,
+
+        "ganhos": float(
+            usuario_atualizado.get("ganhos", 0.0)
+        ),
+
+        "saques": float(
+            usuario_atualizado.get("saques", 0.0)
+        )
+    })
 
 
+# =========================
+# LISTAR MENSAGENS SAQUES
+# =========================
+@app.route('/listar_mensagens_saques')
+def listar_mensagens_saques_todos():
+
+    saques = get_all_saques() or []
+
+    mensagens = []
+
+    for s in saques:
+
+        s["_id"] = str(s["_id"])
+
+        lista = s.get(
+            "mensagens_solicitando_saques",
+            []
+        )
+
+        mensagens.extend(lista)
+
+    return jsonify({
+
+        "mensagens": mensagens
+
+    })
 
 
 @app.route("/movimentacoes", methods=["GET"])
@@ -4122,15 +4649,15 @@ def home_raspadinha(usuario_id):
     if not usuario:
         return "usuário não encontrado", 404
         
-    raspadinhas = RaspadinhaModel().get_all_raspadinhas() or []
+    # raspadinhas = RaspadinhaModel().get_all_raspadinhas() or []
 
-    raspadinhas = [r for r in raspadinhas if r.get("status") == "pending"]
+    # raspadinhas = [r for r in raspadinhas if r.get("status") == "pending"]
 
     return render_template(
         'graficos/eventos/Pagamentos/Cartao/cartao_credito_raspadinha.html',
         public_key=MP_PUBLIC_KEY,
         usuario=usuario,
-        raspadinhas=raspadinhas,
+        # raspadinhas=raspadinhas,
         usuario_id=usuario_id
     )
 
@@ -4225,37 +4752,28 @@ def add_income_raspadinha(usuario_id):
 #---------------------------------------------------------------------------------------------
 
 @app.route("/payment_qrcode_pix/pagamento_pix/ferrari-tech/<usuario_id>")
-def pagamentosqrcode(usuario_id):
-
+def pagamentosqrcode(usuario_id=None):
     import json
-
     from datetime import datetime, timedelta
 
     usuario_id = usuario_id or request.args.get("usuario_id")
 
     if not usuario_id:
-
         return jsonify({
             "erro": "usuario_id não informado"
         }), 400
 
     nome = request.args.get("nome") or ""
-
     sobrenome = request.args.get("sobrenome") or ""
-
     cpf = request.args.get("cpf") or ""
-
     email = request.args.get("email") or ""
-
+    vendedor = request.args.get("vendedor") or ""
     quantidade = int(request.args.get("quantidade") or 0)
 
-    # CORREÇÃO
     if quantidade <= 0:
-
         quantidade = 1
 
     valor_total = round(quantidade * 0.60, 2)
-
     taxa_mp = round(valor_total * 0.0099, 2)
 
     expiration_date = (
@@ -4263,191 +4781,136 @@ def pagamentosqrcode(usuario_id):
     ).strftime('%Y-%m-%dT%H:%M:%S.000-00:00')
 
     payment_data = {
-
         "transaction_amount": float(valor_total),
-
         "description": "Servico Digital",
-
         "payment_method_id": "pix",
-
         "date_of_expiration": expiration_date,
-
         "payer": {
-
             "email": email,
-
             "first_name": nome,
-
             "last_name": sobrenome,
-
             "identification": {
-
                 "type": "CPF",
-
                 "number": cpf
-
             }
         },
-
         "external_reference": email,
-
         "notification_url": notification_url,
-
         "statement_descriptor": "FerrariTech"
     }
 
     try:
-
         response = sdk.payment().create(payment_data)
-
         mp = response.get("response", {})
 
         if "id" not in mp:
-
             return f"ERRO MP: {mp}", 500
 
         payment_id = str(mp["id"])
-
         status = mp.get("status", "pending")
 
         tx = mp.get("point_of_interaction", {}).get("transaction_data", {})
 
         qr_base64 = tx.get("qr_code_base64")
-
         qr_code = tx.get("qr_code")
 
         if not qr_base64 or not qr_code:
-
             return f"ERRO QR: {tx}", 500
 
         image_bytes = base64.b64decode(qr_base64)
-
         image_file = BytesIO(image_bytes)
 
         upload_result = cloudinary.uploader.upload(
-
             image_file,
-
             folder="qrcodes_pix",
-
             public_id=f"qr_{payment_id}"
         )
 
         qr_image_url = upload_result.get("secure_url")
 
-        # DOCUMENTO PAGAMENTO
         documento_pagamento = {
-
             "_id": payment_id,
-
             "payment_id": payment_id,
-
             "status": status,
-
             "payment_method_id": "Pix",
-
             "valor": valor_total,
-
             "cpf": cpf,
-
+            "vendedor": vendedor,
             "email_usuario": email,
-
             "nome_usuario": nome,
-
             "qr_code": qr_code,
-
             "qr_image_url": qr_image_url,
-
             "taxa_mp": taxa_mp,
-
             "quantidade_raspadinhas": quantidade,
-
             "data_criacao": datetime.utcnow().strftime("%a, %d de %B de %Y %H:%M:%S GMT"),
-
             "data_de_expiração": expiration_date
-
         }
 
         try:
-
             PagamentoModel().create_pagamento(documento_pagamento)
-
         except Exception as e:
-
             print("ERRO AO SALVAR:", e)
 
-        # DOCUMENTOS RASPADINHAS
         documentos_raspadinhas = []
 
         for _ in range(quantidade):
-
             documentos_raspadinhas.append({
-
                 "raspadinha_id": payment_id,
-
                 "payment_id": payment_id,
-
                 "usuario_id": usuario_id,
-
                 "cpf": cpf,
-
                 "nome_user": nome,
-
+                "vendedor": vendedor,
                 "valor_unidade": 0.60,
-
                 "valor_total": valor_total,
-
                 "email_user": email,
-
                 "quantidade_raspadinhas": 1,
-
                 "status": "pending",
-
                 "data_criacao": datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S"),
-
                 "expiration_date": expiration_date
-
             })
 
         try:
-
             raspadinhas_collection.insert_many(documentos_raspadinhas)
-
         except Exception as e:
-
             print("ERRO AO SALVAR RASPADINHAS:", e)
 
         # SOCKET
-        socketio.emit('notificacao_compra', {
+        nome_usuario = nome if nome else "Usuário"
 
-            'msg': f'🚀 {nome} acabou de comprar {quantidade} raspadinha(s)!'
+        msg_saque = f'''
+        <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778012674/icone-de-carrinho-de-compras-3d-em-fundo-de-circulo-azul-simbolo-de-varejo-online_84443-55705_dfmhp8.png"
+        style="width:32px;height:32px;vertical-align:middle;margin-right:5px;">
+        {nome_usuario} acabou de comprar {quantidade} pix!
+        '''
 
+        usuarios.append({
+            "id": str(usuario_id),
+            "texto": msg_saque
+        })
+
+        if len(usuarios) > 8000:
+            usuarios.pop(0)
+
+        lista_texto = [u["texto"] for u in usuarios]
+
+        socketio.emit('notificacao_geral', {
+            'lista': lista_texto
         })
 
         return render_template(
-
             "graficos/eventos/Pagamentos/Pix/qrcode-pix.html",
-
             qrcode=qr_image_url,
-
             valor=f"R$ {valor_total:.2f}",
-
             qr_code_cola=qr_code,
-
             status=status,
-
             payment_id=payment_id,
-
             cpf=cpf,
-
             expiration_date=expiration_date
-
         )
 
     except Exception as e:
-
         print("ERRO GERAL:", e)
-
         return f"ERRO GERAL: {str(e)}", 500
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
@@ -4545,7 +5008,6 @@ def sync_raspadinhas_aprovados():
 #---------------------------------------------------------------------------------------------
 
 @app.route('/raspadinha/compra-saldo', methods=['POST'])
-
 def compra_raspadinha_saldo():
 
     dados = request.get_json() or {}
@@ -4642,17 +5104,35 @@ def compra_raspadinha_saldo():
 
     })
 
+
     # SOCKET
-    socketio.emit('notificacao_compra', {
+    nome_usuario = usuario.get("nome", "Usuário")
 
-        'msg': f'🚀 {nome} acabou de comprar {quantidade} raspadinha(s)!'
+    msg_saque = f'''
+    <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778012674/icone-de-carrinho-de-compras-3d-em-fundo-de-circulo-azul-simbolo-de-varejo-online_84443-55705_dfmhp8.png"
+    style="width:32px;height:32px;vertical-align:middle;margin-right:5px;">
 
+    {nome_usuario} acabou de comprar {quantidade} saldo!
+    '''
+
+    usuarios.append({
+        "id": str(usuario_id),
+        "texto": msg_saque
+    })
+
+    if len(usuarios) > 8000:
+        usuarios.pop(0)
+
+    lista_texto = [u["texto"] for u in usuarios]
+
+    socketio.emit('notificacao_geral', {
+        'lista': lista_texto
     })
 
     return jsonify({
 
         "success": True,
-        "mensagem": f"🎉 Sucesso! {quantidade} raspadinha(s) comprada(s) com saldo.",
+        # "mensagem": f"🎉 Sucesso! {quantidade} raspadinha(s) comprada(s) com saldo.",
         "novoSaldoTexto": saldo_formatado,
         "novaQuantidadeTotal": total_raspadinhas_ativas
 
@@ -4681,8 +5161,961 @@ def listar_raspadinhas():
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
-# -Run
+
+
+@app.route("/admin", defaults={'vendedor_id': None})
+@app.route("/admin/<vendedor_id>", methods=["GET"])
+def fechamento_vendedores(vendedor_id=None):
+
+    vendedor = None
+    if vendedor_id:
+        vendedor = vendedores_collection.find_one({
+            "_id": ObjectId(vendedor_id)
+        })
+
+    cpf_vendedor = limpar_cpf(vendedor.get("cpf", "")) if vendedor else ""
+
+    usuarios = list(users_collection.find())
+    vendedores_lista = list(vendedores_collection.find())
+    pagamentos = pagamento_model.get_all_pagamentos() or []
+    saques = list(saques_collection.find())
+
+    for p in pagamentos:
+        p["_id"] = str(p.get("_id"))
+
+    for s in saques:
+        s["_id"] = str(s.get("_id"))
+
+    quantidade_usuarios = len(usuarios)
+    quantidade_vendedores = len(vendedores_lista)
+
+    # Mapas de usuários para buscas rápidas
+    usuarios_map = {u.get("email"): u for u in usuarios}
+    usuarios_map_by_cpf = {u.get("cpf"): u for u in usuarios if u.get("cpf")}
+
+    total_pagamentos_pending = Decimal("0")
+    total_pagamentos_approved = Decimal("0")
+    total_pagamentos_cancelled = Decimal("0")
+
+    total_comissao = Decimal("0")
+    total_saques = Decimal("0")
+    total_taxa_mp = Decimal("0")
+    
+    # Inicializa o resumo com base nos vendedores cadastrados
+    vendedores_resumo = {}
+    for v in vendedores_lista:
+        nome_vendedor = v.get("nome")
+        if nome_vendedor:
+            vendedores_resumo[nome_vendedor] = {
+                "pending": Decimal("0"),
+                "approved": Decimal("0"),
+                "cancelled": Decimal("0"),
+                "quantidade_raspadinhas": 0,
+                "comissao": Decimal("0"),
+                "ganhos": Decimal("0"),  
+                "saques": Decimal("0")   
+            }
+            
+    if "vendedor" not in vendedores_resumo:
+        vendedores_resumo["vendedor"] = {
+            "pending": Decimal("0"), "approved": Decimal("0"), "cancelled": Decimal("0"),
+            "quantidade_raspadinhas": 0, "comissao": Decimal("0"), "ganhos": Decimal("0"), "saques": Decimal("0")
+        }
+
+    faturamento_por_dia = {}
+    total_quantidade_raspadinhas = 0
+    usuarios_qtd = {}
+
+    # =========================================================================
+    # NOVA LÓGICA: PUXAR GANHOS E SAQUES DIRETO DO PERFIL DO USUÁRIO NO BANCO
+    # =========================================================================
+    for u in usuarios:
+        vendedor_nome = u.get("vendedor") or "sem_vendedor"
+        
+        # Pega os valores direto do seu JSON de usuário (garantindo que se for nulo vira 0)
+        u_ganhos = Decimal(str(u.get("ganhos", 0) or 0))
+        u_saques = Decimal(str(u.get("saques", 0) or 0))
+        
+        if vendedor_nome not in vendedores_resumo:
+            vendedores_resumo[vendedor_nome] = {
+                "pending": Decimal("0"), "approved": Decimal("0"), "cancelled": Decimal("0"),
+                "quantidade_raspadinhas": 0, "comissao": Decimal("0"), "ganhos": Decimal("0"), "saques": Decimal("0")
+            }
+            
+        # Acumula no respectivo vendedor os dados reais que você precisava
+        vendedores_resumo[vendedor_nome]["ganhos"] += u_ganhos
+        vendedores_resumo[vendedor_nome]["saques"] += u_saques
+        
+        # Alimenta os totais globais do painel
+        total_saques += u_saques
+
+        # Estrutura base para a tabela auxiliar de usuários detalhados
+        cpf_user = u.get("cpf")
+        if cpf_user:
+            usuarios_qtd[cpf_user] = {
+                "nome": u.get("nome", "Desconhecido"),
+                "vendedor": vendedor_nome,
+                "quantidade": 0,
+                "ganhos": float(u_ganhos),
+                "saques": float(u_saques)
+            }
+
+    # 1. PROCESSAMENTO DE PAGAMENTOS (Apenas faturamento, quantidade e datas)
+    for p in pagamentos:
+        valor = Decimal(str(p.get("valor", 0)))
+        status = p.get("status")
+        email = p.get("email_usuario")
+        usuario = usuarios_map.get(email, {})
+        vendedor_nome = usuario.get("vendedor") or "sem_vendedor"
+
+        if vendedor_nome not in vendedores_resumo:
+            vendedores_resumo[vendedor_nome] = {
+                "pending": Decimal("0"), "approved": Decimal("0"), "cancelled": Decimal("0"),
+                "quantidade_raspadinhas": 0, "comissao": Decimal("0"), "ganhos": Decimal("0"), "saques": Decimal("0")
+            }
+
+        if status == "pending":
+            total_pagamentos_pending += valor
+            vendedores_resumo[vendedor_nome]["pending"] += valor
+
+        elif status == "approved":
+            total_pagamentos_approved += valor
+            vendedores_resumo[vendedor_nome]["approved"] += valor
+
+            if valor > Decimal("0.50"):
+                taxa_mp = valor * Decimal("0.0099")
+                taxa_arredondada = taxa_mp.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+                total_taxa_mp += taxa_arredondada
+
+            quantidade_raspadinhas = int(p.get("quantidade_raspadinhas", 0))
+            vendedores_resumo[vendedor_nome]["quantidade_raspadinhas"] += quantidade_raspadinhas
+            total_quantidade_raspadinhas += quantidade_raspadinhas
+
+            # Atualiza a contagem de raspadinhas no dicionário detalhado do usuário
+            cpf_user = p.get("cpf") or usuario.get("cpf")
+            if cpf_user and cpf_user in usuarios_qtd:
+                usuarios_qtd[cpf_user]["quantidade"] += quantidade_raspadinhas
+
+            data_str = p.get("data_criacao")
+            if data_str:
+                try:
+                    data = datetime.strptime(data_str, "%a, %d %b %Y %H:%M:%S GMT")
+                    dia_formatado = data.strftime("%d/%m")
+                    if dia_formatado not in faturamento_por_dia:
+                        faturamento_por_dia[dia_formatado] = Decimal("0")
+                    faturamento_por_dia[dia_formatado] += valor
+                except:
+                    pass
+
+        elif status == "cancelled":
+            total_pagamentos_cancelled += valor
+            vendedores_resumo[vendedor_nome]["cancelled"] += valor
+
+
+    # 2. CÁLCULO DA COMISSÃO LÍQUIDA (Faturamento - Ganhos - Saques) * 20%
+    for v_nome, dados in vendedores_resumo.items():
+        faturamento_liquido = dados["approved"] - dados["ganhos"] - dados["saques"]
+        
+        if faturamento_liquido > Decimal("0"):
+            comissao_calculada = faturamento_liquido * Decimal("0.20")
+            dados["comissao"] = comissao_calculada
+            total_comissao += comissao_calculada
+        else:
+            dados["comissao"] = Decimal("0")
+
+    # 3. ENCONTRAR TOP USUÁRIO
+    top_usuario = None
+    if usuarios_qtd:
+        top_usuario = max(
+            usuarios_qtd.values(),
+            key=lambda x: x["quantidade"]
+        )
+
+    # 4. FORMATAÇÃO DOS RESULTADOS DO VENDEDOR PARA O HTML
+    vendedores_formatado = {
+        v: {
+            "pending": float(d["pending"]),
+            "approved": float(d["approved"]),
+            "cancelled": float(d["cancelled"]),
+            "quantidade_raspadinhas": d["quantidade_raspadinhas"],
+            "comissao": float(d["comissao"]),
+            "ganhos": float(d["ganhos"]),
+            "saques": float(d["saques"])
+        }
+        for v, d in vendedores_resumo.items()
+    }
+
+    # Tratamento de Projetos
+    projetos = list(projetos_collection.find())
+    total_investimento_premiacao = Decimal("0")
+    projetos_formatados = []
+
+    for pr in projetos:
+        quantidade = pr.get("quantidade", "0")
+        try:
+            quantidade = int(quantidade)
+        except:
+            quantidade = 0
+
+        try:
+            valor_unidade = float(pr.get("valor_unidade", 0))
+        except:
+            valor_unidade = 0.0
+
+        valor_inv = pr.get("valor_injetado_premiacao", 0)
+        try:
+            total_investimento_premiacao += Decimal(str(valor_inv))
+        except:
+            pass
+        
+        pr_copia = pr.copy()
+        pr_copia["_id"] = str(pr_copia["_id"])
+        projetos_formatados.append(pr_copia)
+
+    projetos = list(projetos_collection.find())
+    for p in projetos:
+        p["_id"] = str(p["_id"])
+        p["quantidade"] = p.get("quantidade", "")
+
+    faturamento_por_dia = {k: float(v) for k, v in faturamento_por_dia.items()}
+
+    # Bloco Fiscal
+    faturamento_total = total_pagamentos_approved
+    cfop_produto = "6.103"
+    codigo_servico = "17.22"
+    aliquota_futura = Decimal("0.28")
+    aliquota_transicao = Decimal("0.0015")
+    imposto_futuro = faturamento_total * aliquota_futura
+    imposto_transicao = faturamento_total * aliquota_transicao
+
+    if faturamento_total > Decimal("81000") / Decimal("12"):
+        regime = "Simples Nacional (ME)"
+    elif faturamento_total > Decimal("2112"):
+        regime = "MEI"
+    else:
+        regime = "CPF (Isento até 2.112/mês)"
+
+    lucro = (faturamento_total - total_taxa_mp - total_comissao - imposto_futuro)
+
+    resumo = {
+        "usuarios": quantidade_usuarios,
+        "vendedores_total": quantidade_vendedores,
+        "pagamentos": {
+            "pending": float(total_pagamentos_pending),
+            "approved": float(total_pagamentos_approved),
+            "cancelled": float(total_pagamentos_cancelled)
+        },
+        "faturamento": float(total_pagamentos_approved),
+        "investimento_premiacao": float(total_investimento_premiacao),
+        "total_comissao": float(total_comissao),
+        "taxa_mp_total": float(total_taxa_mp),
+        "total_saques": float(total_saques),
+        "lucro": float(lucro),
+        "projetos": projetos_formatados,
+        "quantidade_raspadinhas": total_quantidade_raspadinhas,
+        "vendedores": vendedores_formatado,
+        "faturamento_diario": faturamento_por_dia,
+        "usuarios_detalhado": usuarios_qtd,
+        "fiscal": {
+            "cfop_produto": cfop_produto,
+            "codigo_servico": codigo_servico,
+            "aliquota_futura": float(aliquota_futura * 100),
+            "aliquota_transicao_2026": float(aliquota_transicao * 100),
+            "imposto_futuro": float(imposto_futuro),
+            "imposto_transicao": float(imposto_transicao),
+            "regime": regime
+        }
+    }
+
+    # =========================
+    # IP
+    # =========================
+    ip_usuario = request.headers.get("X-Forwarded-For", request.remote_addr)
+
+    # =========================
+    # USER AGENT
+    # =========================
+    user_agent_string = request.headers.get("User-Agent", "")
+    user_agent = parse(user_agent_string)
+    ua = user_agent_string.lower()
+
+    # =========================
+    # DETECÇÃO DE APARELHO
+    # =========================
+    aparelho = "Desconhecido"
+
+    if "sm-a356" in ua:
+        aparelho = "Samsung Galaxy A35"
+    elif "sm-a346" in ua:
+        aparelho = "Samsung Galaxy A34"
+    elif "sm-a546" in ua:
+        aparelho = "Samsung Galaxy A54"
+    elif "sm-s918" in ua:
+        aparelho = "Samsung Galaxy S23 Ultra"
+    elif "sm-s926" in ua:
+        aparelho = "Samsung Galaxy S24+"
+    elif "sm-g990" in ua:
+        aparelho = "Samsung Galaxy S21 FE"
+    elif "sm-" in ua:
+        aparelho = "Samsung"
+    elif "2201117tg" in ua:
+        aparelho = "Xiaomi Redmi Note 11"
+    elif "22101316g" in ua:
+        aparelho = "Xiaomi Redmi Note 12"
+    elif "2312draf3" in ua:
+        aparelho = "Xiaomi Redmi Note 13"
+    elif "redmi" in ua or "xiaomi" in ua:
+        aparelho = "Xiaomi"
+    elif "moto g54" in ua:
+        aparelho = "Motorola Moto G54"
+    elif "moto g84" in ua:
+        aparelho = "Motorola Moto G84"
+    elif "moto" in ua:
+        aparelho = "Motorola"
+    elif "iphone" in ua:
+        aparelho = "iPhone"
+    elif "ipad" in ua:
+        aparelho = "iPad"
+    elif "huawei" in ua:
+        aparelho = "Huawei"
+    elif "asus" in ua:
+        aparelho = "Asus"
+    elif "lg-" in ua:
+        aparelho = "LG"
+    elif "realme" in ua:
+        aparelho = "Realme"
+    elif "oppo" in ua:
+        aparelho = "Oppo"
+    elif "vivo" in ua:
+        aparelho = "Vivo"
+    elif "nokia" in ua:
+        aparelho = "Nokia"
+    elif "windows nt" in ua:
+        aparelho = "PC Windows"
+    elif "macintosh" in ua or "mac os" in ua:
+        aparelho = "MacBook / iMac"
+    elif "linux" in ua and "android" not in ua:
+        aparelho = "PC Linux"
+    else:
+        aparelho = f"{user_agent.device.family} | {user_agent.os.family}"
+
+    # =========================
+    # NAVEGADOR
+    # =========================
+    navegador = user_agent.browser.family
+
+    # =========================
+    # CIDADE PELO IP
+    # =========================
+    cidade = "Desconhecida"
+    try:
+        resposta = requests.get(f"http://ip-api.com/json/{ip_usuario}").json()
+        cidade = f"{resposta.get('city', '')} - {resposta.get('regionName', '')}"
+    except:
+        pass
+
+
+    return render_template(
+        "graficos/eventos/Admin/index.html",
+        usuarios=usuarios,
+        vendedores=vendedores_lista,
+        resumo=resumo,
+        projetos=projetos,
+        top_usuario=top_usuario,
+        vendedor=vendedor,
+        vendedor_id=vendedor_id,
+        ip_usuario=ip_usuario,
+        cidade=cidade,
+        aparelho=aparelho,
+        navegador=navegador        
+    )
+
+
 #---------------------------------------------------------------------------------------------
+# - DASHBOARD FATURURAMENTO | PAGAMENTOS vs SAQUES | VENDAS POR COLABORADORES "VENDEDORES"
+#---------------------------------------------------------------------------------------------
+def converter_data_dashboard(string_data):
+    if not string_data:
+        return None
+        
+    # Se o banco já trouxe como objeto datetime nativo do Python, usa direto
+    if isinstance(string_data, datetime):
+        return string_data
+
+    try:
+        string_suja = str(string_data).strip()
+        
+        # Tenta o formato ISO comum: "2026-05-21 16:17:45"
+        try:
+            return datetime.strptime(string_suja, "%Y-%m-%d %H:%M:%S")
+        except:
+            pass
+            
+        try:
+            return datetime.strptime(string_suja, "%Y-%m-%dT%H:%M:%S.%fZ")
+        except:
+            pass
+
+        # Fallback do Regex do Copilot para o formato "Thu, 21 May 2026 16:17:45 GMT"
+        match = re.search(r'(\d{2}).*?(\d{4})\s+(\d{2}):(\d{2}):(\d{2})', string_suja)
+        if match:
+            dia = int(match.group(1))
+            ano = int(match.group(2))
+            hora = int(match.group(3))
+            minuto = int(match.group(4))
+            segundo = int(match.group(5))
+            
+            mes = 5  # Maio fixo baseado no seu banco
+            if "Jun" in string_suja: mes = 6
+            elif "Jul" in string_suja: mes = 7
+            elif "Apr" in string_suja: mes = 4
+            
+            return datetime(ano, mes, dia, hora, minuto, segundo)
+            
+    except Exception as e:
+        print(f"Erro na conversão de data: {e}")
+        
+    return None
+
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+
+@app.route("/api/dados-dashboard")
+def dados_dashboard():
+    pagamentos = pagamento_model.get_all_pagamentos() or []
+    saques = get_all_saques() or []
+
+    # --- 1. FATURAMENTO ---
+    labels_faturamento = ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '23:59']
+    valores_faturamento = [0.0] * 7
+    hoje = datetime.today().date()
+
+    for p in pagamentos:
+        if p.get("status") == "approved":
+            data_pg = converter_data_dashboard(p.get("data_criacao"))
+            if data_pg and data_pg.date() == hoje:
+                hora = data_pg.hour
+                valor = float(p.get("valor", 0))
+                if hora < 4: valores_faturamento[0] += valor
+                elif hora < 8: valores_faturamento[1] += valor
+                elif hora < 12: valores_faturamento[2] += valor
+                elif hora < 16: valores_faturamento[3] += valor
+                elif hora < 20: valores_faturamento[4] += valor
+                elif hora < 24: valores_faturamento[5] += valor
+
+    # --- 2. SEMANAL (SAQUES E PAGAMENTOS) ---
+    labels_semana = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
+    dados_pagamentos_semana = [0.0] * 7
+    dados_saques_semana = [0.0] * 7
+
+    for p in pagamentos:
+        if p.get("status") == "approved":
+            data_pg = converter_data_dashboard(p.get("data_criacao"))
+            if data_pg:
+                dados_pagamentos_semana[data_pg.weekday()] += float(p.get("valor", 0))
+
+    for s in saques:
+        # Se os saques não usarem "criado_em", ele tenta buscar por "data_criacao" igual aos pagamentos
+        data_origem = s.get("criado_em") or s.get("data_criacao")
+        data_sq = converter_data_dashboard(data_origem) 
+        
+        if data_sq:
+            # Garante que pegue a chave certa do valor do saque que está no banco (valor_saque)
+            valor_s = s.get("valor_saque") or s.get("valor", 0)
+            dados_saques_semana[data_sq.weekday()] += float(valor_s)
+
+    return jsonify({
+        "faturamento": {
+            "labels": labels_faturamento,
+            "data": [float(round(v, 2)) for v in valores_faturamento]
+        },
+        "semanal": {
+            "labels": labels_semana,
+            "pagamentos": [float(round(p, 2)) for p in dados_pagamentos_semana],
+            "saques": [float(round(s, 2)) for s in dados_saques_semana]
+        }
+    })
+
+
+from user_agents import parse
+import requests
+
+
+# =============================================
+# UPLOAD ARQUIVOS
+# =============================================
+@app.route('/upload', methods=['POST'])
+def upload_arquivo():
+
+    try:
+
+        if 'file' not in request.files:
+
+            return jsonify({
+                "erro": "Arquivo não enviado"
+            }), 400
+
+        file = request.files['file']
+
+        if file.filename == '':
+
+            return jsonify({
+                "erro": "Arquivo vazio"
+            }), 400
+
+        # =====================================
+        # MIME TYPE
+        # =====================================
+        mimetype = file.mimetype
+
+        resource_type = "raw"
+
+        if mimetype.startswith("image/"):
+
+            resource_type = "image"
+
+        elif (
+            mimetype.startswith("video/")
+            or
+            mimetype.startswith("audio/")
+        ):
+
+            resource_type = "video"
+
+        # =====================================
+        # CLOUDINARY
+        # =====================================
+        upload_result = cloudinary.uploader.upload(
+
+            file,
+
+            resource_type=resource_type,
+
+            folder="saques"
+
+        )
+
+        secure_url = upload_result.get(
+            "secure_url"
+        )
+
+        return jsonify({
+
+            "url": secure_url,
+            "tipo": mimetype
+
+        })
+
+    except Exception as e:
+
+        print("ERRO UPLOAD:", e)
+
+        return jsonify({
+            "erro": str(e)
+        }), 500
+
+@app.route('/saques/mensagens/<usuario_id>')
+def listar_mensagens_saques(usuario_id):
+
+    saques = get_all_saques() or []
+
+    mensagens = []
+
+    for s in saques:
+
+        # filtra só do usuário correto
+        if str(s.get("identificacao")) != str(usuario_id):
+            continue
+
+        msgs = s.get("mensagens_solicitando_saques", [])
+        mensagens.extend(msgs)
+
+    return jsonify({
+        "mensagens": mensagens
+    })
+#--------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+# Armazena todas as mensagens enviadas pelos usuários para vendedores
+mensagens = []
+connected_clients = {}
+
+def get_private_room(usuario_id, vendedor_id):
+    return f"chat_{usuario_id}_{vendedor_id}"
+
+
+# ========================================
+# CHAT DO VENDEDOR
+# ========================================
+@app.route("/chat/vendedor/<vendedor_id>")
+@app.route("/chat/vendedor/<vendedor_id>/<usuario_id>")
+def chat_vendedores(vendedor_id=None, usuario_id=None):
+
+    # ========================================
+    # VENDEDOR LOGADO
+    # ========================================
+    vendedor = vendedores_collection.find_one({
+        "_id": ObjectId(vendedor_id)
+    })
+
+    # ========================================
+    # USUÁRIO SELECIONADO
+    # ========================================
+    usuario = None
+
+    if usuario_id:
+
+        usuario = users_collection.find_one({
+            "_id": ObjectId(usuario_id)
+        })
+
+    # ========================================
+    # LISTA USUÁRIOS
+    # ========================================
+    usuarios = list(users_collection.find())
+
+    # ========================================
+    # RENDER
+    # ========================================
+    return render_template(
+
+        "graficos/eventos/sala_saques_admin.html",
+
+        # VENDEDOR LOGADO
+        vendedor=vendedor,
+
+        # USUÁRIO ATUAL
+        usuario=usuario,
+
+        # LISTA
+        usuarios=usuarios,
+
+        # IDS CORRETOS
+        vendedor_id=str(vendedor["_id"]),
+
+        usuario_id=str(usuario["_id"])
+        if usuario else "",
+
+        # NOMES
+        nome_vendedor=vendedor["nome"]
+        if vendedor else "Vendedor",
+
+        nome_usuario=usuario["nome"]
+        if usuario else "Usuário",
+
+        # FIXO
+        tipo="vendedor",
+
+        # ID REAL LOGADO
+        meu_id=str(vendedor["_id"])
+    )
+
+# ========================================
+# CHAT DO USUÁRIO
+# ========================================
+@app.route("/chat/usuario/<usuario_id>")
+@app.route("/chat/usuario/<usuario_id>/<vendedor_id>")
+def chat_users(usuario_id=None, vendedor_id=None):
+
+    # ========================================
+    # USUÁRIO LOGADO
+    # ========================================
+    usuario = users_collection.find_one({
+        "_id": ObjectId(usuario_id)
+    })
+
+    # ========================================
+    # VENDEDOR SELECIONADO
+    # ========================================
+    vendedor = None
+
+    if vendedor_id:
+
+        vendedor = vendedores_collection.find_one({
+            "_id": ObjectId(vendedor_id)
+        })
+
+    # ========================================
+    # LISTAS SIDEBAR
+    # ========================================
+    vendedores = list(vendedores_collection.find())
+
+    usuarios = list(users_collection.find())
+    # texto = request.args.get("text")
+    # ========================================
+    # RENDER
+    # ========================================
+    return render_template(
+
+        "graficos/eventos/sala_saque_usuarios.html",
+
+        # USUÁRIO LOGADO
+        usuario=usuario,
+
+        # LISTAS
+        usuarios=usuarios,
+        vendedores=vendedores,
+
+        # VENDEDOR ATUAL
+        vendedor=vendedor,
+
+        # IDS
+        usuario_id=str(usuario["_id"]),
+        vendedor_id=str(vendedor["_id"]) if vendedor else "",
+
+        # NOMES
+        nome_usuario=usuario["nome"] if usuario else "Usuário",
+        nome_vendedor=vendedor["nome"] if vendedor else "Vendedor",
+
+        # TIPO FIXO
+        tipo="usuario",
+        # texto=texto,
+        
+
+        # ID REAL DE QUEM ESTÁ LOGADO
+        meu_id=str(usuario["_id"])
+    )
+
+
+
+
+# VEJA O (vendedor_id) DENTRO DA FUNÇÃO ABAIXO:
+@app.route("/conversa/<vendedor_id>")
+def conversas(vendedor_id):  # <- Faltava colocar o vendedor_id aqui!
+    try:
+        # Seu código que busca no banco...
+        vendedor = vendedores_collection.find_one({"_id": vendedor_id})
+        lista_usuarios = list(users_collection.find({"vendedor_id": str(vendedor_id)}))
+
+        for usuario in lista_usuarios:
+            usuario["_id"] = str(usuario["_id"])
+
+        return render_template(
+            "graficos/eventos/Admin/conversas.html", 
+            vendedor=vendedor, 
+            usuarios=lista_usuarios
+        )
+    except Exception as e:
+        print("ERRO NA ROTA DE CONVERSAS:", e)
+        return f"Erro interno: {str(e)}", 500
+
+
+# =============================================
+# ROTA PARA BUSCAR HISTÓRICO DE MENSAGENS
+# =============================================
+@app.route('/historico/<id_usuario>/<id_vendedor>', methods=['GET'])
+def obter_historico_chat(id_usuario, id_vendedor):
+    try:
+        # Busca no banco
+        mensagens_raw = mensagem_model.get_historico_chat(str(id_usuario), str(id_vendedor))
+        
+        # Garante que cada mensagem tenha o campo 'lida'
+        historico = []
+        for msg in mensagens_raw:
+            # Em vez de dict(msg), acesse explicitamente os campos
+            msg_final = {
+                "id": str(msg.get("_id", "")),
+                "from_id": str(msg.get("from_id", "")),
+                "mensagem": msg.get("mensagem", ""),
+                "arquivo": msg.get("arquivo", ""),
+                "arquivo_tipo": msg.get("arquivo_tipo", ""),
+                "timestamp": msg.get("criado_em"), 
+                "lida": bool(msg.get("lida", False)) 
+            }
+            historico.append(msg_final)
+            
+        return jsonify(historico), 200
+    except Exception as e:
+        print("ERRO NA ROTA:", e)
+        return jsonify({"erro": str(e)}), 500
+
+# =============================================
+# ENVIO DE MENSAGENS PRIVADAS
+# =============================================
+@socketio.on("private_message")
+def handle_private_message(data):
+    from_tipo = data.get("from_tipo")
+    from_id = str(data.get("from_id"))
+    to_tipo = data.get("to_tipo")
+    to_id = str(data.get("to_id"))
+    mensagem = data.get("mensagem", "")
+    arquivo = data.get("arquivo", "")
+    arquivo_tipo = data.get("arquivo_tipo", "")
+
+    if not all([from_tipo, from_id, to_tipo, to_id]):
+        emit("error", {"msg": "Dados de envio incompletos."})
+        return
+
+    try:
+        # 1. SALVA NO MONGODB (Usando a estrutura do seu models.py)
+        # Passa a URL do Cloudinary (arquivo) e o tipo se houver
+        salvar_mensagem(
+            from_tipo=from_tipo,
+            from_id=from_id,
+            to_tipo=to_tipo,
+            to_id=to_id,
+            mensagem=mensagem,
+            arquivo=arquivo,
+            arquivo_tipo=arquivo_tipo
+        )
+    except Exception as e:
+        print("ERRO AO SALVAR MENSAGEM NO BANCO:", e)
+        # Mesmo se o banco falhar, o chat envia em tempo real para não travar a experiência
+
+
+    # 2. PREPARA O PACOTE PARA O FRONTEND
+    agora = datetime.now()
+    dados_mensagem = {
+        "from_tipo": from_tipo,
+        "from_id": from_id,
+        "to_tipo": to_tipo,
+        "to_id": to_id,
+        "mensagem": mensagem,
+        "data_hora": agora.strftime("%d/%m/%Y %H:%M"),
+        "hora": agora.strftime("%H:%M"),
+        "arquivo": arquivo,          # Link do Cloudinary limpo enviado via socket
+        "arquivo_tipo": arquivo_tipo  # 'imagem', 'video', 'audio', 'pdf'
+    }
+
+    # Pega o ID da sala combinada
+    room = get_private_room(from_id, to_id)
+
+    # Envia para todos conectados dentro desta sala privada específica
+    socketio.emit("new_message", dados_mensagem, room=room)
+
+
+# Função auxiliar crucial para unificar as salas
+def get_private_room(id1, id2):
+    # Organiza os IDs em ordem alfabética para que a sala seja idêntica para os dois
+    ordenados = sorted([str(id1), str(id2)])
+    return f"room_{ordenados[0]}_{ordenados[1]}"
+
+# =============================================
+# REGISTRO SOCKET
+# =============================================
+@socketio.on("register")
+def handle_register(data):
+    tipo = data.get("tipo")
+    id_ = str(data.get("id"))
+    conversando_com_id = data.get("conversando_com_id") 
+
+    if not tipo or not id_:
+        emit("error", {"msg": "Dados inválidos no registro"})
+        return
+
+    print(f"Cliente registrado: {tipo} {id_}")
+
+    # Se ele está com um chat aberto, coloca ele na sala privada correta
+    if conversando_com_id and str(conversando_com_id).strip() != "":
+        room = get_private_room(id_, str(conversando_com_id))
+        join_room(room)
+        print(f"ID {id_} entrou na sala privada ativa: {room}")
+
+# =============================================
+# DESCONECTAR
+# =============================================
+@socketio.on("disconnect")
+def handle_disconnect():
+    for key, sid in list(connected_clients.items()):
+        if sid == request.sid:
+            del connected_clients[key]
+            print(f"Cliente {key} desconectado.")
+            break
+
+
+
+# =============================================
+# EVENTO DE DIGITAÇÃO (USUÁRIO <-> VENDEDOR)
+# =============================================
+@socketio.on("typing_status")
+def handle_typing_status(data):
+    from_id = data.get("from_id")
+    to_id = data.get("to_id")
+    is_typing = data.get("is_typing")
+    
+    room = get_private_room(from_id, to_id)
+    # Repassa o status de digitação para a outra pessoa na sala privada
+    socketio.emit("user_typing", {"from_id": from_id, "is_typing": is_typing}, room=room, include_self=False)
+#---------------------------------------------------------------------------------------------
+
+
+
+@socketio.on('message_read')
+def handle_message_read(data):
+    message_id = data.get('message_id')
+    from_id = data.get('from_id')
+    to_id = data.get('to_id')
+    
+    if not message_id:
+        return
+
+    from bson import ObjectId
+    try:
+        query_id = ObjectId(message_id)
+        
+        # ACESSO CORRETO: Usando a collection dentro do model que você instanciou
+        resultado = mensagem_model.collection.update_one(
+            {"_id": query_id},
+            {"$set": {"lida": True}}
+        )
+        
+        if resultado.matched_count > 0:
+            room = get_private_room(from_id, to_id)
+            socketio.emit('message_read_confirm', {'message_id': message_id}, room=room, include_self=False)
+        else:
+            print(f"DEBUG: Nenhuma mensagem encontrada com o ID {message_id}")
+            
+    except Exception as e:
+        print(f"ERRO NO UPDATE: {e}")
+        
+from bson import json_util
+from flask import Response
+
+@app.route('/debug/ver_mensagens', methods=['GET'])
+def debug_mensagens_reais():
+    try:
+        # Acessa a collection através da instância que você já usa no projeto
+        docs = list(mensagem_model.collection.find({}))
+        
+        from bson import json_util
+        from flask import Response
+        
+        json_data = json_util.dumps({"quantidade": len(docs), "dados": docs})
+        return Response(json_data, mimetype='application/json')
+    except Exception as e:
+        return str(e), 500
+
+#---------------------------------------------------------------------------------------------
+@socketio.on('conectar_chamada')
+def handle_conectar_chamada(data):
+    # O front-end envia quem está logado no momento (pode ser o usuario_id ou vendedor_id)
+    meu_id = data['meu_id']
+    join_room(str(meu_id))
+    print(f"ID {meu_id} entrou na sala de sinalização de voz.")
+
+@socketio.on('enviar-convite-chamada')
+def handle_call_offer(data):
+    # Quem está recebendo a chamada (se o usuario ligou, o destino é vendedor_id e vice-versa)
+    destino_id = data['destino_id']
+    emit('receber-convite-chamada', {
+        'origem_id': data['origem_id'],
+        'dadosConexao': data['dadosConexao']
+    }, room=str(destino_id))
+
+@socketio.on('responder-chamada')
+def handle_call_answer(data):
+    destino_id = data['destino_id']
+    emit('chamada-aceita', {
+        'dadosConexao': data['dadosConexao']
+    }, room=str(destino_id))
+
+@socketio.on('enviar-ice-candidate')
+def handle_ice_candidate(data):
+    destino_id = data['destino_id']
+    emit('receber-ice-candidate', {
+        'candidate': data['candidate']
+    }, room=str(destino_id))
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
 if __name__ == "__main__":
@@ -4694,128 +6127,4 @@ if __name__ == "__main__":
         debug=True,
         allow_unsafe_werkzeug=True
     )
-#---------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------
-# =========================
-# RESULTADO RASPADINHA (COM HISTÓRICO)
-# =========================
-# @app.route('/raspadinha/resultado', methods=['POST'])
-# def resultado_raspadinha():
 
-#     dados = request.get_json()
-
-#     premio = next(
-#         (p for p in PREMIOS if p["id"] == dados.get("id_premio")),
-#         None
-#     )
-
-#     if not premio:
-#         return jsonify({
-#             "valorTexto": "R$ 0,00",
-#             "valorNumerico": 0.0
-#         })
-
-#     valor_triplicado = float(premio["numero"]) * 10
-
-#     texto_triplicado = f"R$ {valor_triplicado:.2f}".replace(".", ",")
-
-#     user_id = session.get("user_id")
-
-#     if user_id and ObjectId.is_valid(user_id):
-
-#         usuario = users_collection.find_one({"_id": ObjectId(user_id)})
-
-#         if usuario:
-
-#             ganhos_atuais = float(usuario.get("ganhos", 0.0))
-
-#             novo_total = ganhos_atuais + valor_triplicado
-
-#             users_collection.update_one(
-#                 {"_id": ObjectId(user_id)},
-#                 {
-#                     "$set": {
-#                         "ganhos": round(novo_total, 2)
-#                     },
-#                     "$push": {
-#                         "entradas": {
-#                             "tipo": "raspadinha",
-#                             "valor": round(valor_triplicado, 2),
-#                             "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")
-#                         }
-#                     }
-#                 }
-#             )
-
-#     return jsonify({
-#         "valorTexto": texto_triplicado,
-#         "valorNumerico": valor_triplicado
-#     })
-
-
-
-
-
-
-
-# @app.route('/raspadinha/resultado', methods=['POST'])
-# def resultado_raspadinha():
-#     dados = request.get_json() or {}
-    
-#     # PEGA O ID DIRETAMENTE DA URL ATUAL DO NAVEGADOR
-#     # Como você entra via /raspadinha/<usuario_id>, o flask sabe quem é esse usuário
-#     # Isso elimina qualquer dependência de variáveis no JavaScript ou HTML
-    
-#     # Se o ID não veio no JSON, tentamos pegar do "Referer" ou do último acesso
-#     usuario_id = dados.get("usuario_id")
-    
-#     if not usuario_id:
-#         # Tenta pegar da URL da página que enviou o POST
-#         referer = request.headers.get("Referer", "")
-#         if "/raspadinha/" in referer:
-#             usuario_id = referer.split("/raspadinha/")[1].split("/")[0]
-
-#     if not usuario_id or usuario_id == "None":
-#         return jsonify({"error": "Usuário não detectado"}), 400
-    
-#     try:
-#         oid = ObjectId(str(usuario_id))
-#     except:
-#         return jsonify({"error": "ID inválido"}), 400
-
-#     # O restante da lógica de prêmios e banco permanece idêntico
-#     id_premio = dados.get("id_premio")
-#     premio = next((p for p in PREMIOS if str(p.get("id")) == str(id_premio)), None)
-
-#     if not premio:
-#         return jsonify({"valorTexto": "R$ 0,00", "valorNumerico": 0.0})
-
-#     valor_triplicado = float(premio["numero"]) * 100
-#     texto_triplicado = f"R$ {valor_triplicado:.2f}".replace(".", ",")
-
-#     usuario = users_collection.find_one({"_id": oid})
-    
-#     if usuario:
-#         users_collection.update_one(
-#             {"_id": oid},
-#             {
-#                 "$set": {"ganhos": round(float(usuario.get("ganhos", 0.0)) + valor_triplicado, 2)},
-#                 "$push": {"entradas": {"tipo": "raspadinha", "valor": round(valor_triplicado, 2), "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")}}
-#             }
-#         )
-#         msg = f'🎉 {usuario.get("nome", "Usuário")} ganhou {texto_triplicado}!'
-#         usuarios.append({"id": str(usuario_id), "texto": msg})
-#         if len(usuarios) > 8000: usuarios.pop(0)
-#         socketio.emit('notificacao_geral', {'lista': [u["texto"] for u in usuarios]})
-        
-#         # --- CÓDIGO CORRIGIDO AQUI ---
-#         usuario_atualizado = users_collection.find_one({"_id": oid})
-#         saldo_atual = float(usuario_atualizado.get("ganhos", 0.0))
-#         saldo_formatado = f"R$ {saldo_atual:.2f}".replace(".", ",")
-        
-#         return jsonify({
-#             "valorTexto": texto_triplicado, 
-#             "valorNumerico": valor_triplicado,
-#             "novoSaldoTexto": saldo_formatado
-#         })

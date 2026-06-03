@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#333">
+<title>Ferrari Tech Servicos Digitais</title>
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='w.png') }}">
+<link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Roleta Americana Interativa</title>
+    <style>
+        html, body {
+        overscroll-behavior-y: none;
+        }        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #346200;
+            background-image:url("https://res.cloudinary.com/dptprh0xk/image/upload/v1765412810/pngwing.com_5_x9e2sp.png");
+            background-position: center;
+            background-size:cover;
+            background-repeat: no-repeat;            
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+            gap: 20px;
+            scale: 90%;
+        }
+
+
+
+
+
+
+        /* Container principal da roleta */
+        .roleta-container {
+            position: relative;
+            /* background: #346200; */
+            background-image:url("https://res.cloudinary.com/dptprh0xk/image/upload/v1765412810/pngwing.com_5_x9e2sp.png");
+            background-position: center;
+            background-size:cover;
+            background-repeat: no-repeat;                  
+            width: 400px;
+            height: 400px;
+        }
+
+        /* O disco da roleta que vai girar */
+        .roleta {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 10px solid #333;
+            position: relative;
+            overflow: hidden;
+            background-image:url("https://res.cloudinary.com/dptprh0xk/image/upload/v1765412810/pngwing.com_5_x9e2sp.png");
+            background-position: center;
+            background-size:cover;
+            background-repeat: no-repeat;       
+            box-shadow: 0 0 20px rgba(249, 248, 248, 0.948);
+        }
+
+        /* Centro branco para isolar as fatias */
+        .roleta::after {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            width: 70%;
+            height: 70%;
+            background: rgb(0, 91, 6);
+            border-radius: 50%;
+            z-index: 2;
+            border: 5px solid #222;
+        }
+
+        /* Cada fatia/número da roleta */
+        .fatia {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 33px; /* Largura aproximada do topo da fatia */
+            height: 50%;
+            transform-origin: bottom center;
+            margin-left: -16.5px;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            font-size: 14px;
+            padding-top: 10px;
+            z-index: 1;
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+        }
+
+        /* Cores de fundo */
+        .vermelho { background-color: #e61919; }
+        .preto { background-color: #222; }
+        .verde { background-color: #00b300; }
+
+        /* A Bolinha */
+        .bolinha {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #fff;
+            border-radius: 50%;
+            top: 25px; /* Alinha a bolinha na pista dos números */
+            left: calc(50% - 10px);
+            z-index: 10;
+            box-shadow: inset -3px -3px 5px rgba(0,0,0,0.4), 0 0 8px rgba(255,255,255,0.8);
+            transform-origin: center 175px; /* Faz a bolinha orbitar o centro da roleta */
+            transition: transform 4s cubic-bezier(0.1, 0.8, 0.1, 1);
+        }
+        .logo-centro{
+            display: none;
+            position:absolute;
+            top:50%;
+            left:50%;
+            transform:translate(-50%,-50%);
+            width:350px;
+            height:350px;
+            border-radius:50%;
+            z-index:20;
+            object-fit:contain;
+            pointer-events:none;
+        }
+        /* Botão de girar */
+        button {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #0a090000;
+            border: 4px solid white;
+            color: #fb0505;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: transform 0.1s ease;
+        }
+
+        .botao-girar:active {
+            transform: scale(0.95);
+        }
+        .btn-apostas{
+            position:absolute;
+            bottom:20px;
+            right:20px;
+            width:auto;
+            height:auto;
+            padding:12px 20px;
+            border-radius:12px;
+            background:#ffc107;
+            color:#000;
+            border:none;
+            font-weight:bold;
+            z-index:9999;
+        }
+
+        .tabuleiro{
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+       }
+
+        .zero-area{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:4px;
+        }
+
+        .numeros{
+            display:grid;
+            grid-template-columns:repeat(12,1fr);
+            gap:4px;
+        }
+
+        .casa{
+            height:42px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-radius:6px;
+            color:#fff;
+            font-weight:bold;
+            cursor:pointer;
+            border:1px solid rgba(255,255,255,.2);
+        }
+
+        .vermelho{
+            background:#d50000;
+        }
+
+        .preto{
+            background:#111;
+        }
+
+        .verde{
+            background:#0a8f08;
+        }
+
+        .apostas-externas{
+            display:grid;
+            grid-template-columns:repeat(6,1fr);
+            gap:4px;
+        }
+
+        .duzias{
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            gap:4px;
+        }
+
+        .aposta{
+            background:#2c2c2c;
+            text-align:center;
+            padding:12px;
+            border-radius:6px;
+            cursor:pointer;
+            font-weight:bold;
+        }
+
+        .selecionada{
+            outline:3px solid gold;
+            transform:scale(1.08);
+        }
+
+
+
+    </style>
+</head>
+
+<body>
+ 
+<div class="modal fade" id="modalApostas" tabindex="-1">
+<div class="modal-dialog modal-dialog-centered modal-lg">
+<div class="modal-content bg-dark text-white">
+
+<div class="modal-header">
+<h5 class="modal-title">Mesa de Apostas</h5>
+<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+
+<div class="tabuleiro">
+
+<div class="zero-area">
+<div class="casa verde">0</div>
+<div class="casa verde">00</div>
+</div>
+
+<div class="numeros" id="gridNumeros"></div>
+
+<div class="apostas-externas">
+<div class="aposta">1-18</div>
+<div class="aposta">PAR</div>
+<div class="aposta vermelho">VERMELHO</div>
+<div class="aposta preto">PRETO</div>
+<div class="aposta">ÍMPAR</div>
+<div class="aposta">19-36</div>
+</div>
+
+<div class="duzias">
+<div class="aposta">1ª DÚZIA</div>
+<div class="aposta">2ª DÚZIA</div>
+<div class="aposta">3ª DÚZIA</div>
+</div>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+    <div class="roleta-container">
+        <!-- Bolinha que orbita a roleta -->
+        <div class="bolinha" id="bolinha"></div>
+                 <img
+        src="https://res.cloudinary.com/dptprh0xk/image/upload/v1765412810/pngwing.com_5_x9e2sp.png"
+        class="logo-centro"
+        alt="Logo">
+        <!-- Estrutura da Roleta com a ordem exata da imagem -->
+        <div class="roleta" id="roleta">
+            <!-- Gerado via JavaScript para manter o HTML limpo -->
+        </div>
+    </div>
+
+    <button onclick="girarBolinha()">Girar Roleta</button>
+    <button class="btn-apostas" data-bs-toggle="modal" data-bs-target="#modalApostas">
+    🎰 Apostas
+    </button>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+const vermelhos = [
+1,3,5,7,9,12,14,16,18,19,
+21,23,25,27,30,32,34,36
+];
+
+const grid = document.getElementById("gridNumeros");
+
+for(let i=1;i<=36;i++){
+
+    const div = document.createElement("div");
+
+    div.className =
+        vermelhos.includes(i)
+        ? "casa vermelho"
+        : "casa preto";
+
+    div.textContent = i;
+
+    div.onclick = () => {
+        document.querySelectorAll('.selecionada')
+        .forEach(el=>el.classList.remove('selecionada'));
+
+        div.classList.add('selecionada');
+    };
+
+    grid.appendChild(div);
+}
+        // Ordem exata dos números e cores da Roleta Americana (sentido horário)
+        const estruturaRoleta = [
+            { n: '00', c: 'verde' }, { n: '27', c: 'vermelho' }, { n: '10', c: 'preto' }, 
+            { n: '25', c: 'vermelho' }, { n: '29', c: 'preto' }, { n: '12', c: 'vermelho' }, 
+            { n: '8', c: 'preto' }, { n: '19', c: 'vermelho' }, { n: '31', c: 'preto' }, 
+            { n: '18', c: 'vermelho' }, { n: '6', c: 'preto' }, { n: '21', c: 'vermelho' }, 
+            { n: '33', c: 'preto' }, { n: '16', c: 'vermelho' }, { n: '4', c: 'preto' }, 
+            { n: '23', c: 'vermelho' }, { n: '35', c: 'preto' }, { n: '14', c: 'vermelho' }, 
+            { n: '2', c: 'preto' }, { n: '0', c: 'verde' }, { n: '28', c: 'preto' }, 
+            { n: '9', c: 'vermelho' }, { n: '26', c: 'preto' }, { n: '30', c: 'vermelho' }, 
+            { n: '11', c: 'preto' }, { n: '7', c: 'vermelho' }, { n: '20', c: 'preto' }, 
+            { n: '32', c: 'vermelho' }, { n: '17', c: 'preto' }, { n: '5', c: 'vermelho' }, 
+            { n: '22', c: 'preto' }, { n: '34', c: 'vermelho' }, { n: '15', c: 'preto' }, 
+            { n: '3', c: 'vermelho' }, { n: '24', c: 'preto' }, { n: '36', c: 'vermelho' }, 
+            { n: '13', c: 'preto' }, { n: '1', c: 'vermelho' }
+        ];
+
+        const totalFatias = estruturaRoleta.length;
+        const grausPorFatia = 360 / totalFatias; // ~9.47 graus por número
+        const roletaEl = document.getElementById('roleta');
+        const bolinhaEl = document.getElementById('bolinha');
+
+        // Construir visualmente a roleta rotacionando cada fatia
+        estruturaRoleta.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = `fatia ${item.c}`;
+            div.style.transform = `rotate(${index * grausPorFatia}deg)`;
+            div.innerText = item.n;
+            roletaEl.appendChild(div);
+        });
+
+        // Função para simular o giro da bolinha e parar em um número
+        let giroAtual = 0;
+        function girarBolinha() {
+            // Escolhe um número aleatório da roleta
+            const indiceSorteado = Math.floor(Math.random() * totalFatias);
+            const resultado = estruturaRoleta[indiceSorteado];
+
+            // Calcula a rotação (voltas completas + ângulo do número sorteado)
+            // Multiplicamos por -1 para girar no sentido anti-horário se desejado, ou mantemos positivo
+            const voltasExtras = (Math.floor(Math.random() * 5) + 5) * 360; 
+            const anguloDestino = indiceSorteado * grausPorFatia;
+            
+            giroAtual = voltasExtras + anguloDestino;
+
+            // Aplica a rotação na propriedade transform-origin da bolinha
+            bolinhaEl.style.transform = `rotate(${giroAtual}deg)`;
+
+            // Exibe o resultado no console após a animação terminar (4 segundos)
+            setTimeout(() => {
+                alert(`A bolinha parou no número: ${resultado.n} (${resultado.c.toUpperCase()})`);
+            }, 4000);
+        }
+
+
+    </script>
+</body>
+</html>

@@ -23,9 +23,11 @@ db = client[DB_NAME]
 PAGAMENTOS_COLLECTION_NAME = "pagamentos"
 BILHETES_COLLECTION_NAME = "bilhetes"
 RASPADINHAS_COLLECTION_NAME = "raspadinhas"
+MENSAGENS_COLLECTION_NAME = "mensagens"
 users_collection = db["users"]
 vendedores_collection = db["vendedores"]
 saques_collection = db["saques"]
+mensagens_collection = db[MENSAGENS_COLLECTION_NAME]
 
 
 
@@ -44,10 +46,24 @@ def validar_cpf(cpf: str) -> bool:
 #     
 #------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------
-def criar_usuario(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, email: str, vendedor: str, chave_pix: str) -> dict:
-    cpf = limpar_cpf(cpf)
+# =========================
+# models.py / modal.py
+# =========================
 
-    # estado = (estado or "").strip().upper()
+def criar_usuario(
+    nome: str,
+    sobrenome: str,
+    cpf: str,
+    dt_nascimento: str,
+    email: str,
+    vendedor: str,
+    chave_pix: str,
+    ip_usuario: str,
+    aparelho: str,
+    navegador: str
+) -> dict:
+
+    cpf = limpar_cpf(cpf)
 
     if (
         not nome.strip()
@@ -56,7 +72,6 @@ def criar_usuario(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, email
         or not dt_nascimento.strip()
         or not vendedor.strip()
         or not chave_pix.strip()
-        # or not estado
     ):
         raise ValueError("Dados inválidos para cadastro.")
 
@@ -69,11 +84,21 @@ def criar_usuario(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, email
         "cpf": cpf,
         "dt_nascimento": dt_nascimento.strip(),
         "email": email.strip(),
-        # "estado": estado,  # 
+        "vendedor_id": vendedor.strip(),
         "vendedor": vendedor.strip(),
         "chave_pix": chave_pix.strip(),
+
         "ganhos": 0.00,
-        "saques": 0.00, # valor minimo saque e de 3.00
+        "saques": 0.00,
+        "mensagem_saques": [],
+        "bloqueado": [],
+
+        "ip_usuario": ip_usuario,
+        "aparelho": aparelho,
+        "navegador": navegador,
+        "status": "offline",  
+
+
         "criado_em": datetime.now(timezone.utc)
     }
 
@@ -102,15 +127,15 @@ class UsuarioModel:
             return None
 
 
-def deletar_usuario(user_id: str) -> bool:
-    try:
-        if not ObjectId.is_valid(user_id):
+    def deletar_usuario(user_id: str) -> bool:
+        try:
+            if not ObjectId.is_valid(user_id):
+                return False
+            result = users_collection.delete_one({"_id": ObjectId(user_id)})
+            return result.deleted_count > 0
+        except Exception as e:
+            print("ERRO AO DELETAR:", e)
             return False
-        result = users_collection.delete_one({"_id": ObjectId(user_id)})
-        return result.deleted_count > 0
-    except Exception as e:
-        print("ERRO AO DELETAR:", e)
-        return False
 
     def update_usuario(self, user_id, new_data):
         try:
@@ -134,7 +159,6 @@ def deletar_usuario(user_id: str) -> bool:
 # MODELS.PY
 # =========================
 
-from datetime import datetime, timezone
 
 # PROJETO
 projetos_collection = db["projetos"]
@@ -194,7 +218,20 @@ def get_all_projetos():
 #--------------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------------
 # VENDEDORES
-def criar_vendedor(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, email: str, chave_pix: str, comissao: str) -> dict:
+def criar_vendedor(
+    nome: str, 
+    sobrenome: str, 
+    cpf: str, 
+    dt_nascimento: str, 
+    email: str, 
+    chave_pix: str, 
+    comissao: str, 
+    ip_usuario: str, 
+    aparelho: str,
+    localizacao: str,  # 📍 Adicionado o parâmetro da localização aqui
+    navegador: str     # 🌐 Adicionado o parâmetro do navegador aqui
+) -> dict:
+    
     cpf = limpar_cpf(cpf)
 
     if not nome.strip() or not validar_cpf(cpf) or not email.strip() or not dt_nascimento.strip() or not chave_pix.strip():
@@ -211,6 +248,13 @@ def criar_vendedor(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, emai
         "email": email.strip(),
         "chave_pix": chave_pix.strip(),
         "comissao": comissao.strip(),
+        "mensagem_usuarios": [],
+        "bloqueado": [],
+        "ip_usuario": ip_usuario,
+        "aparelho": aparelho,
+        "localizacao": localizacao.strip(),  # 💾 Salvando a localização no banco de dados
+        "navegador": navegador,     
+        "status": "offline",  
         "criado_em": datetime.now(timezone.utc)
     }
 
@@ -218,7 +262,6 @@ def criar_vendedor(nome: str, sobrenome: str, cpf: str, dt_nascimento: str, emai
     vendedor["_id"] = str(result.inserted_id)
 
     return vendedor
-
 #================================================================================================================================
 #================================================================================================================================
 
@@ -233,6 +276,7 @@ pagamentos_collection = db[PAGAMENTOS_COLLECTION_NAME]
 def criar_documento_pagamento(payment_id, status, valor, cpf, email_user,
                               payment_method_id,
                               lista_numeros=None,
+                              vendedor=None,
                               qr_code=None,
                               qr_image_url=None,
                               taxa_mp=None,
@@ -246,6 +290,7 @@ def criar_documento_pagamento(payment_id, status, valor, cpf, email_user,
         "status": status,
         "valor": float(valor),
         "cpf": cpf,
+        "vendedor": vendedor,
         "email_usuario": email_user,
         "qr_code": qr_code,
         "payment_method_id": payment_method_id,
@@ -439,7 +484,7 @@ class BilheteModel:
 #=====================================================================================================================
 raspadinhas_collection = db[RASPADINHAS_COLLECTION_NAME]
 
-def criar_documento_raspadinha(raspadinha_id, cpf, nome_user, valor_unidade, email_user, quantidade_raspadinha=None, data_criacao=None):
+def criar_documento_raspadinha(raspadinha_id, cpf, nome_user, valor_unidade, email_user, vendedor, quantidade_raspadinha=None, data_criacao=None):
 
     if data_criacao is None:
         data_criacao = datetime.now(timezone.utc)
@@ -451,11 +496,9 @@ def criar_documento_raspadinha(raspadinha_id, cpf, nome_user, valor_unidade, ema
         "email_usuario": email_user,
         "data_criacao": data_criacao,
         "status": "pending",
+        "vendedor": vendedor,
         "valor": valor_unidade,
         "payment_id": "aguardando gerar pagamento",
-        # "quantidade_raspadinha": quantidade_raspadinha or [],
-        # "quantidade_raspadinhas_raspadas": quantidade_raspadinha_raspada or []
-
     }
 
 class RaspadinhaModel:
@@ -538,7 +581,7 @@ class RaspadinhaModel:
 
 
 
-
+# MODELS.PY
 # SAQUES
 saques_collection = db["saques"]
 
@@ -553,7 +596,6 @@ def criar_saque(
 ) -> dict:
 
     saque = {
-        "ganhos": 0,
         "identificacao": str(identificacao).strip(),
         "valor_saque": float(valor_saque), 
         "descricao": str(descricao).strip(),
@@ -561,7 +603,8 @@ def criar_saque(
         "cpf_favorecido": str(cpf_favorecido).strip(),
         "email_favorecido": str(email_favorecido).strip(),
         "status": str(status).strip(),
-        "quantidade_raspadinhas": quantidade_raspadinhas or [],
+        "mensagens_solicitando_saques": [],
+        "mensagens_resposta_saques": [],
         "criado_em": datetime.now(timezone.utc)
     }
 
@@ -572,3 +615,68 @@ def criar_saque(
 
 def get_all_saques():
     return list(saques_collection.find())
+
+
+
+
+# ====================================================================================================================
+# ADICIONADO: HISTÓRICO DE MENSAGENS CHAT (SOCKET.IO)
+# ====================================================================================================================
+
+def salvar_mensagem(from_tipo, from_id, to_tipo, to_id, mensagem, arquivo="", arquivo_tipo=""):
+    doc_mensagem = {
+        "from_tipo": from_tipo.strip(),
+        "from_id": from_id.strip(),
+        "to_tipo": to_tipo.strip(),
+        "to_id": to_id.strip(),
+        "mensagem": mensagem.strip(),
+        "arquivo": arquivo.strip(),
+        "arquivo_tipo": arquivo_tipo.strip(),
+        "criado_em": datetime.now(timezone.utc),
+        "lida": False 
+    }
+    result = mensagens_collection.insert_one(doc_mensagem)
+    doc_mensagem["_id"] = str(result.inserted_id)
+    return doc_mensagem
+
+class MensagemModel:
+    def __init__(self):
+        self.collection = mensagens_collection
+
+    def get_historico_chat(self, id_usuario: str, id_vendedor: str):
+        """
+        Busca e ordena de forma cronológica todas as mensagens trocadas 
+        entre um Usuário específico e um Vendedor específico.
+        """
+        try:
+            query = {
+                "$or": [
+                    {"from_id": id_usuario, "to_id": id_vendedor},
+                    {"from_id": id_vendedor, "to_id": id_usuario}
+                ]
+            }
+            # Traz o histórico do mais antigo para o mais recente
+            docs = list(self.collection.find(query).sort("criado_em", ASCENDING))
+            for d in docs:
+                d["_id"] = str(d["_id"])
+            return docs
+        except Exception as e:
+            print("ERRO AO BUSCAR HISTÓRICO CHAT:", e)
+            return []
+
+    def deletar_conversa(self, id_usuario: str, id_vendedor: str) -> int:
+        """
+        Deleta todo o histórico de mensagens entre as duas partes envolvidas.
+        """
+        try:
+            query = {
+                "$or": [
+                    {"from_id": id_usuario, "to_id": id_vendedor},
+                    {"from_id": id_vendedor, "to_id": id_usuario}
+                ]
+            }
+            result = self.collection.delete_many(query)
+            return result.deleted_count
+        except Exception as e:
+            print("ERRO AO DELETAR HISTÓRICO CHAT:", e)
+            return 0

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#333">
-<title>Ferrari Tech</title>
+<title>Ferrari Tech Servicos Digitais</title>
 <link rel="apple-touch-icon" href="{{ url_for('static', filename='w.png') }}">
 <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
 <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
@@ -13,11 +13,79 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/raspadinha/raspadinha.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/registro.css') }}">
 <style> 
+
+/* .push__wrapper {
+    margin-top: 75px;
+}
+
+.push__box {
+    display:none ;
+    position:fixed;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 20px rgba(0, 0, 0, .3);
+    z-index: 1;
+    width:90%;
+    padding: 10px 12px;
+    margin: 8px 0;
+}
+
+.push__box:last-child {
+    display: block;
+}
+
+.push__box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 12px;
+    box-shadow: inset 0 0 100px rgba(255, 255, 255, .6);
+    backdrop-filter: blur(20px);
+    z-index: -1;
+}
+
+.push__top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.push__top .col {
+    display: flex;
+    align-items: center;
+}
+
+.push__imgwrap {
+    margin: 2px 5px 0 0;
+}
+
+.push__icon {
+    max-width: 25px;
+    width: auto;
+}
+
+.push__title {
+    color: #bf201c;
+    text-transform: uppercase;
+}
+
+.push__time {
+    font-size: 14px;
+    color: #0123cd;
+}
+
+.push__person {
+    font-weight: 700;
+    margin-bottom: 2px;
+} */
     .btn-sair-flutuante {
   position: fixed;
   top: 20px; /* Distância do topo da tela */
   left: 20px; /* ALTERADO: Agora alinhado à esquerda */
-  z-index: 9999; /* Garante que o botão fique sempre na frente de todo o conteúdo */
+  z-index: 100; /* Garante que o botão fique sempre na frente de todo o conteúdo */
   
   /* Estilos visuais do botão */
   background-color: #ff4d5087; /* Cor de destaque para saída */
@@ -558,6 +626,17 @@
 }
 
 
+
+.botao-abrir {
+    margin: 20px;
+    padding: 12px 24px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
 /* Responsividade Mobile */
 @media (max-width: 768px) {
     #relogio-flutuante {
@@ -566,6 +645,11 @@
         font-size: 1rem;
         padding: 80px 15px;
     }
+
+    .roleta { width: 260px; height: 260px; }
+    .botao-girar { width: 70px; height: 70px; font-size: 14px; }
+
+
 }
 
 
@@ -604,7 +688,8 @@
         font-size: 13px;
 
     }
-
+    .roleta { width: 260px; height: 260px; }
+    .botao-girar { width: 70px; height: 70px; font-size: 14px; }
 }
 
 /* Responsividade para telas de celulares menores */
@@ -621,12 +706,16 @@
     padding: 10px 18px;
     font-size: 14px;
   }
+      .roleta { width: 260px; height: 260px; }
+    .botao-girar { width: 70px; height: 70px; font-size: 14px; }
 }
 
 </style>
 </head>
 
 <body>
+
+  
 <div id="loading-pagamento">
 
     <div class="loading-box-pagamento">
@@ -643,13 +732,14 @@
 <div id="relogio-flutuante">00:00:00</div>
 
 <!-- Botão flutuante no topo -->
+ 
 <button id="btn-som-topo" class="botao-som-flutuante">🔈 Ligar Som</button>
 
 <!-- Tag do áudio de fundo (troque pelo seu arquivo de som) -->
-<!-- <audio id="audio-ambiente" src="/static/audio/confeite.mp3" loop></audio> -->
+<!-- <audio id="audio-ambiente" src="/static/audio/shimafm-90-freestyle-2026-479162.mp3" loop></audio> -->
 
 
-<button class="btn-sair-flutuante" onclick="window.location.href='/raspadinha';">
+<button class="btn-sair-flutuante" onclick="location.href='/raspadinha'">
   Sair
 </button>
 
@@ -675,14 +765,38 @@
     </div>
 
 </header>
+        <!-- <div class="push__wrapper">
+            <div class="push__box">
+                <div class="push__content">
+                    <div class="push__top">
+                        <div class="col">
+                            <div class="push__imgwrap">
+                                <img class="push__icon" src="/static/w.png" alt="">
+                            </div>
+                            <span class="push__title">messages</span>
+                        </div>
+                        <div class="col">
+                            <div class="push__time">now</div>
+                        </div>
+                    </div>
+                    <div class="push__main">
+                        <div class="push__person"></div>
+                        <p>3 Text Messages</p>
+                    </div>
+                </div>
+            </div>
 
+
+
+            </div>
+        </div> -->
 
 <div class="scratch-container">
     <div class="scratch-card">
 
         <div class="prize">
             <img id="prize-image"
-            src=""
+            src="https://res.cloudinary.com/dptprh0xk/image/upload/v1779217595/file_0000000013b471f9a0c8b0e9e02ccb7a_udhftc.png"
             alt="Prêmio">
         </div>
 
@@ -691,7 +805,7 @@
     </div>
 
 <div style="display:block" class="chat-container"> 
-    <strong style="font-size: 14px; font-family: 'MinhaFonteCustomizada', sans-serif;" id="status-box"></strong>
+    <strong style="font-size: 16px; font-family: 'MinhaFonteCustomizada', sans-serif;" id="status-box"></strong>
 </div>
 
     <button  class="botao-cassaniquel" id="new-btn" onclick="resetCard()">
@@ -774,7 +888,7 @@
                 </div>
 
                 <div class="input-group">
-                <input id="dt_nascimento" type="date" class="form-control" name="dt_nascimento" required>
+                <input id="dt_nascimento" type="date" class="form-control" name="dt_nascimento" placeholder="data nascimento" required>
 
                 </div>
 
@@ -796,7 +910,6 @@
                 </div>
 
                 <div class="input-group full">
-           <!-- <label for="vendedorInput" class="form-label text-start d-block">Lista Indicação</label> -->
                 <input type="text" class="form-control" id="vendedorInput" name="vendedor" placeholder="Clique para selecionar..." data-bs-toggle="modal" data-bs-target="#vendedorModal" readonly required>        
                 </div>
 
@@ -827,10 +940,12 @@
                         {% for u in vendedores %}
                         <button type="button" class="list-group-item list-group-item-action vendor-option">
                             {{ u.nome }}
+                            <div id="vendedor_id">{{u._id}}</div>
                         </button>
                         {% endfor %}
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -938,13 +1053,13 @@
 
                 <div class="card-produto" data-preco-unitario="0.60">
 
-                    <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778025827/pngwing.com_pkfnfu.png" class="produto-img">
+                    <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png" class="produto-img">
 
                     <div class="produto-info">
 
-                        <h3 class="produto-titulo">Compra com Saldo<br>
+                        <p class="produto-titulo">Compra com Saldo<br>
                             {{usuario.ganhos}}
-                        </h3>
+                        </p>
                         <p class="produto-descricao">Ferrari Tech Serviço Digital</p>
 
                         <div class="compra-container">
@@ -1101,6 +1216,59 @@
         </div>
 
         <div class="premio-item">
+          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1779221189/file_0000000063ac720e965131493b7e6f41_u1oc0r.png">
+          <div class="multiplicadores">
+            <span>1x</span>
+            <span>2x</span>
+            <span>3x</span>
+            <span>4x</span>
+            <span>5x</span>
+            <span>10x</span>
+          </div>
+          <strong>R$ 20,00</strong>
+        </div>        
+
+
+        <div class="premio-item">
+          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1779218486/file_000000008a7c71f5bac286bab3ba1f1a_smqhkr.png">
+          <div class="multiplicadores">
+            <span>1x</span>
+            <span>2x</span>
+            <span>3x</span>
+            <span>4x</span>
+            <span>5x</span>
+            <span>10x</span>
+          </div>
+          <strong>R$ 30,00</strong>
+        </div>
+
+        <div class="premio-item">
+          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1779222836/file_00000000d3ec71fbbd04e208192b8157_moyivw.png">
+          <div class="multiplicadores">
+            <span>1x</span>
+            <span>2x</span>
+            <span>3x</span>
+            <span>4x</span>
+            <span>5x</span>
+            <span>10x</span>
+          </div>
+          <strong>R$ 50,00</strong>
+        </div>
+
+        <div class="premio-item">
+          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1779217595/file_00000000514c71fbacfcc7e2d6ab0f1b_bib4aa.png">
+          <div class="multiplicadores">
+            <span>1x</span>
+            <span>2x</span>
+            <span>3x</span>
+            <span>4x</span>
+            <span>5x</span>
+            <span>10x</span>
+          </div>
+          <strong>R$ 100,00</strong>
+        </div>
+
+        <div class="premio-item">
           <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778615047/file_000000006b3871fb9a60d2812e6ce8df_d0zmmi.png">
           <div class="multiplicadores">
             <span>1x</span>
@@ -1114,7 +1282,7 @@
         </div>
 
         <div class="premio-item">
-          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1779154935/image_1778976107545_gcwmr8.jpg">
+          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1779217595/file_0000000013b471f9a0c8b0e9e02ccb7a_udhftc.png">
           <div class="multiplicadores">
             <span>1x</span>
             <span>2x</span>
@@ -1221,7 +1389,7 @@
                 <thead>
                     <tr>
                         <th>Data</th>
-                        <th>Tipo</th>
+                        <th>Status</th>
                         <th>Valor</th>
                     </tr>
                 </thead>
@@ -1244,7 +1412,6 @@
 
 
 <audio id="win-audio" preload="auto">
-    <source src="/static/audio/confeite.mp3" type="audio/mpeg">
 </audio>
 
 
@@ -1252,13 +1419,13 @@
     <!-- Header/Footer Fixo -->
     <header class="fixed-bottom-menu">
         <button class="btn-acao">
-            <img onclick="abrirCompra()" style="width: 48px; height: 48px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778012674/icone-de-carrinho-de-compras-3d-em-fundo-de-circulo-azul-simbolo-de-varejo-online_84443-55705_dfmhp8.png"></img>
+            <img onclick="abrirCompra()" style="width: 32px; height: 32px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778012674/icone-de-carrinho-de-compras-3d-em-fundo-de-circulo-azul-simbolo-de-varejo-online_84443-55705_dfmhp8.png"></img>
         </button>
         <button class="btn-acao"> 
-            <img onclick="abrirSaques()" style="width: 48px; height: 48px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778720610/saque_k5hlcq.png"></img>
+            <img onclick="abrirSaques()" style="width: 32px; height: 32px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778720610/saque_k5hlcq.png"></img>
         </button>
-        <button class="btn-acao" onclick="abrirSuporte()">
-        <img style="width: 48px; height: 48px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778702172/Pngtree_3d_isolated_render_of_a_20808938_lxm032.png"></img>
+        <button class="btn-acao" onclick="window.location.href='/chat/usuario/{{ usuario_id }}'">
+        <img style="width: 32px; height: 32px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778702172/Pngtree_3d_isolated_render_of_a_20808938_lxm032.png"></img>
         </button>
 
                 <!-- MODAL -->
@@ -1277,7 +1444,7 @@
                 </button>
 
                 <button onclick="falarAdministrador()" class="btn-modal">
-                    Falar com Administrador
+                 Falar com Administrador
                 </button>
 
                 <button onclick="fecharSuporte()" class="btn-fechar">
@@ -1290,18 +1457,18 @@
 
         </button>
         <!-- BOTÃO -->
-        <button style="font-size: 32px;" class="btn-acao" onclick="abrirdados()">
+        <button style="font-size: 22px;" class="btn-acao" onclick="abrirdados()">
 
             📄
 
         </button>
 
         <!-- MODAL -->
-        <div id="modal-dados" class="modal-dados">
+        <div style="z-index: 9999;" id="modal-dados" class="modal-dados">
 
             <div class="modal-dados-box">
 
-                <h2>Confirmação dados</h2>
+                <h2>Dados Usuario</h2>
 
                 <div class="dados-scroll">
 
@@ -1334,10 +1501,19 @@
                         Indicação:
                         <span id="vendedor">{{ usuario.vendedor }}</span>
                     </p>
+
+                    
                     <p>
                         Saldo:
                         <span>R$ {{ "%.2f"|format(usuario.ganhos|float)|replace('.', ',') if usuario else "0,00" }}</span>
                     </p>
+                        <!-- O Botão HTML -->
+                        <!-- O Botão HTML -->
+                    
+                    <button style="background: blue;" class="btn-deletar-conta" onclick="limparProgressoJogo()">Resetar Jogo</button>
+
+                    
+                    
                     <button class="btn-deletar-conta">
                         Deletar Conta
                     </button>
@@ -1356,17 +1532,11 @@
         </div>
 
 
-
-
-
-
     </header>
-
+<script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-<!-- Crie a variável global no HTML antes do arquivo JS externo -->
-<!-- Coloque isso ANTES da tag <script src="seu-arquivo.js"></script> -->
 <script>
     window.totalQuantidadeRaspadinhas = {{ total_quantidade | default(0) }};
 </script>
@@ -1393,28 +1563,35 @@
 
 /// Recebe e exibe as mensagens
 socket.on('notificacao_geral', (data) => {
+
     const box = document.getElementById('status-box');
+
     if (!box) return;
-    
+
     box.innerHTML = '';
 
     if (!data || !data.lista) return;
 
     data.lista.forEach((msg, index) => {
+
         const span = document.createElement('span');
-        span.textContent = msg;
+
+        // TROCA textContent POR innerHTML
+        span.innerHTML = msg;
+
         const cor = `hsl(${(index * 137) % 360}, 70%, 50%)`;
+
         span.style.color = cor;
         span.style.fontWeight = "bold";
         span.style.display = "block";
         span.style.margin = "2px 0";
 
-        // Adiciona as novas mensagens no topo para subirem automaticamente
         box.prepend(span);
+
     });
 
-    // Mantém a rolagem travada no topo onde os novos prêmios aparecem
     box.scrollTop = 0;
+
 });
 
 // Conecta enviando o ID corretamente vindo do Jinja
@@ -1425,34 +1602,7 @@ socket.on('connect', () => {
     });
 });
 
-// Ouve quando alguém compra
-socket.on('notificacao_compra', function(data) {
 
-    const box = document.getElementById('status-box');
-
-    if (!box) return;
-
-    const span = document.createElement('span');
-
-    span.textContent = data.msg;
-
-    // gera cor diferente toda vez
-    const hue = Date.now() % 360;
-
-    span.style.color = `hsl(${hue}, 90%, 55%)`;
-    span.style.fontWeight = "bold";
-    span.style.display = "block";
-    span.style.margin = "2px 0";
-
-    // adiciona no topo
-    box.prepend(span);
-
-    // mantém topo
-    box.scrollTop = 0;
-
-    mostrarAviso(data.msg);
-
-});
 
 function atualizarRelogio() {
     const agora = new Date();
@@ -1474,6 +1624,7 @@ setInterval(atualizarRelogio, 1000);
 
 // Executa imediatamente para não aparecer o "00:00:00" inicial
 atualizarRelogio();
+
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -1622,49 +1773,341 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const botao = document.getElementById("btn-som-topo");
 
-    // Áudio criado só quando clicar
-    let audio = null;
+    // =========================
+    // LISTA DE MÚSICAS
+    // =========================
+    const musicas = [
 
-    botao.addEventListener("click", async () => {
+        {
+            nome: "Brazilian Phonk",
+            arquivo: "/static/audio/shimafm-2026-brazilian-phonk-477102.mp3"
+        },
+
+        {
+            nome: "90 Freestyle",
+            arquivo: "/static/audio/shimafm-90-freestyle-2026-479162.mp3"
+        },
+
+        {
+            nome: "Freestyle 2026",
+            arquivo: "/static/audio/shimafm-2026-freestyle-477328.mp3"
+        }
+
+    ];
+
+    // =========================
+    // ÁUDIO
+    // =========================
+    let audio = new Audio();
+
+    audio.volume = 0.4;
+
+    // CONTROLE RANDOM
+    let modoAleatorio = false;
+
+    // =========================
+    // TOCAR ALEATÓRIA
+    // =========================
+    async function tocarAleatoria() {
 
         try {
 
-            // cria apenas uma vez
-            if (!audio) {
+            const indice =
+                Math.floor(Math.random() * musicas.length);
 
-                audio = new Audio("/static/audio/confeite.mp3");
+            const musica = musicas[indice];
 
-                audio.loop = true;
-                audio.volume = 0.4;
-                audio.preload = "none";
+            audio.src = musica.arquivo;
 
-            }
-
-            if (audio.paused) {
-
-                await audio.play();
-
-                botao.innerText = "🔊 Pausar Som";
-                botao.classList.add("tocando");
-
-            } else {
-
-                audio.pause();
-
-                botao.innerText = "🔈 Ligar Som";
-                botao.classList.remove("tocando");
-
-            }
+            await audio.play();
 
         } catch (erro) {
 
-            console.error("Erro no áudio:", erro);
+            console.error("Erro música aleatória:", erro);
+
+        }
+    }
+
+    // =========================
+    // QUANDO TERMINAR
+    // =========================
+    audio.addEventListener("ended", () => {
+
+        if (modoAleatorio) {
+
+            tocarAleatoria();
 
         }
 
     });
 
+    // =========================
+    // MODAL
+    // =========================
+    const modal = document.createElement("div");
+
+    modal.id = "modal-musicas";
+
+    modal.style.position = "fixed";
+    modal.style.top = "50%";
+    modal.style.left = "50%";
+    modal.style.transform = "translate(-50%, -50%)";
+    modal.style.width = "320px";
+    modal.style.background = "#111";
+    modal.style.border = "2px solid #6a00ff";
+    modal.style.borderRadius = "12px";
+    modal.style.padding = "15px";
+    modal.style.zIndex = "999999";
+    modal.style.display = "none";
+    modal.style.boxShadow = "0 0 25px #6a00ff";
+
+    // =========================
+    // TÍTULO
+    // =========================
+    const titulo = document.createElement("div");
+
+    titulo.innerText = "🎵 Player Música";
+
+    titulo.style.color = "#fff";
+    titulo.style.fontSize = "20px";
+    titulo.style.fontWeight = "bold";
+    titulo.style.marginBottom = "15px";
+    titulo.style.textAlign = "center";
+
+    modal.appendChild(titulo);
+
+    // =========================
+    // VOLUME
+    // =========================
+    const volumeLabel = document.createElement("div");
+
+    volumeLabel.innerText = "🔊 Volume";
+
+    volumeLabel.style.color = "#fff";
+    volumeLabel.style.marginBottom = "8px";
+
+    modal.appendChild(volumeLabel);
+
+    const volume = document.createElement("input");
+
+    volume.type = "range";
+    volume.min = "0";
+    volume.max = "1";
+    volume.step = "0.01";
+    volume.value = "0.4";
+
+    volume.style.width = "100%";
+    volume.style.marginBottom = "20px";
+
+    volume.addEventListener("input", () => {
+
+        audio.volume = volume.value;
+
+    });
+
+    modal.appendChild(volume);
+
+    // =========================
+    // LISTA DE MÚSICAS
+    // =========================
+    const lista = document.createElement("div");
+
+    lista.style.display = "flex";
+    lista.style.flexDirection = "column";
+    lista.style.gap = "10px";
+
+    musicas.forEach((musica) => {
+
+        const item = document.createElement("button");
+
+        item.innerText = musica.nome;
+
+        item.style.padding = "10px";
+        item.style.border = "none";
+        item.style.borderRadius = "8px";
+        item.style.cursor = "pointer";
+        item.style.background = "#240046";
+        item.style.color = "#fff";
+        item.style.fontWeight = "bold";
+
+        item.addEventListener("click", async () => {
+
+            try {
+
+                modoAleatorio = false;
+
+                audio.src = musica.arquivo;
+
+                await audio.play();
+
+            } catch (erro) {
+
+                console.error("Erro áudio:", erro);
+
+            }
+
+        });
+
+        lista.appendChild(item);
+
+    });
+
+    modal.appendChild(lista);
+
+    // =========================
+    // BOTÃO ALEATÓRIO
+    // =========================
+    const aleatorio = document.createElement("button");
+
+    aleatorio.innerText = "🔀 Modo Aleatório";
+
+    aleatorio.style.marginTop = "15px";
+    aleatorio.style.width = "100%";
+    aleatorio.style.padding = "10px";
+    aleatorio.style.border = "none";
+    aleatorio.style.borderRadius = "8px";
+    aleatorio.style.background = "#3a0ca3";
+    aleatorio.style.color = "#fff";
+    aleatorio.style.fontWeight = "bold";
+    aleatorio.style.cursor = "pointer";
+
+    aleatorio.addEventListener("click", async () => {
+
+        modoAleatorio = true;
+
+        tocarAleatoria();
+
+    });
+
+    modal.appendChild(aleatorio);
+
+    // =========================
+    // BOTÃO STOP
+    // =========================
+    const parar = document.createElement("button");
+
+    parar.innerText = "⏹ Stop Música";
+
+    parar.style.marginTop = "10px";
+    parar.style.width = "100%";
+    parar.style.padding = "10px";
+    parar.style.border = "none";
+    parar.style.borderRadius = "8px";
+    parar.style.background = "#222";
+    parar.style.color = "#fff";
+    parar.style.fontWeight = "bold";
+    parar.style.cursor = "pointer";
+
+    parar.addEventListener("click", () => {
+
+        modoAleatorio = false;
+
+        audio.pause();
+
+        audio.currentTime = 0;
+
+    });
+
+    modal.appendChild(parar);
+
+    // =========================
+    // FECHAR
+    // =========================
+    const fechar = document.createElement("button");
+
+    fechar.innerText = "❌ Fechar";
+
+    fechar.style.marginTop = "10px";
+    fechar.style.width = "100%";
+    fechar.style.padding = "10px";
+    fechar.style.border = "none";
+    fechar.style.borderRadius = "8px";
+    fechar.style.background = "red";
+    fechar.style.color = "#fff";
+    fechar.style.fontWeight = "bold";
+    fechar.style.cursor = "pointer";
+
+    fechar.addEventListener("click", () => {
+
+        modal.style.display = "none";
+
+    });
+
+    modal.appendChild(fechar);
+
+    // =========================
+    // ADICIONA MODAL
+    // =========================
+    document.body.appendChild(modal);
+
+    // =========================
+    // ABRIR MODAL
+    // =========================
+    botao.addEventListener("click", () => {
+
+        modal.style.display = "block";
+
+    });
+
 });
+
+
+function limparProgressoJogo() {
+// Confirma se o usuário realmente quer apagar
+if (confirm("Não se preocupe não apaga ganhos e saldo salvos")) {
+
+// Opção 1: Apaga TUDO do seu site (mais seguro para resetar)
+localStorage.clear(); 
+
+// Opção 2: Se quiser apagar só a chave do jogo (ex: 'meu_save')
+// localStorage.removeItem('meu_save'); 
+
+alert("Progresso apagado!");
+location.reload(); // Recarrega o jogo do zero
+}
+}
+
+
+
+let anguloAtual = 0;
+let girando = false;
+
+function girarRoleta() {
+    if (girando) return;
+    girando = true;
+    
+    const roleta = document.getElementById('roleta');
+    const botao = document.getElementById('botaoGirar');
+    
+    // Calcula giros aleatórios (pelo menos 5 giros completos)
+    const voltasMinimas = 5;
+    const grausAleatorios = Math.floor(Math.random() * 360);
+    anguloAtual += (voltasMinimas * 360) + grausAleatorios;
+    
+    // Aplica o giro
+    roleta.style.transform = `rotate(${anguloAtual}deg)`;
+    botao.disabled = true;
+    
+    // Aguarda o fim da animação (4 segundos conforme CSS)
+    setTimeout(() => {
+        girando = false;
+        botao.disabled = false;
+        alert("A roleta parou! Verifique o resultado.");
+    }, 4000);
+}
+
+function fecharRoleta() {
+    document.getElementById('overlayRoleta').style.opacity = '0';
+    setTimeout(() => {
+        document.getElementById('overlayRoleta').style.display = 'none';
+    }, 300);
+}
+
+function abrirRoleta() {
+    const overlay = document.getElementById('overlayRoleta');
+    overlay.style.display = 'flex';
+    setTimeout(() => overlay.style.opacity = '1', 50);
+}
 </script>
 
 </body>

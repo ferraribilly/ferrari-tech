@@ -2,11 +2,11 @@
 <html lang="pt-BR">
 <head>
    <meta charset="UTF-8">
-        <meta name="theme-color" content="#082c62">
-  <title>Visão Geral de Vendas - Ferrari Tech</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/grafico_geral_sistema.css') }}">
-  <style>
+   <meta name="theme-color" content="#082c62">
+   <title>Visão Geral de Vendas - Ferrari Tech</title>
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/grafico_geral_sistema.css') }}">
+   <style>
 
 
   </style>
@@ -74,9 +74,9 @@
         <span style="font-weight: bold; color:#fff; font-size:22px;">R$ </span>
         {{ "{:,.2f}".format(resumo.lucro).replace(",", "X").replace(".", ",").replace("X", ".") }}
     </p>
-</div>
+    </div>
     <div class="metric"><h2 style="color:#fff;">Margem</h2><p id="margemValor" style="font-weight: bold; color: #ccc; font-size:22px;">0%</p></div>
-    <div class="metric"><h2 style="color:#fff;">Vendas</h2><p style="font-weight: bold; font-size:18px;"><span style="font-weight: bold; color:#fff; font-size:22px;">Qtd:</span> {{resumo.numeros_aprovados}}</p></div>
+    <div class="metric"><h2 style="color:#fff;">Vendas</h2><p style="font-weight: bold; font-size:18px;"><span style="font-weight: bold; color:#fff; font-size:22px;">Qtd:</span> {{resumo._aprovados}}</p></div>
 
   <div class="metric">
     <h2 style="color:#fff;">Meta</h2>
