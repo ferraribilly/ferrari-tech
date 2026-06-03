@@ -85,7 +85,7 @@ cloudinary.config(
 
 @app.route("/")
 def produtos():
-    return render_template("produtos/minha_pagina.html")
+    return render_template("produtos/index.html")
 
 
 
