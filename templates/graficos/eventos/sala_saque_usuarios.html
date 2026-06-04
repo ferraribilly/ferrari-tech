@@ -77,16 +77,16 @@
 
     <nav class="navbar">
         <div class="navbar-brand">
-            <span style="color:#fff;" class="material-symbols-outlined" onclick="location.href='/raspadinha/{{ usuario_id }}'">arrow_back</span>
+            <span style="color:#fff;" class="material-symbols-outlined" role="button" tabindex="0" onclick="location.href='/raspadinha/{{ usuario_id }}'">arrow_back</span>
             <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png" alt="Logo" class="navbar-logo">
             <h1>{{ usuario.nome or "Player" }}<br>
             <span style="font-size: 12px;" class="user-status">user_ID: {{ usuario_id }}</span>
              </h1>
         </div>
             <div class="header-actions">
-                <span style="display: none;" class="material-symbols-outlined">videocam</span>
+                <span style="display: none;" class="material-symbols-outlined" role="button" tabindex="0">videocam</span>
                
-                <span  style="display: none;" class="material-symbols-outlined" onclick="iniciarLigacao()">call</span>
+                <span  style="display: none;" class="material-symbols-outlined" role="button" tabindex="0" onclick="iniciarLigacao()">call</span>
                 
                                         <!-- MODAL CHAMADA -->
                 <div  style="display: none;" id="modal-ligacao">
@@ -124,7 +124,7 @@
                 >
                     chat
                 </span>           -->
-                <span class="material-symbols-outlined"  id="openMenuBtn">person</span>
+                <span class="material-symbols-outlined" role="button" tabindex="0"  id="openMenuBtn">person</span>
             </div>
     </nav>
 
@@ -246,10 +246,10 @@
             </button>      -->
                    
             <button class="botao-anexo" type="button" aria-label="Anexar arquivo" onclick="document.getElementById('uploadImg').click()">
-              <span class="material-symbols-outlined">attach_file</span>
+              <span class="material-symbols-outlined" role="button" tabindex="0">attach_file</span>
             </button>
             <button class="botao-camera" type="button" aria-label="Anexar arquivo" onclick="document.getElementById('uploadImg').click()">
-              <span class="material-symbols-outlined">photo_camera</span>
+              <span class="material-symbols-outlined" role="button" tabindex="0">photo_camera</span>
             </button>     
 
             <input
@@ -269,7 +269,7 @@
 
             <!-- ENVIAR -->
             <button id="btnEnviar">
-                ➤
+                <span class="material-symbols-outlined">send</span>
             </button>
 
         </div>

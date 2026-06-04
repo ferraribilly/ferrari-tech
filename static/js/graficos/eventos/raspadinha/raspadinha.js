@@ -737,6 +737,45 @@ function solicitarSaque() {
 
 
 
+async function fazerTransferencia() {
+const valor = document
+    .getElementById('valor-transferencia')
+    .value
+    .replace(",", ".");
+
+const favorecido = document
+    .getElementById('favorecido')
+    .value
+    .trim();
+
+const res = await fetch('/transferencia', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        valor,
+        favorecido
+    })
+});
+
+const data = await res.json();
+
+if (data.success) {
+
+    alert(data.mensagem);
+
+    document.getElementById('favorecido').value = '';
+
+    carregarMovimentacoes();
+
+} else {
+
+    alert(data.erro || 'Erro na transferência');
+
+}
+
+}
 
 
 // =========================
@@ -763,6 +802,7 @@ async function carregarMovimentacoes() {
     const entradas = document.getElementById('entradas-body');
     const saidas = document.getElementById('saidas-body');
     const ganhos = document.getElementById('valor-saque');
+    const transferencia = document.getElementById('valor-transferencia');
 
     if (entradas) {
         entradas.innerHTML = "";
@@ -802,6 +842,12 @@ async function carregarMovimentacoes() {
         ganhos.value = Number(data.ganhos || 0).toFixed(2).replace(".", ",");
     }
 
+    if (transferencia) {
+        transferencia.value = Number(data.ganhos || 0)
+        .toFixed(2)
+        .replace(".", ",");
+    }
+
     // 🔴 ISSO AQUI RESOLVE SEU PROBLEMA DO SALDO NÃO ATUALIZAR
     if (ganhos) {
         ganhos.value = Number(data.ganhos || 0).toFixed(2).replace(".", ",");
@@ -822,7 +868,7 @@ function mudarAbaSaque(index) {
     });
 }
 
-// =========================
+// ========================
 // PIX
 // =========================
 function mudarAbaPix(index) {

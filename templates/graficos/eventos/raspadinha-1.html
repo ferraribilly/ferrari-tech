@@ -4,12 +4,24 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!-- Configurações para o X / Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ferrari Tech">
+<meta name="twitter:description" content="Conheça a Ferrari Tech. Soluções e inovação em tecnologia.">
+<meta name="twitter:image" content="https://ferrari-tech.onrender.com/raspadinha">
+<!-- Configurações para WhatsApp, Facebook e LinkedIn (Open Graph) -->
+<meta property="og:title" content="Ferrari Tech">
+<meta property="og:description" content="Conheça a Ferrari Tech. Soluções e inovação em tecnologia.">
+<meta property="og:image" content="https://ferrari-tech.onrender.com/raspadinha">
+<meta property="og:url" content="https://ferrari-tech.onrender.com/raspadinha">
+<meta property="og:type" content="website">
 <meta name="theme-color" content="#333">
-<title>Ferrari Tech Servicos Digitais</title>
-<link rel="apple-touch-icon" href="{{ url_for('static', filename='w.png') }}">
+<title>Ferrari Tech Services Digitais</title>
+<link rel="apple-touch-icon" href="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png">
 <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-<link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
+<link rel="shortcut icon" href="https://res.cloudinary.com/dptprh0xk/image/upload/v1778632848/1778632824626_hszmjz.png" type="image/x-icon">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
 <link rel="stylesheet" href="{{ url_for('static', filename='css/raspadinha/raspadinha.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/registro.css') }}">
 <style> 
@@ -112,14 +124,14 @@
   font-weight: normal;
   font-style: normal;
 }
+
 .botao-som-flutuante {
   position: fixed;
   top: 20px; /* Distância do topo da tela */
   right: 20px; /* Distância da borda direita */
   z-index: 9999; /* Fica acima de todo o conteúdo da página */
-  
   padding: 10px 20px;
-  background-color: #2e7d32; /* Verde enquanto está pausado */
+  background-color: #2e7d3268; /* Verde enquanto está pausado */
   color: #ffffff;
   border: none;
   border-radius: 50px; /* Formato arredondado */
@@ -646,10 +658,6 @@
         padding: 80px 15px;
     }
 
-    .roleta { width: 260px; height: 260px; }
-    .botao-girar { width: 70px; height: 70px; font-size: 14px; }
-
-
 }
 
 
@@ -688,8 +696,7 @@
         font-size: 13px;
 
     }
-    .roleta { width: 260px; height: 260px; }
-    .botao-girar { width: 70px; height: 70px; font-size: 14px; }
+
 }
 
 /* Responsividade para telas de celulares menores */
@@ -706,8 +713,7 @@
     padding: 10px 18px;
     font-size: 14px;
   }
-      .roleta { width: 260px; height: 260px; }
-    .botao-girar { width: 70px; height: 70px; font-size: 14px; }
+
 }
 
 </style>
@@ -733,30 +739,37 @@
 
 <!-- Botão flutuante no topo -->
  
-<button id="btn-som-topo" class="botao-som-flutuante">🔈 Ligar Som</button>
+<button id="btn-som-topo" class="botao-som-flutuante">
+    <span class="material-symbols-outlined">library_music</span>Musicas</button>
 
 <!-- Tag do áudio de fundo (troque pelo seu arquivo de som) -->
 <!-- <audio id="audio-ambiente" src="/static/audio/shimafm-90-freestyle-2026-479162.mp3" loop></audio> -->
 
 
 <button class="btn-sair-flutuante" onclick="location.href='/raspadinha'">
-  Sair
+  <span class="material-symbols-outlined">logout</span>Sair
 </button>
 
 <header class="top-header">
 
     <div class="header-card">
-        <h3 style="font-family: 'MinhaFonteCustomizada', sans-serif;">RASPADINHAS</h3>
+        <h3 style="font-family: 'MinhaFonteCustomizada', sans-serif;">
+            <span class="material-symbols-outlined">confirmation_number</span>
+        </h3>
         <p style="color: rgb(255, 217, 0);" id="qtd-rsp">{{ total_quantidade }}</p>
     </div>
 
     <div class="header-card">
-        <h3 style="font-family: 'MinhaFonteCustomizada', sans-serif;">GANHOU</h3>
+        <h3 style="font-family: 'MinhaFonteCustomizada', sans-serif;">
+            <span class="material-symbols-outlined">paid</span>
+        </h3>
         <p style="color: orange;" id="valor-total">R$ 0.00 </p>
     </div>
 
     <div class="header-card">
-        <h3 style="font-family: 'MinhaFonteCustomizada', sans-serif;">SALDO</h3>
+        <h3 style="font-family: 'MinhaFonteCustomizada', sans-serif;">
+            <span class="material-symbols-outlined">payments</span>
+        </h3>
         <p style="color: rgb(85, 255, 0);" id="saldo-valor">
         R$ {{ "%.2f"|format(usuario.ganhos|float)|replace('.', ',') if usuario else "0,00" }}
         </p>
@@ -963,24 +976,26 @@
 
     <div class="buy-card">  
 
-        <h2>Compras no app</h2>  
+        <h2 style="color:yellow; font-family:MinhaFonteCustomizada;">Ferrari Tech <br>
+            <p>Compras dentro Aplicativo</p>
+        </h2>  
 
         <div class="auth-tabs">
 
             <button class="auth-tab active" onclick="mudarAbaPix(0)">
-                Pix Rápido
+                <span style="color: #fff;" class="material-symbols-outlined">qr_code_2</span>
             </button>
 
             <button class="auth-tab" onclick="mudarAbaPix(1)">
-                Cartão Crédito
+            <span style="color: blue;" class="material-symbols-outlined">credit_card</span>
             </button>
 
             <button class="auth-tab" onclick="mudarAbaPix(2)">
-                Saldo
+                <span style="color: #fff;" class="material-symbols-outlined">account_balance</span>
             </button>
 
             <button style="background: red; color: #fff; font-weight: bold;" class="auth-tab" onclick="fecharCompra()">
-                Sair
+               <span class="material-symbols-outlined">arrow_back_ios_new</span>
             </button>
 
         </div>
@@ -1025,9 +1040,11 @@
 
                     <div class="produto-info">
 
-                        <h3 class="produto-titulo">Cartão de Crédito</h3>
+                        <h3 class="produto-titulo">Cartão de Crédito<br>
+                            Players Premium
+                            <span style="background: #000; border-radius: 50%; color: gold;" class="material-symbols-outlined">workspace_premium</span>
+                        </h3>
                         <p class="produto-descricao">Ferrari Tech Serviço Digital</p>
-
                         <div class="compra-container">
                             <button class="btn-qtd menos">-</button>
                             <span class="quantidade">5</span>
@@ -1056,8 +1073,9 @@
                     <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png" class="produto-img">
 
                     <div class="produto-info">
+                         <p class="produto-titulo">Usar Saldo</p>
 
-                        <p class="produto-titulo">Compra com Saldo<br>
+                        <p style="display: none;" class="produto-titulo"><br>
                             {{usuario.ganhos}}
                         </p>
                         <p class="produto-descricao">Ferrari Tech Serviço Digital</p>
@@ -1313,20 +1331,24 @@
 <div class="saques-overlay" id="saques-overlay">
 
     <div style="max-height:85vh; overflow-y:auto;" class="saques-card">
-
+        <h2 style="color:#ffff; font-family:MinhaFonteCustomizada;">Ferrari Tech <br>
+            <p>Saques Mov/Trasferencias</p>
+        </h2>  
         <div class="auth-tabs">
 
             <button class="auth-tab active" onclick="mudarAbaSaque(0)">Sacar</button>
-            <button class="auth-tab" onclick="mudarAbaSaque(1); carregarMovimentacoes()">Entradas</button>
-            <button class="auth-tab" onclick="mudarAbaSaque(2); carregarMovimentacoes()">Saídas</button>
-            <button class="auth-tab" onclick="fecharSaques()" style="background:red;color:#fff;">Sair</button>
+            <button class="auth-tab" onclick="mudarAbaSaque(1); carregarMovimentacoes()"><span style="color: rgb(250, 250, 3); font-weight: bold;" class="material-symbols-outlined">add</span></button>
+            <button class="auth-tab" onclick="mudarAbaSaque(2); carregarMovimentacoes()"><span style="color: red; font-weight: bold;" class="material-symbols-outlined">text_decrease</span></button>
+            <button class="auth-tab" style="color:gold;" onclick="mudarAbaSaque(3)"><span class="material-symbols-outlined">currency_exchange</span></button>
+            <button class="auth-tab"  style="color:#fff;" onclick="fecharSaques()" ><span class="material-symbols-outlined">arrow_back_ios_new</span></button>
+            
 
         </div>
 
         <!-- SACAR -->
         <div class="aba-saque-content" id="aba-0">
 
-            <h2>Sacar Ganhos</h2>
+            <h2 style="color:#fff; font-family:MinhaFonteCustomizada;">Saque da carteira</h2>
 
             <div class="saque-form">
 
@@ -1338,17 +1360,17 @@
                 </div>
 
                 <div>
-                    <label>Nome</label>
+                    <label>Nome Favorecido</label>
                     <input type="text" id="saque-nome" value="{{ usuario.nome }}" disabled>
                 </div>
 
                 <div>
-                    <label>CPF</label>
+                    <label>CPF do Titular</label>
                     <input type="text" id="saque-cpf" value="{{ usuario.cpf }}" disabled>
                 </div>
 
                 <div>
-                    <label>PIX</label>
+                    <label> Chave PIX</label>
                     <input type="text" id="saque-pix" value="{{ usuario.chave_pix }}" disabled>
                 </div>
 
@@ -1363,7 +1385,7 @@
         <!-- ENTRADAS -->
         <div class="aba-saque-content" id="aba-1" style="display:none;">
 
-            <h2>Entradas (Ganhos)</h2>
+            <h2 style="color:#fff; font-family:MinhaFonteCustomizada;">Entradas (Ganhos)</h2>
 
             <table class="tabela-financeira">
                 <thead>
@@ -1383,7 +1405,7 @@
         <!-- SAÍDAS -->
         <div class="aba-saque-content" id="aba-2" style="display:none;">
 
-            <h2>Saídas (Saques)</h2>
+            <h2 style="color:#fff; font-family:MinhaFonteCustomizada;">Saídas (Saques)</h2>
 
             <table class="tabela-financeira">
                 <thead>
@@ -1397,9 +1419,33 @@
                 <tbody id="saidas-body"></tbody>
 
             </table>
-
+           
         </div>
 
+        <!--Trasferencias ganhos para usuario_id-->
+        <div class="aba-saque-content" id="aba-3" style="display: none;">
+                   <div class="saque-form">
+            <h2 style="color:#fff; font-family:MinhaFonteCustomizada;">Saídas (Transferências)</h2>
+
+                <div>
+                    <label>Valor Transferência<br> (min: R$ 0.60 max: R$ 1.000.00)</label>
+                    <input type="text" id="valor-transferencia" placeholder="R$ {{ '%.2f'|format(usuario.ganhos|float)|replace('.', ',') if usuario else '0,00' }}">
+                </div>
+
+                <div>
+                    <label>ID Player Favorecido ou Telefone "Obrigatório"</label>
+                    <input type="text" id="favorecido" placeholder="{{ usuario_id }}" required>
+                </div>
+
+                <button class="withdraw-btn" onclick="fazerTransferencia()">
+                    Fazer Transferencia
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+    
     </div>
 
 </div>
@@ -1419,17 +1465,39 @@
     <!-- Header/Footer Fixo -->
     <header class="fixed-bottom-menu">
         <button class="btn-acao">
-            <img onclick="abrirCompra()" style="width: 32px; height: 32px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778012674/icone-de-carrinho-de-compras-3d-em-fundo-de-circulo-azul-simbolo-de-varejo-online_84443-55705_dfmhp8.png"></img>
+            <img onclick="abrirCompra()" style="width: 32px; height: 32px; background: radial-gradient(circle, #0364ff 0%, #013bfc 100%); border-radius: 50%;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778012674/icone-de-carrinho-de-compras-3d-em-fundo-de-circulo-azul-simbolo-de-varejo-online_84443-55705_dfmhp8.png"></img>
         </button>
-        <button class="btn-acao"> 
-            <img onclick="abrirSaques()" style="width: 32px; height: 32px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778720610/saque_k5hlcq.png"></img>
+        <button class="btn-acao"  onclick="abrirSaques()"> 
+        <span style="
+        color: yellow;
+        background: radial-gradient(circle, #000 0%, #013bfc 100%);
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        vertical-align: middle;
+        " class="material-symbols-outlined">account_balance_wallet</span>
         </button>
         <button class="btn-acao" onclick="window.location.href='/chat/usuario/{{ usuario_id }}'">
-        <img style="width: 32px; height: 32px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778702172/Pngtree_3d_isolated_render_of_a_20808938_lxm032.png"></img>
+        <span style="
+        color: yellow;
+        background: radial-gradient(circle, #000 0%, #013bfc 100%);
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        vertical-align: middle;
+        " class="material-symbols-outlined">support_agent</span>
         </button>
 
                 <!-- MODAL -->
-        <div id="modal-suporte" class="modal-suporte">
+        <!-- <div id="modal-suporte" class="modal-suporte">
 
             <div class="modal-box">
 
@@ -1453,13 +1521,24 @@
 
             </div>
 
-        </div>
+        </div> -->
 
         </button>
         <!-- BOTÃO -->
-        <button style="font-size: 22px;" class="btn-acao" onclick="abrirdados()">
-
-            📄
+        <button class="btn-acao" onclick="abrirdados()">
+       <span style="
+        color: yellow;
+        background: radial-gradient(circle, #000 0%, #013bfc 100%);
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        vertical-align: middle;
+        " class="material-symbols-outlined" role="button" tabindex="0">database</span>
+        
 
         </button>
 

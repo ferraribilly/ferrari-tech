@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="theme-color" content="#fff">
+        <title>Ferrari Tech {{ nome_projeto }}</title>
+        <link rel="apple-touch-icon" href="{{ url_for('static', filename='w.png') }}">
+        <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
+        </head>
+    <body>
+
+
+ <!-- Banner de Cookies -->
+<!-- <div id="cookie-banner" class="cookie-banner">
+    <div class="cookie-container">
+        <p>
+            Utilizamos cookies para melhorar sua experiência. Ao continuar navegando, você concorda com nossa 
+            <a href="/politica-privacidade" target="_blank">Política de Privacidade</a>.
+        </p>
+        <button id="accept-cookies" class="cookie-btn">Aceitar</button>
+    </div>
+</div> -->
+
+  <!-- Botão flutuante -->
+<button class="help-btn" id="helpBtn">❔️</button>
+
+<div class="modal-overlay" id="helpModal">
+    
+    <!-- CARD PRINCIPAL -->
+    <div class="modal-card" id="mainCard">
+        <button class="close-btn" id="closeModal">&times;</button>
+        
+
+        <ul class="help-options">
+            <!-- AJUDA -->
+            <li class="item-icon ajuda">
+                <span style="color: #000;">Painel de Ajuda 👇👇</span>
+            </li>          
+
+            <!-- VIDEO -->
+            <li id="openVideo" class="item-icon video">
+                <span  style="color: #000;"> Introdução</span>
+            </li>
+
+            <!-- WHATSAPP -->
+            <li class="item-icon whatsapp">
+                <a href="https://wa.me/5527998031796?text=Preciso%20de%20suporte%20Por%20Favor%20Usuario%20ID%20:%20{{usuario_id}}%20{{projetos}}" target="_blank">
+                    <span style="color: #000;">Suporte WhatsApp 24h</span>
+                </a>
+            </li>
+
+            <!-- INSTAGRAM -->
+            <li class="item-icon instagram">
+                <a href="https://www.instagram.com/joaolucasanjoiluminado?igsh=dmlwdHd4NndkaXdn" target="_blank">
+                    <span style="color: #000;">Siga Instagram</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- CARD VIDEO -->
+    <div class="modal-card" id="videoCard" style="display:none;">
+        <button class="close-btn" id="backToMenu">&larr;</button>
+        <h3 style="color: #000;">Como Jogar</h3>
+
+    <iframe
+    src="https://player.cloudinary.com/embed/?cloud_name=dptprh0xk&public_id=projetos%2Fvideo_instrucao_ojoxqk"
+    width="640"
+    height="360" 
+    style="height: auto; width: 100%; aspect-ratio: 640 / 360;"
+    allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+    allowfullscreen
+    frameborder="0"
+    ></iframe>
+    </div>
+
+</div>
+
+
+   
+  <!-- style="background-image: url('https://res.cloudinary.com/dptprh0xk/image/upload/v1777382535/file_0000000025e871f5b53ef0bfdc3abb33_wi9woh.png');"> -->
+   
+  
+
+  <main class="main"
+  style="background-image: url('{{ projeto_principal.imagem_projeto }}');">
+  <div class="main-child">
+    
+<!-- Botão de CTA -->
+<form class="form-cta" style="margin-top:20px;">    
+  <a style="border-radius:5px; height:40px; text-align:center; font-weight:bold; 
+          margin:0; color:#fff; background-color:rgba(224, 25, 177, 0.992); 
+          display:inline-block; line-height:40px; padding:0 20px; text-decoration:none;"
+   href="/vitoria_visonaria/gerar_cupom/{{ usuario._id }}/{{ projeto_id }}">
+    COMPRAR AGORA
+  </a>
+</form>
+    </div>
+    
+
+</div>
+  <div class="gradient">
+
+  </div>
+</main>
+
+<footer class="footer">
+
+
+
+
+
+
+  <div class="table-container">
+  <h2 style="text-decoration:none;color:rgb(0,136,255);margin:20px;"><br><span style="color:#fcd602;font-size:22px;" class="piscar">Se increva-se já</span></h2>
+
+    <!-- adiciona isso no HTML -->
+<div id="projeto_id" style="display:none;">
+    {{ projeto_id }}
+</div>
+     <table>
+      <tbody>
+        {% if projeto_principal %}
+        <tr>
+          <td style="color: #12ec8e; font-weight: bold;">
+              <a href="${projeto_principal.link_tiktok}" target="_blank"
+                style="
+                  display:inline-block;
+                  width:32px;
+                  height:32px;
+                  border-radius:20%;
+                  background-image:url('/static/img/tik-tok.svg');
+                  background-repeat:no-repeat;
+                  background-position:center;
+                  background-size:cover;
+                ">
+              </a>
+          </td>
+                    <td style="color: #12ec8e; font-weight: bold;">
+              <a href="${projeto_principal.instagram}" target="_blank"
+                style="
+                  display:inline-block;
+                  width:32px;
+                  height:32px;
+                  border-radius:20%;
+                  background-image:url('/static/img/instagram.svg');
+                  background-repeat:no-repeat;
+                  background-position:center;
+                  background-size:cover;
+                ">
+              </a>
+          </td>
+                    <td style="color: #12ec8e; font-weight: bold;">
+              <a href="${projeto_principal.kwai}" target="_blank"
+                style="
+                  display:inline-block;
+                  width:32px;
+                  height:32px;
+                  border-radius:20%;
+                  background-image:url('/static/img/kwai.svg');
+                  background-repeat:no-repeat;
+                  background-position:center;
+                  background-size:cover;
+                ">
+              </a>
+          </td>
+          
+        </tr>
+        {% else %}
+      </tbody>
+       {% endif %}
+      </table>
+       </div>
+
+<div class="table-container">
+   <h2 style="text-decoration: none; margin:20px;">Meus Bilhetes</h2>
+   <table>
+    <thead>
+      <tr>
+        <th>Bilhetes</th>
+        <th>Números</th>
+        <th>Compartilhar</th>
+         </tr>
+         </thead>
+         <tbody>
+          {% for b in bilhetes %}
+          <tr>
+            <!-- IMAGENS -->
+              <td>
+                {% if b.lista_urls_img_bilhetes %}
+                 {% for img in b.lista_urls_img_bilhetes %}
+                 <img src="{{ img }}"
+                  style="width:100px; margin:5px; border-radius:6px;"
+                   onclick="abrirImagem(this.src)">
+                   {% endfor %}
+                    {% else %}
+                    <span>Sem imagem</span>
+                    {% endif %}
+                    </td>
+                            <!-- NUMEROS -->
+        <td style="color: #12ec8e;">
+          {% for n in b.lista_numeros %}
+            🔐 {{ n }}<br>
+          {% endfor %}
+        </td>
+               <!-- WHATSAPP -->
+         <td>
+  <button
+    class="btn-whatsapp"
+    data-imagens='{{ b.lista_urls_img_bilhetes | tojson }}'
+    style="border-radius:50%;">
+
+    <img style="width:32px;height:32px;border-radius:50%;"
+         src="{{ url_for('static', filename='img/whatsapp-svgrepo-com.svg') }}">
+  </button>
+   </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+
+                               
+
+
+ 
+
+  
+    
+      
+        
+</div>
+<!-- MODAL IMAGEM -->
+<div id="modalImg" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:9999;">
+  <img id="imgExpandida" style="max-width:90%; max-height:90%; border-radius:10px;">
+</div>
+
+
+  <h2 style=" margin:20px; color: #12ec8e;">🚀Progresso do Projeto</h2>
+  <span></span>
+   <div class="info-box" id="mediaDiaria">Média diária necessária: 0</div>
+  <div class="pizza-chart" id="chart">0%</div>
+
+<!--Table Participantes-->
+<div  class="table-container">
+    <h2 style="text-decoration: underline; margin:20px;">👦👧 Participantes</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="color: #fdf903; font-weight: bold;">Participantes</th>
+                <th style="color: #fdf903; font-weight: bold;">Estado</th>
+                <th style="color: #fdf903; font-weight: bold;">Indicação</th>
+            </tr>
+        </thead>
+
+   <tbody id="tabela-participantes">
+    {% for u in usuarios %}
+    <tr>
+        <td class="nome">{{ u.nome }}</td>
+        <td class="estado">{{ u.estado }}</td>                
+        <td class="vendedor">{{ u.vendedor }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+    </div>
+  
+
+
+
+
+
+ 
+<div class="table-container">
+  <h2 style="text-decoration: underline; margin:20px;">📽 Sorteios Ao Vivo</h2>
+  <table border="none">
+    <thead>
+      <tr>
+        <th style="color: #ffffff; font-weight: bold;">Data</th>
+        <th style="color: #ffffff; font-weight: bold;">Hora</th>
+        <th style="color: #ffffff; font-weight: bold;">Sala Ao Vivo</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if projeto_principal %}
+      <tr>
+        <td style="color: #f5f108; font-weight: bold;">
+          {{ projeto_principal.dt_sorteio }}
+        </td>
+
+        <td style="color: #265ddc; font-weight: bold;">
+          {{ projeto_principal.horario_sorteio }}
+        </td>
+
+        <td style="color: #a0da0ee5; font-weight: bold;">
+          <a 
+            href="/sala_online/{{ usuario._id }}/{{ projeto_id }}" 
+            target="_blank"
+            style="
+              display: inline-block;
+              width: 100px;
+              height: 32px;
+              border-radius: 20%;
+              background-image: url('/static/img/marca.png');
+              background-repeat: no-repeat;
+              background-position: center;
+              background-size: cover;
+            ">
+          </a>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="3" style="color: white; text-align: center;">Nenhum sorteio agendado.</td>
+      </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+  
+  <div  style="display: none ;" class="time-chart" id="timeChart">0 dias
+  </div>
+  <div style="text-align:center; margin-top:20px;">
+  </div>
+  <p>Copyright © 2026 "Ferrari Tech" Marca Brasil todos os direitos reservados</p>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>         
+  <script src="{{ url_for('static', filename='js/meta_atingir.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/suporte.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/cores.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/button_whatsapp.js') }}"></script>
+
+  
+
+<script>
+
+const chart = document.getElementById("chart");
+
+const porcentagem = {{ projetos[0].progresso_meta|default(0)|int if projetos|length > 0 else 0 }};
+
+const valor = Math.min(Math.max(porcentagem, 0), 100);
+
+chart.innerText = valor + "%";
+
+const grau = (valor / 100) * 360;
+
+chart.style.background = `conic-gradient(
+  #00ff00 ${grau}deg,
+  #e0e0e0 ${grau}deg
+)`;
+
+
+
+
+
+
+
+</script>
+    </body>
+</html>

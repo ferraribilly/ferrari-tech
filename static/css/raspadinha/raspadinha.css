@@ -17,7 +17,7 @@ body{
 
 .top-header{
     width:100%;
-    background:#333;
+    background:#33333388;
     display:flex;
     justify-content:center;
     gap:15px;
@@ -28,7 +28,7 @@ body{
 }
 
 .header-card{
-    background:#111;
+    background:#11111126;
     border-radius:12px;
     padding:12px 18px;
     min-width:120px;
@@ -327,6 +327,10 @@ canvas {
     align-items:center;
 }
 
+.saques-overlay{
+    background: rgb(0, 79, 0);
+}
+
 .buy-card{
     overflow:hidden;
 }
@@ -373,19 +377,19 @@ canvas {
     height:100%;
     justify-content:center;
     align-items:center;
-    box-shadow:0 0 10px #f8f8f6;
+    animation: pulsarLentoWinOverlay 3s infinite ease-in-out;
     
 }
 
 @keyframes pulsarLentoWinOverlay {
   0% {
     /* Se quiser a logo maior, mude o valor inicial aqui (ex: 1.2 é 20% maior que os 250px) */
-    scale: 1.2; 
+    scale: 0.5; 
     opacity: 1;
   }
   50% {
     /* O topo do pulso aumenta a partir do valor inicial (ex: 1.25) */
-    scale: 1.26; 
+    scale: 1.2; 
     opacity: 0.8;
   }
   100% {
@@ -395,6 +399,7 @@ canvas {
 }
 
 .win-content{   
+    width:100%;
     height:100%;
     padding:30px;
     border-radius:20px;
@@ -403,13 +408,13 @@ canvas {
     background-position: center;
     background-repeat: no-repeat;
     animation:zoom .5s ease;
-    width:100%;
-    animation: pulsarLentoWinOverlay 3s infinite ease-in-out;
+   
+  
 }
 
 .win-content img {
     width: 300px;
-    margin-top: 50px;
+    margin: 100px auto;
     /* Reduzido para 0.8s para ficar muito mais rápido e energético */
     animation: win-hyper-celebration 0.8s cubic-bezier(0.25, 1, 0.5, 1) infinite;
     /* Melhora o desempenho da animação no navegador */
@@ -419,7 +424,7 @@ canvas {
 @keyframes win-hyper-celebration {
     0% {
         transform: translateY(0) scale(1, 1) rotate(0deg);
-        filter: drop-shadow(0 0 5px #ffcc00) brightness(1);
+        filter: drop-shadow(0 0 5px #fafafa) brightness(1);
     }
     15% {
         /* Esmaga no chão antes de pegar impulso */
@@ -456,6 +461,7 @@ canvas {
 
 .buy-card,
 .saques-card,
+/* .transferencia-card, */
 .prize-card{
     width:90%;
     max-width:100%;
@@ -464,7 +470,13 @@ canvas {
     padding:20px;
     box-sizing:border-box;
     font-weight: bold;
-    box-shadow: 0 0 10px 2px #ffffff, 0 0 20px 8px rgba(250, 249, 250, 0.935);
+    /* box-shadow: 0 0 10px 2px #ffffff, 0 0 20px 8px rgba(250, 249, 250, 0.935); */
+}
+
+
+
+.saques-card{
+    background: rgb(0, 79, 0);
 }
 
 .saques-card h2,
@@ -476,10 +488,13 @@ canvas {
 }
 .tabela-financeira {
     width: 100%;
+    background: #fff;
     border-collapse: collapse;
+    border-radius: 3px;
     margin-top: 15px;
-    color:#3fff;
+    color:#000;
     text-align: center;
+    font-weight: bold;
     font-size: 14px;
 }
 
@@ -490,7 +505,7 @@ th, .tabela-financeira td {
 }
 
 .tabela-financeira th {
-    background: rgb(71, 71, 64);
+    background: rgb(1, 94, 242);
 }
 .buy-table{
     width:100%;
@@ -507,7 +522,7 @@ th, .tabela-financeira td {
 }
 
 .buy-action{
-    background:#00b894;
+    background:#004db8;
     border:none;
     color:#fff;
     padding:8px 15px;
@@ -516,28 +531,13 @@ th, .tabela-financeira td {
     font-weight:bold;
 }
 
-/* =========================
-   SCROLL POR TRÁS DO HEADER (OVERLAY REAL)
-   ========================= */
-
-.saques-card {
-    max-height: 85vh;
-    overflow: hidden;
-}
-
-/* cada aba vira uma janela de scroll */
-.aba-saque-content {
-    max-height: 60vh;
-    overflow-y: auto;
-    position: relative;
-}
 
 /* cabeçalho fica por cima (não participa do fluxo) */
 .tabela-financeira thead {
     position: sticky;
     top: 0;
     z-index: 10;
-    background: rgb(71, 71, 64);
+    background: rgb(1, 94, 242);
 }
 
 /* corpo rola “por trás” visualmente */
@@ -665,14 +665,29 @@ th, .tabela-financeira td {
 }
 
 .btn-acao img{
-    background-color:#fff;
-    border-radius: 50%;
+    /* background-color:#fff;
+    border-radius: 50%; */
     background-size:cover;
     background-position: center;
     background-repeat: no-repeat;
 }
 
 
+/* =========================
+   SCROLL POR TRÁS DO HEADER (OVERLAY REAL)
+   ========================= */
+
+.saques-card {
+    max-height: 85vh;
+    overflow: hidden;
+}
+
+/* cada aba vira uma janela de scroll */
+.aba-saque-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    position: relative;
+}
 
 /* FORMULARIO*/
 /* Estilos para o formulário de saque */
@@ -694,8 +709,9 @@ th, .tabela-financeira td {
     padding: 12px;
     border-radius: 8px;
     border: 1px solid #444;
-    background: #222;
-    color: #fff;
+    background: #fff;
+    color: #000;
+    font-weight: bold;
     box-sizing: border-box;
 }
 
@@ -720,6 +736,7 @@ th, .tabela-financeira td {
 .saques-btn {
     background: #ff7675; /* Cor para o botão de sacar na home */
 }
+
 
 
 @keyframes zoom{

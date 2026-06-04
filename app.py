@@ -33,7 +33,7 @@ from models import criar_projeto
 from models import projetos_collection
 from models import criar_saque, saques_collection
 from models import get_all_saques
-from models import db  # Puxa a conexão direta do seu arquivo de modelos
+from models import db 
 from models import salvar_mensagem 
 from models import MensagemModel
 from flask_cors import CORS
@@ -85,7 +85,7 @@ cloudinary.config(
 
 @app.route("/")
 def produtos():
-    return render_template("produtos/index.html")
+    return render_template("index.html")
 
 
 
@@ -972,7 +972,7 @@ def view_pagamentos(usuario_id, projeto_id):
         p["_id"] = str(p["_id"])
 
     return render_template(
-        "index.html",
+        "index-1.html",
         usuario=usuario,
         usuarios=usuarios,
         projetos=projetos,
@@ -4528,6 +4528,150 @@ def saque():
             usuario_atualizado.get("saques", 0.0)
         )
     })
+
+
+
+# ===========================================================================
+# TRANSFERENCIAS DE GANHOS PARA OUTRO USUARIO_ID (COM HISTÓRICO)
+# ===========================================================================
+@app.route('/transferencia', methods=['POST'])
+def transferencia():
+    dados = request.get_json() or {}
+
+    valor = str(dados.get("valor", "0")).replace(",", ".").strip()
+    favorecido = str(dados.get("favorecido", "")).strip()
+
+    try:
+        valor = float(valor)
+    except:
+        return jsonify({
+            "erro": "Valor inválido"
+        }), 400
+
+    usuario_id = session.get("usuario_id") or dados.get("usuario_id")
+
+    if not usuario_id or usuario_id == "None" or isinstance(usuario_id, dict):
+
+        referer = request.headers.get("Referer", "")
+
+        if "/raspadinha/" in referer:
+            usuario_id = referer.split("/raspadinha/")[1].split("/")[0]
+
+    if not usuario_id or not ObjectId.is_valid(str(usuario_id)):
+        return jsonify({
+            "erro": "Usuário inválido ou não autenticado"
+        }), 400
+
+    remetente = users_collection.find_one({
+        "_id": ObjectId(usuario_id)
+    })
+
+    if not remetente:
+        return jsonify({
+            "erro": "Usuário não encontrado"
+        }), 404
+
+    saldo = float(remetente.get("ganhos", 0))
+
+    if valor < 0.60:
+        return jsonify({
+            "erro": "Valor mínimo R$ 0,60"
+        }), 400
+
+    if valor > 1000:
+        return jsonify({
+            "erro": "Valor máximo R$ 1.000,00"
+        }), 400
+
+    if valor > saldo:
+        return jsonify({
+            "erro": "Saldo insuficiente"
+        }), 400
+
+    destinatario = None
+
+    # Procura por ObjectId
+    if ObjectId.is_valid(favorecido):
+        destinatario = users_collection.find_one({
+            "_id": ObjectId(favorecido)
+        })
+
+    # Procura por telefone
+    if not destinatario:
+        destinatario = users_collection.find_one({
+            "telefone": favorecido
+        })
+
+    # Procura por CPF
+    if not destinatario:
+        destinatario = users_collection.find_one({
+            "cpf": favorecido
+        })
+
+    if not destinatario:
+        return jsonify({
+            "erro": "Favorecido não encontrado"
+        }), 404
+
+    if str(destinatario["_id"]) == str(usuario_id):
+        return jsonify({
+            "erro": "Não é permitido transferir para sua própria conta"
+        }), 400
+
+    data_transferencia = datetime.now(timezone.utc)
+    data_formatada = data_transferencia.strftime("%d/%m/%Y %H:%M:%S")
+
+    nome_remetente = remetente.get("nome", "Usuário")
+    nome_destinatario = destinatario.get("nome", "Usuário")
+
+    # Debita remetente
+    users_collection.update_one(
+        {"_id": ObjectId(usuario_id)},
+        {
+            "$inc": {
+                "ganhos": -valor
+            },
+            "$push": {
+                "saidas": {
+                    "status": "transferencia",
+                    "valor": round(valor, 2),
+                    "data": data_formatada,
+                    "destinatario_id": str(destinatario["_id"]),
+                    "destinatario_nome": nome_destinatario
+                }
+            }
+        }
+    )
+
+    # Credita destinatário
+    users_collection.update_one(
+        {"_id": destinatario["_id"]},
+        {
+            "$inc": {
+                "ganhos": valor
+            },
+            "$push": {
+                "entradas": {
+                    "tipo": "transferencia",
+                    "valor": round(valor, 2),
+                    "data": data_formatada,
+                    "origem_id": str(usuario_id),
+                    "origem_nome": nome_remetente
+                }
+            }
+        }
+    )
+
+    usuario_atualizado = users_collection.find_one({
+        "_id": ObjectId(usuario_id)
+    })
+
+    return jsonify({
+        "success": True,
+        "mensagem": f"Transferência realizada para {nome_destinatario}",
+        "ganhos": float(usuario_atualizado.get("ganhos", 0))
+    })
+
 
 
 # =========================
