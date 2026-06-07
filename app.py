@@ -108,86 +108,86 @@ os.makedirs(PDF_FOLDER, exist_ok=True)
 # =========================================================================
 # CENTRALIZADOR GLOBAL DE SEGURANÇA E AUDITORIA DE ERROS
 # =========================================================================
-def obter_localizacao_ip(ip):
-    """
-    Consulta a API de geolocalização para extrair cidade e estado do IP.
-    """
-    # Ignora IPs de teste local
-    if ip in ['127.0.0.1', 'localhost'] or ip.startswith('192.168.'):
-        return "Rede Local / Teste"
+# def obter_localizacao_ip(ip):
+#     """
+#     Consulta a API de geolocalização para extrair cidade e estado do IP.
+#     """
+#     # Ignora IPs de teste local
+#     if ip in ['127.0.0.1', 'localhost'] or ip.startswith('192.168.'):
+#         return "Rede Local / Teste"
     
-    try:
-        # Consulta a API de forma ultra rápida (limite de 1s para não travar o site)
-        resposta = requests.get(f"http://ip-api.com{ip}?fields=status,city,regionName,country", timeout=1)
-        dados_geo = resposta.json()
+#     try:
+#         # Consulta a API de forma ultra rápida (limite de 1s para não travar o site)
+#         resposta = requests.get(f"http://ip-api.com{ip}?fields=status,city,regionName,country", timeout=1)
+#         dados_geo = resposta.json()
         
-        if dados_geo.get("status") == "success":
-            return f"{dados_geo.get('city')}, {dados_geo.get('regionName')} - {dados_geo.get('country')}"
-    except:
-        pass
+#         if dados_geo.get("status") == "success":
+#             return f"{dados_geo.get('city')}, {dados_geo.get('regionName')} - {dados_geo.get('country')}"
+#     except:
+#         pass
     
-    return "Não identificada"
+#     return "Não identificada"
 
 
-@app.before_request
-def monitorar_seguranca_global():
-    ip_usuario = request.headers.get('X-Forwarded-For', request.remote_addr)
-    # Se houver uma lista de IPs, pega apenas o primeiro (IP real do cliente)
-    if ip_usuario and ',' in ip_usuario:
-        ip_usuario = ip_usuario.split(',')[0].strip()
+# @app.before_request
+# def monitorar_seguranca_global():
+#     ip_usuario = request.headers.get('X-Forwarded-For', request.remote_addr)
+#     # Se houver uma lista de IPs, pega apenas o primeiro (IP real do cliente)
+#     if ip_usuario and ',' in ip_usuario:
+#         ip_usuario = ip_usuario.split(',')[0].strip()
 
-    rotas_criticas = ['/saque', '/raspadinha/resultado']
+#     rotas_criticas = ['/saque', '/raspadinha/resultado']
     
-    if request.path in rotas_criticas:
-        dados = request.get_json(silent=True) or {}
-        usuario_id = dados.get("usuario_id") or request.args.get("usuario_id")
+#     if request.path in rotas_criticas:
+#         dados = request.get_json(silent=True) or {}
+#         usuario_id = dados.get("usuario_id") or request.args.get("usuario_id")
         
-        if usuario_id and not ObjectId.is_valid(str(usuario_id)):
-            # Busca a localização antes de salvar
-            localizacao = obter_localizacao_ip(ip_usuario)
+#         if usuario_id and not ObjectId.is_valid(str(usuario_id)):
+#             # Busca a localização antes de salvar
+#             localizacao = obter_localizacao_ip(ip_usuario)
 
-            db["logs_seguranca_erros"].insert_one({
-                "tipo": "TENTATIVA_INVASAO_ID",
-                "status_code": 400,
-                "rota": request.path,
-                "metodo": request.method,
-                "detalhe": f"Formato de ID inválido ou tentativa de injeção: '{usuario_id}'",
-                "ip": ip_usuario,
-                "localizacao": localizacao, # <-- Novo campo salvo no banco
-                "user_agent": request.headers.get("User-Agent"),
-                "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")
-            })
-            return jsonify({"erro": "Ação inválida. Esta tentativa foi registrada para auditoria."}), 400
+#             db["logs_seguranca_erros"].insert_one({
+#                 "tipo": "TENTATIVA_INVASAO_ID",
+#                 "status_code": 400,
+#                 "rota": request.path,
+#                 "metodo": request.method,
+#                 "detalhe": f"Formato de ID inválido ou tentativa de injeção: '{usuario_id}'",
+#                 "ip": ip_usuario,
+#                 "localizacao": localizacao, # <-- Novo campo salvo no banco
+#                 "user_agent": request.headers.get("User-Agent"),
+#                 "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")
+#             })
+#             return jsonify({"erro": "Ação inválida. Esta tentativa foi registrada para auditoria."}), 400
 
 
-@app.errorhandler(Exception)
-def capturar_erros_500_global(e):
-    ip_usuario = request.headers.get('X-Forwarded-For', request.remote_addr)
-    if ip_usuario and ',' in ip_usuario:
-        ip_usuario = ip_usuario.split(',')[0].strip()
+# @app.errorhandler(Exception)
+# def capturar_erros_500_global(e):
+#     ip_usuario = request.headers.get('X-Forwarded-For', request.remote_addr)
+#     if ip_usuario and ',' in ip_usuario:
+#         ip_usuario = ip_usuario.split(',')[0].strip()
         
-    erro_completo = traceback.format_exc()
+#     erro_completo = traceback.format_exc()
     
-    # Busca a localização antes de salvar
-    localizacao = obter_localizacao_ip(ip_usuario)
+#     # Busca a localização antes de salvar
+#     localizacao = obter_localizacao_ip(ip_usuario)
 
-    db["logs_seguranca_erros"].insert_one({
-        "tipo": "ERRO_SISTEMA_500",
-        "status_code": getattr(e, 'code', 500),
-        "rota": request.path,
-        "metodo": request.method,
-        "erro_mensagem": str(e),
-        "rastreamento_terminal": erro_completo,
-        "ip": ip_usuario,
-        "localizacao": localizacao, # <-- Novo campo salvo no banco
-        "user_agent": request.headers.get("User-Agent"),
-        "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")
-    })
+#     db["logs_seguranca_erros"].insert_one({
+#         "tipo": "ERRO_SISTEMA_500",
+#         "status_code": getattr(e, 'code', 500),
+#         "rota": request.path,
+#         "metodo": request.method,
+#         "erro_mensagem": str(e),
+#         "rastreamento_terminal": erro_completo,
+#         "ip": ip_usuario,
+#         "localizacao": localizacao, # <-- Novo campo salvo no banco
+#         "user_agent": request.headers.get("User-Agent"),
+#         "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")
+#     })
     
-    return jsonify({
-        "erro": "Ocorreu uma inconsistência interna no servidor.",
-        "mensagem": "O incidente foi registrado automaticamente para análise técnica."
-    }), 500
+#     return jsonify({
+#         "erro": "Ocorreu uma inconsistência interna no servidor.",
+#         "mensagem": "O incidente foi registrado automaticamente para análise técnica."
+#     }), 500
 
 @app.route("/template", methods=["POST"])
 def template():
