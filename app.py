@@ -108,86 +108,86 @@ os.makedirs(PDF_FOLDER, exist_ok=True)
 # =========================================================================
 # CENTRALIZADOR GLOBAL DE SEGURANÇA E AUDITORIA DE ERROS
 # =========================================================================
-# def obter_localizacao_ip(ip):
-#     """
-#     Consulta a API de geolocalização para extrair cidade e estado do IP.
-#     """
-#     # Ignora IPs de teste local
-#     if ip in ['127.0.0.1', 'localhost'] or ip.startswith('192.168.'):
-#         return "Rede Local / Teste"
+def obter_localizacao_ip(ip):
+    """
+    Consulta a API de geolocalização para extrair cidade e estado do IP.
+    """
+    # Ignora IPs de teste local
+    if ip in ['127.0.0.1', 'localhost'] or ip.startswith('192.168.'):
+        return "Rede Local / Teste"
     
-#     try:
-#         # Consulta a API de forma ultra rápida (limite de 1s para não travar o site)
-#         resposta = requests.get(f"http://ip-api.com{ip}?fields=status,city,regionName,country", timeout=1)
-#         dados_geo = resposta.json()
+    try:
+        # Consulta a API de forma ultra rápida (limite de 1s para não travar o site)
+        resposta = requests.get(f"http://ip-api.com{ip}?fields=status,city,regionName,country", timeout=1)
+        dados_geo = resposta.json()
         
-#         if dados_geo.get("status") == "success":
-#             return f"{dados_geo.get('city')}, {dados_geo.get('regionName')} - {dados_geo.get('country')}"
-#     except:
-#         pass
+        if dados_geo.get("status") == "success":
+            return f"{dados_geo.get('city')}, {dados_geo.get('regionName')} - {dados_geo.get('country')}"
+    except:
+        pass
     
-#     return "Não identificada"
+    return "Não identificada"
 
 
-# @app.before_request
-# def monitorar_seguranca_global():
-#     ip_usuario = request.headers.get('X-Forwarded-For', request.remote_addr)
-#     # Se houver uma lista de IPs, pega apenas o primeiro (IP real do cliente)
-#     if ip_usuario and ',' in ip_usuario:
-#         ip_usuario = ip_usuario.split(',')[0].strip()
+@app.before_request
+def monitorar_seguranca_global():
+    ip_usuario = request.headers.get('X-Forwarded-For', request.remote_addr)
+    # Se houver uma lista de IPs, pega apenas o primeiro (IP real do cliente)
+    if ip_usuario and ',' in ip_usuario:
+        ip_usuario = ip_usuario.split(',')[0].strip()
 
-#     rotas_criticas = ['/saque', '/raspadinha/resultado']
+    rotas_criticas = ['/saque', '/raspadinha/resultado']
     
-#     if request.path in rotas_criticas:
-#         dados = request.get_json(silent=True) or {}
-#         usuario_id = dados.get("usuario_id") or request.args.get("usuario_id")
+    if request.path in rotas_criticas:
+        dados = request.get_json(silent=True) or {}
+        usuario_id = dados.get("usuario_id") or request.args.get("usuario_id")
         
-#         if usuario_id and not ObjectId.is_valid(str(usuario_id)):
-#             # Busca a localização antes de salvar
-#             localizacao = obter_localizacao_ip(ip_usuario)
+        if usuario_id and not ObjectId.is_valid(str(usuario_id)):
+            # Busca a localização antes de salvar
+            localizacao = obter_localizacao_ip(ip_usuario)
 
-#             db["logs_seguranca_erros"].insert_one({
-#                 "tipo": "TENTATIVA_INVASAO_ID",
-#                 "status_code": 400,
-#                 "rota": request.path,
-#                 "metodo": request.method,
-#                 "detalhe": f"Formato de ID inválido ou tentativa de injeção: '{usuario_id}'",
-#                 "ip": ip_usuario,
-#                 "localizacao": localizacao, # <-- Novo campo salvo no banco
-#                 "user_agent": request.headers.get("User-Agent"),
-#                 "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")
-#             })
-#             return jsonify({"erro": "Ação inválida. Esta tentativa foi registrada para auditoria."}), 400
+            db["logs_seguranca_erros"].insert_one({
+                "tipo": "TENTATIVA_INVASAO_ID",
+                "status_code": 400,
+                "rota": request.path,
+                "metodo": request.method,
+                "detalhe": f"Formato de ID inválido ou tentativa de injeção: '{usuario_id}'",
+                "ip": ip_usuario,
+                "localizacao": localizacao, # <-- Novo campo salvo no banco
+                "user_agent": request.headers.get("User-Agent"),
+                "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")
+            })
+            return jsonify({"erro": "Ação inválida. Esta tentativa foi registrada para auditoria."}), 400
 
 
-# @app.errorhandler(Exception)
-# def capturar_erros_500_global(e):
-#     ip_usuario = request.headers.get('X-Forwarded-For', request.remote_addr)
-#     if ip_usuario and ',' in ip_usuario:
-#         ip_usuario = ip_usuario.split(',')[0].strip()
+@app.errorhandler(Exception)
+def capturar_erros_500_global(e):
+    ip_usuario = request.headers.get('X-Forwarded-For', request.remote_addr)
+    if ip_usuario and ',' in ip_usuario:
+        ip_usuario = ip_usuario.split(',')[0].strip()
         
-#     erro_completo = traceback.format_exc()
+    erro_completo = traceback.format_exc()
     
-#     # Busca a localização antes de salvar
-#     localizacao = obter_localizacao_ip(ip_usuario)
+    # Busca a localização antes de salvar
+    localizacao = obter_localizacao_ip(ip_usuario)
 
-#     db["logs_seguranca_erros"].insert_one({
-#         "tipo": "ERRO_SISTEMA_500",
-#         "status_code": getattr(e, 'code', 500),
-#         "rota": request.path,
-#         "metodo": request.method,
-#         "erro_mensagem": str(e),
-#         "rastreamento_terminal": erro_completo,
-#         "ip": ip_usuario,
-#         "localizacao": localizacao, # <-- Novo campo salvo no banco
-#         "user_agent": request.headers.get("User-Agent"),
-#         "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")
-#     })
+    db["logs_seguranca_erros"].insert_one({
+        "tipo": "ERRO_SISTEMA_500",
+        "status_code": getattr(e, 'code', 500),
+        "rota": request.path,
+        "metodo": request.method,
+        "erro_mensagem": str(e),
+        "rastreamento_terminal": erro_completo,
+        "ip": ip_usuario,
+        "localizacao": localizacao, # <-- Novo campo salvo no banco
+        "user_agent": request.headers.get("User-Agent"),
+        "data": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M:%S")
+    })
     
-#     return jsonify({
-#         "erro": "Ocorreu uma inconsistência interna no servidor.",
-#         "mensagem": "O incidente foi registrado automaticamente para análise técnica."
-#     }), 500
+    return jsonify({
+        "erro": "Ocorreu uma inconsistência interna no servidor.",
+        "mensagem": "O incidente foi registrado automaticamente para análise técnica."
+    }), 500
 
 @app.route("/template", methods=["POST"])
 def template():
@@ -774,14 +774,14 @@ def login():
     try:
         data = request.json
 
-        cpf = str(data["cpf"]).strip()
+        email = str(data["email"]).strip()
 
-        usuario = users_collection.find_one({"cpf": cpf})
+        usuario = users_collection.find_one({"email": email})
 
         if not usuario:
             return jsonify({
                 "status": "erro",
-                "mensagem": "CPF não encontrado"
+                "mensagem": "Email não encontrado"
             }), 404
 
         users_collection.update_one(
@@ -879,8 +879,9 @@ def logout():
 #------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------
 # 📄 PÁGINA PROJETO  PRINCIPAL
+@app.route("/access/codigo_servico/1722/<vendedor_id>/<projeto_id>")
 @app.route("/vitoria_visionaria/projeto-desenvolvimento-fase-teste/codigo_servico/1722/<usuario_id>/<projeto_id>")
-def view_pagamentos(usuario_id, projeto_id):
+def view_pagamentos(usuario_id=None, vendedor_id=None, projeto_id=None):
 
     def limpar_numero(n):
         return re.sub(r"\D", "", str(n))
@@ -898,19 +899,38 @@ def view_pagamentos(usuario_id, projeto_id):
         except:
             return 0
 
-    if not usuario_id:
+    if not usuario_id and not vendedor_id:
         return redirect("/vitoria-visonaria_franca-sp")
 
-    # BUSCA USUÁRIO
-    usuario = users_collection.find_one({"_id": ObjectId(usuario_id)})
-    if not usuario:
-        return "usuário não encontrado", 404
-    
-    # Converte ID do usuário para string para evitar erro no template
-    usuario["_id"] = str(usuario["_id"])
+    usuario = None
+    vendedor = None
 
-    email = (usuario.get("email") or usuario.get("email_usuario") or "").strip().lower()
-    cpf = limpar_cpf(usuario.get("cpf"))
+    # Busca usuário
+    if usuario_id:
+        usuario = users_collection.find_one({
+            "_id": ObjectId(usuario_id)
+        })
+
+        if not usuario:
+            return "usuário não encontrado", 404
+
+        pessoa = usuario
+
+    # Busca vendedor
+    elif vendedor_id:
+        vendedor = vendedores_collection.find_one({
+            "_id": ObjectId(vendedor_id)
+        })
+
+        if not vendedor:
+            return "vendedor não encontrado", 404
+
+        pessoa = vendedor
+
+    pessoa["_id"] = str(pessoa["_id"])
+
+    email = (pessoa.get("email") or pessoa.get("email_usuario") or "").strip().lower()
+    cpf = limpar_cpf(pessoa.get("cpf"))
 
     # BILHETES APROVADOS
     bilhetes_all = bilhete_model.get_all_bilhetes() or []
@@ -974,11 +994,14 @@ def view_pagamentos(usuario_id, projeto_id):
     return render_template(
         "index-1.html",
         usuario=usuario,
+        vendedor=vendedor,
         usuarios=usuarios,
         projetos=projetos,
         bilhetes=bilhetes,
         projeto_principal=projeto_principal,
-        projeto_id=projeto_id
+        projeto_id=projeto_id,
+        usuario_id=usuario_id,
+        vendedor_id=vendedor_id
     )
 
 #----------------------------------------------------------------------  
@@ -2158,9 +2181,6 @@ def listar_usuarios():
     except Exception as e:
         print("ERRO /usuarios:", e)  # 👈 MUITO IMPORTANTE PRA DEBUG
         return jsonify({"status": "erro", "mensagem": str(e)}), 500
-
-
-
 
 
 from bson import ObjectId
@@ -3840,17 +3860,32 @@ def usuario_saiu():
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
+@app.route("/access/codigo_servico/1722/<vendedor_id>")
 @app.route("/vitoria_visionaria/projeto-desenvolvimento-fase-teste/codigo_servico/1722/<usuario_id>")
-def eventos_semana(usuario_id):
-
+def eventos_semana(usuario_id=None, vendedor_id=None):
     try:
-        if not usuario_id:
-            return redirect("/vitoria-visonaria_franca-sp")
 
-        usuario = users_collection.find_one({"_id": ObjectId(usuario_id)})
+        usuario = None
+        vendedor = None
 
-        if not usuario:
-            return "usuário não encontrado", 404
+        if usuario_id:
+            usuario = users_collection.find_one(
+                {"_id": ObjectId(usuario_id)}
+            )
+
+            if not usuario:
+                return "usuário não encontrado", 404
+
+        elif vendedor_id:
+            vendedor = vendedores_collection.find_one(
+                {"_id": ObjectId(vendedor_id)}
+            )
+
+            if not vendedor:
+                return "vendedor não encontrado", 404
+
+        else:
+            return redirect("/rooms")
 
         projetos = list(projetos_collection.find())
 
@@ -3860,13 +3895,15 @@ def eventos_semana(usuario_id):
         return render_template(
             "graficos/eventos/eventos.html",
             projetos=projetos,
-            usuario_id=usuario_id
+            usuario_id=usuario_id,
+            vendedor_id=vendedor_id,
+            usuario=usuario,
+            vendedor=vendedor
         )
 
     except Exception as e:
         print("ERRO:", e)
         return "Erro ao carregar eventos", 500
-
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
@@ -4164,7 +4201,6 @@ PREMIOS = [
     {"id": 14, "valor": "R$ 1.000.00", "numero": 1000.00, "imagem": "https://res.cloudinary.com/dptprh0xk/image/upload/v1779217595/file_0000000013b471f9a0c8b0e9e02ccb7a_udhftc.png", "probabilidade": 0.01}
 ]
 
-# Nota: Corrigi também erros de digitação nos campos "numero" dos IDs 12 e 13 da sua lista original.
 
 #---------------------------------------------------------------------------------------------
 # NOVA RASPADINHA AQUI 
@@ -4531,9 +4567,9 @@ def saque():
 
 
 
-# ===========================================================================
-# TRANSFERENCIAS DE GANHOS PARA OUTRO USUARIO_ID (COM HISTÓRICO)
-# ===========================================================================
+# # ===========================================================================
+# # TRANSFERENCIAS DE GANHOS PARA OUTRO USUARIO_ID (COM HISTÓRICO)
+# # ===========================================================================
 @app.route('/transferencia', methods=['POST'])
 def transferencia():
     dados = request.get_json() or {}
@@ -4596,10 +4632,16 @@ def transferencia():
             "_id": ObjectId(favorecido)
         })
 
-    # Procura por telefone
+    # Procura por chave_pix
     if not destinatario:
         destinatario = users_collection.find_one({
-            "telefone": favorecido
+            "chave_pix": favorecido
+        })
+
+    # Procura por email
+    if not destinatario:
+        destinatario = users_collection.find_one({
+            "email": favorecido
         })
 
     # Procura por CPF
@@ -4666,12 +4708,46 @@ def transferencia():
         "_id": ObjectId(usuario_id)
     })
 
+    #Saldo atualizado remetente
+
+    socketio.emit(
+    "saldo_atualizado",
+    {
+    "usuario_id": str(usuario_id),
+    "ganhos": float(usuario_atualizado.get("ganhos", 0))
+    }
+    )
+
+    #Saldo atualizado destinatário
+
+    destinatario_atualizado = users_collection.find_one({
+    "_id": destinatario["_id"]
+    })
+
+    socketio.emit(
+    "saldo_atualizado",
+    {
+    "usuario_id": str(destinatario["_id"]),
+    "ganhos": float(destinatario_atualizado.get("ganhos", 0))
+    }
+    )
+
+    #Notificação de transferência
+
+    socketio.emit(
+    "transferencia_recebida",
+    {
+    "usuario_id": str(destinatario["_id"]),
+    "valor": round(valor, 2),
+    "nome": nome_remetente
+    }
+    )
+
     return jsonify({
         "success": True,
         "mensagem": f"Transferência realizada para {nome_destinatario}",
         "ganhos": float(usuario_atualizado.get("ganhos", 0))
     })
-
 
 
 # =========================

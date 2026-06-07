@@ -25,7 +25,41 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/raspadinha/raspadinha.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/registro.css') }}">
 <style> 
+.mp-footer-menu {
+    position: relative;
+    bottom: 20px; /* Distância da parte de baixo do menu */
+    left: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding-top: 15px;
+    /* border-top: 1px solid #eaeaea; Linha separadora opcional */
+}
 
+.mp-seguro {
+    font-size: 12px;
+    color: #c4ff01;
+    font-family: sans-serif;
+}
+
+.mp-icons {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espaçamento entre os ícones */
+}
+
+.mp-logo {
+    height: 25px; /* Ajuste o tamanho da logo principal */
+    width: auto;
+}
+
+.mp-icon {
+    height: 20px; /* Ajuste o tamanho dos ícones de cartão/pix */
+    width: auto;
+    opacity: 0.8;
+}
 /* .push__wrapper {
     margin-top: 75px;
 }
@@ -120,10 +154,28 @@
 
 @font-face {
   font-family: 'MinhaFonteCustomizada'; /* Nome que você vai dar para a fonte */
-  src: url('/static/fonts/NK57 Monospace Cd Bd It.otf') format('truetype'); /* Caminho correto do arquivo */
+  src: url('/static/fonts/Bigtimes.woff2') format('woff2'),
+       url('/static/fonts/Bigtimes.woff') format('woff');  
   font-weight: normal;
   font-style: normal;
 }
+
+@font-face {
+  font-family: 'MinhaFonte'; /* Nome que você vai dar para a fonte */
+  src: url('/static/fonts/Mitshuka_PERSONAL_USE_ONLY.otf') format('truetype'); /* Caminho correto do arquivo */
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'MinhaFonteNumbers';
+  src: url('/static/fonts/Stoehr Numbers.woff2') format('woff2'),
+       url('/static/fonts/Stoehr Numbers.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
 
 .botao-som-flutuante {
   position: fixed;
@@ -721,7 +773,9 @@
 
 <body>
 
-  
+<div id="notificacao-chat"></div>
+    <!-- NAV BAR SUPERIOR -->
+  </div>  
 <div id="loading-pagamento">
 
     <div class="loading-box-pagamento">
@@ -813,16 +867,17 @@
             alt="Prêmio">
         </div>
 
-        <canvas id="card" width="310" height="160"></canvas>
+        <canvas   id="card" width="310" height="160"></canvas>
 
     </div>
 
 <div style="display:block" class="chat-container"> 
+    
     <strong style="font-size: 16px; font-family: 'MinhaFonteCustomizada', sans-serif;" id="status-box"></strong>
 </div>
 
-    <button  class="botao-cassaniquel" id="new-btn" onclick="resetCard()">
-        PLAY
+    <button style="color:#fff; font-family:MinhaFonte; font-size: 1rem;"  class="botao-cassaniquel" id="new-btn" onclick="resetCard()">
+        Start
     </button>
 
 
@@ -851,25 +906,26 @@
             <img class="logo-raspadinha"
             src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
             alt="logo-raspadinha">
+         <h2 style="color:#fff; font-family:MinhaFonte; font-size: 1rem; text-align: center;">Ferrari Tech</h2>
         
 
         <div class="auth-tabs">
-            <button class="auth-tab active">Login</button>
-            <button class="auth-tab">Registro</button>
+            <button style="color:red; font-family:MinhaFonte; font-size: 1rem;" class="auth-tab active">Login</button>
+            <button style="color:gold; font-family:MinhaFonte; font-size: 1rem;" class="auth-tab">Registre-se</button>
         </div>
 
         <!-- LOGIN -->
         <form id="formLogin" class="auth-form active">
 
-            <h2>Entrar</h2>
+            <h2 style="color:#fff; font-family:MinhaFonte; font-size: 1.5rem;">Entrar na sala</h2>
 
             <div class="input-group">
-                <input style="color:#000; font-weight: bold; font-size:16px;" id="cpfLogin" type="password" placeholder="CPF" required>
+                <input style="color:#000; font-weight: bold; font-size:16px;" id="emailLogin" type="email" placeholder="Digite seu email...." required>
             </div>
         <!-- Mensagem de erro ou sucesso -->
             <div style="text-align: center; font-weight: bold; color:red;" id="loginMsg"></div>
 
-            <button type="submit" class="auth-btn">
+            <button style="color:#fff; font-family:MinhaFonte; font-size: 1.5rem;" type="submit" class="auth-btn">
                 Entrar
             </button>
 
@@ -879,9 +935,9 @@
         <form id="formRegistro" class="auth-form">
             <div id="loadingOverlay">
                 <div class="spinner-border" role="status"></div>
-                <span id="loadingText">Verificando dados...</span>
+                <span style="color:yellow; font-family:MinhaFonte; font-size: 1rem;" id="loadingText">Verificando dados...</span>
             </div>
-            <h2>Criar Conta</h2>
+            <h2 style="color:#fff; font-family:MinhaFonte; font-size: 1rem;">Criar Conta</h2>
 
             <div class="form-grid">
 
@@ -930,14 +986,14 @@
                         <!-- --- CONTAINER DA CHECKBOX ADICIONADO AQUI --- -->
             <div class="termos-container">
                 <input type="checkbox" id="aceitaTermos" name="termos" required>
-                <label for="aceitaTermos">
+                <label style="color:#fff; font-family:MinhaFonte; font-size: 0.8rem;" for="aceitaTermos">
                     Li e aceito os <a href="/termos" target="_blank">Termos de Uso</a> e políticas.
                 </label>
             </div>
                 <div style="text-align: center; font-weight: bold; color:rgb(21, 255, 0);" id="registroMsg" class="mt-2"></div>
 
-            <button id="btnSubmit" class="auth-btn">
-                Registrar
+            <button style="color:#fff; font-family:MinhaFonte; font-size: 1.5rem;" id="btnSubmit" class="auth-btn">
+                Registrar Agora
             </button>
         </form>
         
@@ -976,9 +1032,11 @@
 
     <div class="buy-card">  
 
-        <h2 style="color:yellow; font-family:MinhaFonteCustomizada;">Ferrari Tech <br>
-            <p>Compras dentro Aplicativo</p>
-        </h2>  
+            <img class="logo-raspadinha"
+            src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
+            alt="logo-raspadinha">
+         <h2 style="color:#fff; font-family:MinhaFonte; font-size: 1rem;">Ferrari Tech</h2>
+         <h2 style="color:#fff; font-family:MinhaFonte; font-size: 1rem;"> Sala depositos</h2>
 
         <div class="auth-tabs">
 
@@ -994,7 +1052,7 @@
                 <span style="color: #fff;" class="material-symbols-outlined">account_balance</span>
             </button>
 
-            <button style="background: red; color: #fff; font-weight: bold;" class="auth-tab" onclick="fecharCompra()">
+            <button style="color: #fff; font-weight: bold;" class="auth-tab" onclick="fecharCompra()">
                <span class="material-symbols-outlined">arrow_back_ios_new</span>
             </button>
 
@@ -1011,18 +1069,19 @@
 
                     <div class="produto-info">
 
-                        <h3 class="produto-titulo">Pix Rápido</h3>
-                        <p class="produto-descricao">Ferrari Tech Serviço Digital</p>
+                        <h3 style="color:green; font-family:MinhaFonte; font-size: 1rem;" class="produto-titulo">Pix Rápido</h3>
+                        <p style="color:#000; font-family:MinhaFonte; font-size: 1rem;" class="produto-descricao">Ferrari Tech Serviço Digital</p>
 
                         <div class="compra-container">
                             <button class="btn-qtd menos">-</button>
                             <span class="quantidade">1</span>
                             <button class="btn-qtd mais">+</button>
-                            <button id="btn-pagar" class="btn-comprar">Comprar</button>
+                            <button style="color:#fff; font-family:MinhaFonte; font-size: 1rem;" id="btn-pagar" class="btn-comprar">Comprar</button>
                         </div>
 
-                        <div class="total-container">
-                            Total: R$ <span class="total-bruto">0.60</span>
+                        <div style="color:#000; font-family:MinhaFonte; font-size: 1rem;" class="total-container">
+                            Total: R$ 
+                            <span style="color:#000; font-family:MinhaFonteNumbers; font-size: 1.5rem;" class="total-bruto">0.60</span>
                         </div>
 
                     </div>
@@ -1040,23 +1099,24 @@
 
                     <div class="produto-info">
 
-                        <h3 class="produto-titulo">Cartão de Crédito<br>
+                        <h3 style="color:blue; font-family:MinhaFonte; font-size: 1rem;" class="produto-titulo">Cartão de Crédito<br>
                             Players Premium
                             <span style="background: #000; border-radius: 50%; color: gold;" class="material-symbols-outlined">workspace_premium</span>
                         </h3>
-                        <p class="produto-descricao">Ferrari Tech Serviço Digital</p>
+                        <p style="color:#000; font-family:MinhaFonte; font-size: 1rem;" class="produto-descricao">Ferrari Tech Serviço Digital</p>
                         <div class="compra-container">
                             <button class="btn-qtd menos">-</button>
                             <span class="quantidade">5</span>
                             <button class="btn-qtd mais">+</button>
 
                             <a style="width:100%" href="/pagamento/cartao_credito/ferrari-tech/{{ usuario._id }}">
-                                <button class="btn-comprar">Comprar</button>
+                                <button style="color:#fff; font-family:MinhaFonte; font-size: 1rem;" class="btn-comprar">Comprar</button>
                             </a>
                         </div>
 
-                        <div class="total-container">
-                            Total: R$ <span class="total-bruto">3.00</span>
+                        <div style="color:#000; font-family:MinhaFonte; font-size: 1rem;" class="total-container">
+                            Total: R$ 
+                            <span style="color:#000; font-family:MinhaFonteNumbers; font-size: 1.5rem;" class="total-bruto">3.00</span>
                         </div>
 
                     </div>
@@ -1065,7 +1125,7 @@
 
             </div>
 
-            <!-- SALDO -->
+             <!-- SALDO -->
             <div class="buy-slide">
 
                 <div class="card-produto" data-preco-unitario="0.60">
@@ -1073,7 +1133,7 @@
                     <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png" class="produto-img">
 
                     <div class="produto-info">
-                         <p class="produto-titulo">Usar Saldo</p>
+                         <p style="color:#000; font-family:MinhaFonte; font-size: 1rem;"  class="produto-titulo">Usar Saldo</p>
 
                         <p style="display: none;" class="produto-titulo"><br>
                             {{usuario.ganhos}}
@@ -1085,22 +1145,35 @@
                             <span class="quantidade">1</span>
                             <button class="btn-qtd mais">+</button>
 
-                            <button class="btn-comprar" id="btn-saldo">Comprar</button>
+                            <button style="color:#fff; font-family:MinhaFonte; font-size: 1rem;"  class="btn-comprar" id="btn-saldo">Comprar</button>
                         </div>
 
-                        <div class="total-container">
-                            Total: R$ <span class="total-bruto">0.60</span>
+                        <div style="color:#000; font-family:MinhaFonte; font-size: 1rem;"  class="total-container">
+                            Total: R$ <span style="color:#000; font-family:MinhaFonteNumbers; font-size: 1rem;"  class="total-bruto">0.60</span>
                         </div>
 
                     </div>
+
 
                 </div>
 
             </div>
 
         </div>
+        
 
+   <div class="mp-footer-menu">
+    <span style="color:#fff; font-family:MinhaFonteCustomizada; font-size: 1rem;"   class="mp-seguro">Pagamento 100% seguro 🔐</span>
+
+    <div class="mp-icons">
+        <img class="mp-logo" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1780704197/Logotipo_do_Banco_Central_do_Brasil.svg_lj5wck.png" alt="Banco Central do Brasil">
+        <img class="mp-logo" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1764290951/pix-icon_ixm2o0.svg" alt="PIX">
+        <img class="mp-logo" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1765203728/mastercard_i5c2wh.png" alt="Mastercard">
+        <img class="mp-logo" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1780704886/mercado-pago-seeklogo_pvbdkt.png" alt="Mercado Pago">
     </div>
+</div>
+    </div>
+
 
 </div>
 
@@ -1110,11 +1183,19 @@
 
   <div class="prize-card">
 
-    <h2>Prêmios 🏆</h2>
+    <h2 style="color:#fff; font-family:MinhaFonte; font-size: 1rem;" >Prêmios 🏆</h2>
 
     <div class="premios-scroll">
 
       <div class="premios-grid">
+
+        <div class="premio-item">
+          <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1780455026/Gemini_Generated_Image_yern2fyern2fyern_a3p5r2.png">
+          <div class="multiplicadores">
+          </div>
+          <strong>R$ 0,00</strong>
+        </div>
+
 
         <div class="premio-item">
           <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778621532/1778621069295_byxfmy.png">
@@ -1331,7 +1412,10 @@
 <div class="saques-overlay" id="saques-overlay">
 
     <div style="max-height:85vh; overflow-y:auto;" class="saques-card">
-        <h2 style="color:#ffff; font-family:MinhaFonteCustomizada;">Ferrari Tech <br>
+            <img class="logo-raspadinha"
+            src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
+            alt="logo-raspadinha">        
+        <h2 style="color:#fff; font-family:MinhaFonte; font-size: 1rem;" >Ferrari Tech <br>
             <p>Saques Mov/Trasferencias</p>
         </h2>  
         <div class="auth-tabs">
@@ -1348,33 +1432,33 @@
         <!-- SACAR -->
         <div class="aba-saque-content" id="aba-0">
 
-            <h2 style="color:#fff; font-family:MinhaFonteCustomizada;">Saque da carteira</h2>
+            <h2 style="color:#fff; font-family:MinhaFonte; font-size: 1rem; margin: 5px auto;" >Saque da carteira</h2>
 
             <div class="saque-form">
 
                 <div>
                     <label>Valor Saque</label>
-                    <input type="text" id="valor-saque" placeholder="R$ {{ '%.2f'|format(usuario.ganhos|float)|replace('.', ',') if usuario else '0,00' }}">
+                    <input style="color:#000; font-family:MinhaFonteNumbers; font-size: 1rem;" type="text" id="valor-saque" placeholder="R$ {{ '%.2f'|format(usuario.ganhos|float)|replace('.', ',') if usuario else '0,00' }}">
 
 
                 </div>
 
                 <div>
                     <label>Nome Favorecido</label>
-                    <input type="text" id="saque-nome" value="{{ usuario.nome }}" disabled>
+                    <input style="color:#000; font-family:MinhaFonte; font-size: 1rem;" type="text" id="saque-nome" value="{{ usuario.nome }}" disabled>
                 </div>
 
                 <div>
                     <label>CPF do Titular</label>
-                    <input type="text" id="saque-cpf" value="{{ usuario.cpf }}" disabled>
+                    <input style="color:#000; font-family:MinhaFonteNumbers; font-size: 1rem;" type="text" id="saque-cpf" value="{{ usuario.cpf }}" disabled>
                 </div>
 
                 <div>
                     <label> Chave PIX</label>
-                    <input type="text" id="saque-pix" value="{{ usuario.chave_pix }}" disabled>
+                    <input style="color:#000; font-family:MinhaFonteNumbers; font-size: 1rem;" type="text" id="saque-pix" value="{{ usuario.chave_pix }}" disabled>
                 </div>
 
-                <button class="withdraw-btn" onclick="solicitarSaque()">
+                <button style="color:#fff; font-family:MinhaFonte; font-size: 1.5rem;" class="withdraw-btn" onclick="solicitarSaque()">
                     Solicitar Saque
                 </button>
 
@@ -1385,14 +1469,14 @@
         <!-- ENTRADAS -->
         <div class="aba-saque-content" id="aba-1" style="display:none;">
 
-            <h2 style="color:#fff; font-family:MinhaFonteCustomizada;">Entradas (Ganhos)</h2>
+            <h2 style="color:#fff; font-family:MinhaFonte; font-size: 1rem; margin: 5px auto;" >Entradas (Ganhos)</h2>
 
             <table class="tabela-financeira">
                 <thead>
                     <tr>
-                        <th>Data</th>
-                        <th>Tipo</th>
-                        <th>Valor</th>
+                        <th style="color:#fff; font-family:MinhaFonte; font-size: 1rem;">Data</th>
+                        <th style="color:#fff; font-family:MinhaFonte; font-size: 1rem;">Tipo</th>
+                        <th style="color:#fff; font-family:MinhaFonte; font-size: 1rem;">Valor</th>
                     </tr>
                 </thead>
 
@@ -1405,14 +1489,14 @@
         <!-- SAÍDAS -->
         <div class="aba-saque-content" id="aba-2" style="display:none;">
 
-            <h2 style="color:#fff; font-family:MinhaFonteCustomizada;">Saídas (Saques)</h2>
+            <h2 style="color:red; font-family:MinhaFonte; font-size: 1rem; margin: 5px auto;" >Saídas (Saques)</h2>
 
             <table class="tabela-financeira">
                 <thead>
                     <tr>
-                        <th>Data</th>
-                        <th>Status</th>
-                        <th>Valor</th>
+                        <th style="color:#fff; font-family:MinhaFonte; font-size: 1rem;">Data</th>
+                        <th style="color:#fff; font-family:MinhaFonte; font-size: 1rem;">Tipo</th>
+                        <th style="color:red; font-family:MinhaFonte; font-size: 1rem;">Valor</th>
                     </tr>
                 </thead>
 
@@ -1425,23 +1509,38 @@
         <!--Trasferencias ganhos para usuario_id-->
         <div class="aba-saque-content" id="aba-3" style="display: none;">
                    <div class="saque-form">
-            <h2 style="color:#fff; font-family:MinhaFonteCustomizada;">Saídas (Transferências)</h2>
+            <h2 style="color:#fff; font-family:MinhaFonte; font-size: 1.5rem; margin: 5px auto;" >Saídas (Transferências)</h2>
 
                 <div>
-                    <label>Valor Transferência<br> (min: R$ 0.60 max: R$ 1.000.00)</label>
-                    <input type="text" id="valor-transferencia" placeholder="R$ {{ '%.2f'|format(usuario.ganhos|float)|replace('.', ',') if usuario else '0,00' }}">
+                    <label>Valor Transferência para outros Players<br><span style="color:gold; text-align: center; font-weight: bold;"> (min: R$ 0.60 max: R$ 1.000.00)</span></label>
+                    <input style="color:red; font-family:MinhaFonteNumbers; font-size: 1rem;" type="text" id="valor-transferencia" placeholder="R$ {{ '%.2f'|format(usuario.ganhos|float)|replace('.', ',') if usuario else '0,00' }}">
                 </div>
 
                 <div>
-                    <label>ID Player Favorecido ou Telefone "Obrigatório"</label>
+                    <label>ID Player Favorecido ou chave pix "Obrigatório"</label>
                     <input type="text" id="favorecido" placeholder="{{ usuario_id }}" required>
                 </div>
 
-                <button class="withdraw-btn" onclick="fazerTransferencia()">
+                <button style="color:#fff; font-family:MinhaFonte; font-size: 1rem;" class="withdraw-btn" onclick="fazerTransferencia()">
                     Fazer Transferencia
                 </button>
+                <div id="transfer-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:999999;align-items:center;justify-content:center;">
 
-            </div>
+                    <div style="width:90%;max-width:350px;background:#111;border-radius:15px;padding:20px;text-align:center;border:1px solid #333;">
+
+                        <h3 id="transfer-status" style="color:#fff; font-family:MinhaFonte; font-size: 1rem; margin: 5px auto;">
+                            Iniciando...
+                        </h3>
+
+                        <div style="width:100%;height:20px;background:#222;border-radius:20px;overflow:hidden;">
+
+                            <div id="transfer-bar" style="width:0%;height:100%;background:linear-gradient(90deg,#00ff88,#00ccff);transition:all .4s ease;"></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
         </div>
     </div>
@@ -1464,16 +1563,41 @@
 
     <!-- Header/Footer Fixo -->
     <header class="fixed-bottom-menu">
-        <button class="btn-acao">
-            <img onclick="abrirCompra()" style="width: 32px; height: 32px; background: radial-gradient(circle, #0364ff 0%, #013bfc 100%); border-radius: 50%;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778012674/icone-de-carrinho-de-compras-3d-em-fundo-de-circulo-azul-simbolo-de-varejo-online_84443-55705_dfmhp8.png"></img>
-        </button>
-        <button class="btn-acao"  onclick="abrirSaques()"> 
+        <button class="btn-acao" onclick="abrirCompra()">
+        <!-- <img onclick="abrirCompra()" style="width: 48px; height: 48px; background: radial-gradient(circle, #000 0%, #013bfc 100%); border-radius: 50%;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778012674/icone-de-carrinho-de-compras-3d-em-fundo-de-circulo-azul-simbolo-de-varejo-online_84443-55705_dfmhp8.png"></img> -->
         <span style="
-        color: yellow;
+        color: #fff;
         background: radial-gradient(circle, #000 0%, #013bfc 100%);
         border-radius: 50%;
-        width: 32px;
-        height: 32px;
+        box-shadow: 
+            0 5px 10px rgb(0, 7, 10),
+            inset 0 3px 5px rgba(0, 5, 16, 0.979), 
+            inset 0 -3px 5px rgba(241, 242, 243, 0.945);     
+        transition: all 0.1s ease-in-out;
+
+        width: 48px;
+        height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        vertical-align: middle;
+        " class="material-symbols-outlined">local_convenience_store</span>         
+        </button>
+
+        <button class="btn-acao"  onclick="abrirSaques()"> 
+        <span style="
+        color: #fff;
+        background: radial-gradient(circle, #000 0%, #013bfc 100%);
+        border-radius: 50%;
+        box-shadow: 
+            0 5px 10px rgb(0, 7, 10),
+            inset 0 3px 5px rgba(0, 5, 16, 0.979), 
+            inset 0 -3px 5px rgba(241, 242, 243, 0.945);
+        transition: all 0.1s ease-in-out;
+
+        width: 48px;
+        height: 48px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -1481,13 +1605,20 @@
         vertical-align: middle;
         " class="material-symbols-outlined">account_balance_wallet</span>
         </button>
+        
         <button class="btn-acao" onclick="window.location.href='/chat/usuario/{{ usuario_id }}'">
         <span style="
-        color: yellow;
+        color: #fff;
         background: radial-gradient(circle, #000 0%, #013bfc 100%);
         border-radius: 50%;
-        width: 32px;
-        height: 32px;
+        box-shadow: 
+            0 5px 10px rgb(0, 7, 10),
+            inset 0 3px 5px rgba(0, 5, 16, 0.979), 
+            inset 0 -3px 5px rgba(241, 242, 243, 0.945);   
+        transition: all 0.1s ease-in-out;
+                 
+        width: 48px;
+        height: 48px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -1527,19 +1658,22 @@
         <!-- BOTÃO -->
         <button class="btn-acao" onclick="abrirdados()">
        <span style="
-        color: yellow;
+        color: #fff;
         background: radial-gradient(circle, #000 0%, #013bfc 100%);
         border-radius: 50%;
-        width: 32px;
-        height: 32px;
+        box-shadow: 
+            0 5px 10px rgb(0, 7, 10),
+            inset 0 3px 5px rgba(0, 5, 16, 0.979), 
+            inset 0 -3px 5px rgba(241, 242, 243, 0.945);     
+        transition: all 0.1s ease-in-out;
+        width: 48px;
+        height: 48px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         font-size: 28px;
         vertical-align: middle;
-        " class="material-symbols-outlined" role="button" tabindex="0">database</span>
-        
-
+        " class="material-symbols-outlined" role="button" tabindex="0">account_circle</span>
         </button>
 
         <!-- MODAL -->
@@ -1547,53 +1681,57 @@
 
             <div class="modal-dados-box">
 
-                <h2>Dados Usuario</h2>
+                <h2 style="color:#fff; font-family:MinhaFonte; font-size: 1rem; margin: 5px auto;" >Dados Usuario</h2>
 
                 <div class="dados-scroll">
 
-                    <p>
-                        ID:
-                        <span id="usuario_id">{{ usuario._id }}</span>
+                    <p style="color:#fff; font-family:MinhaFonte; font-size: 1rem;">
+                        ID: Transferência
+                        <span style="color:gold; font-family:MinhaFonteNumbers; font-size: 1rem;" id="usuario_id">{{ usuario._id }}</span>
                     </p>
 
-                    <p>
+                    <p style="color:#fff; font-family:MinhaFonte; font-size: 1rem;">
                         Nome:
                         <span id="nome">{{ usuario.nome }}</span>
                     </p>
 
-                    <p>
+                    <p style="color:#fff; font-family:MinhaFonte; font-size: 1rem;">
                         Sobrenome:
                         <span id="sobrenome">{{ usuario.sobrenome }}</span>
                     </p>
 
-                    <p>
+                    <p style="color:#fff; font-family:MinhaFonte; font-size: 1rem;">
                         CPF:
-                        <span id="cpf">{{ usuario.cpf }}</span>
+                        <span style="color:red; font-family:MinhaFonteNumbers; font-size: 1rem;" id="cpf">{{ usuario.cpf }}</span>
                     </p>
 
-                    <p>
+                    <p style="color:#fff; font-family:MinhaFonteCustomizada; font-size: 1.5rem;">
                         Email:
                         <span id="email">{{ usuario.email }}</span>
                     </p>
 
+                    <p style="color:#fff; font-family:MinhaFonte; font-size: 1rem;">
+                        Chave Pix Registrada:
+                        <span style="color:red; font-family:MinhaFonteNumbers; font-size: 1rem;" id="chave_pix">{{ usuario.chave_pix }}</span>
+                    </p>                    
                     <p>
                         Indicação:
                         <span id="vendedor">{{ usuario.vendedor }}</span>
                     </p>
 
                     
-                    <p>
+                    <p style="color:green; font-family:MinhaFonte; font-size: 1rem;">
                         Saldo:
-                        <span>R$ {{ "%.2f"|format(usuario.ganhos|float)|replace('.', ',') if usuario else "0,00" }}</span>
+                        <span style="color:red; font-family:MinhaFonteNumbers; font-size: 1rem;">R$ {{ "%.2f"|format(usuario.ganhos|float)|replace('.', ',') if usuario else "0,00" }}</span>
                     </p>
                         <!-- O Botão HTML -->
                         <!-- O Botão HTML -->
                     
-                    <button style="background: blue;" class="btn-deletar-conta" onclick="limparProgressoJogo()">Resetar Jogo</button>
+                    <button style="color:#fff; font-family:MinhaFonte; font-size: 1rem; margin: 5px auto;" style="background: blue;" class="btn-deletar-conta" onclick="limparProgressoJogo()">Resetar Jogo</button>
 
                     
                     
-                    <button class="btn-deletar-conta">
+                    <button style="color:#fff; font-family:MinhaFonte; font-size: 1rem; margin: 5px auto;" class="btn-deletar-conta">
                         Deletar Conta
                     </button>
 
@@ -1602,7 +1740,7 @@
 
                 </div>
 
-                <button class="btn-fechar-dados" onclick="fechardados()">
+                <button style="color:#fff; font-family:MinhaFonte; font-size: 1rem; margin: 5px auto;" class="btn-fechar-dados" onclick="fechardados()">
                     Fechar
                 </button>
 
@@ -2146,50 +2284,227 @@ location.reload(); // Recarrega o jogo do zero
 }
 }
 
+// ================================
+// TRANSFERENCIAS GANHOS TEMPO REAL
+// ================================
 
+const meuUsuarioId = "{{ usuario_id }}"; 
 
-let anguloAtual = 0;
-let girando = false;
+// 3. Entra na sala exclusiva assim que conectar
+socket.on("connect", () => {
+    if (meuUsuarioId && meuUsuarioId !== "None") {
+        socket.emit("join", { usuario_id: meuUsuarioId });
+    }
+});
 
-function girarRoleta() {
-    if (girando) return;
-    girando = true;
-    
-    const roleta = document.getElementById('roleta');
-    const botao = document.getElementById('botaoGirar');
-    
-    // Calcula giros aleatórios (pelo menos 5 giros completos)
-    const voltasMinimas = 5;
-    const grausAleatorios = Math.floor(Math.random() * 360);
-    anguloAtual += (voltasMinimas * 360) + grausAleatorios;
-    
-    // Aplica o giro
-    roleta.style.transform = `rotate(${anguloAtual}deg)`;
-    botao.disabled = true;
-    
-    // Aguarda o fim da animação (4 segundos conforme CSS)
-    setTimeout(() => {
-        girando = false;
-        botao.disabled = false;
-        alert("A roleta parou! Verifique o resultado.");
-    }, 4000);
+socket.on("saldo_atualizado", function(data) {
+
+if (
+    typeof meuUsuarioId !== "undefined" &&
+    String(data.usuario_id) === String(meuUsuarioId)
+) {
+
+    const saldo = document.getElementById("saldo-valor");
+
+    if (saldo) {
+        saldo.innerText =
+            "R$ " +
+            Number(data.ganhos)
+                .toFixed(2)
+                .replace(".", ",");
+    }
+
+    const valorTransferencia =
+        document.getElementById("valor-transferencia");
+
+    if (valorTransferencia) {
+        valorTransferencia.value =
+            Number(data.ganhos)
+                .toFixed(2)
+                .replace(".", ",");
+    }
+
+    carregarMovimentacoes();
 }
 
-function fecharRoleta() {
-    document.getElementById('overlayRoleta').style.opacity = '0';
-    setTimeout(() => {
-        document.getElementById('overlayRoleta').style.display = 'none';
-    }, 300);
+});
+
+socket.on("transferencia_recebida", function(data) {
+
+if (
+    typeof usuario_id !== "undefined" &&
+    String(data.usuario_id) === String(usuario_id)
+) {
+
+    const saldo = document.getElementById("saldo-valor");
+
+    if (saldo) {
+
+        saldo.classList.add("pulse");
+
+        setTimeout(() => {
+            saldo.classList.remove("pulse");
+        }, 2000);
+    }
+
+    carregarMovimentacoes();
+
+    alert(
+        "Você recebeu R$ " +
+        Number(data.valor)
+            .toFixed(2)
+            .replace(".", ",") +
+        " de " +
+        data.nome
+    );
 }
 
-function abrirRoleta() {
-    const overlay = document.getElementById('overlayRoleta');
-    overlay.style.display = 'flex';
-    setTimeout(() => overlay.style.opacity = '1', 50);
+});
+
+
+// 5. Sua função de transferência ajustada
+async function fazerTransferencia() {
+    const valor = document
+        .getElementById('valor-transferencia')
+        .value
+        .replace(",", ".");
+
+    const favorecido = document
+        .getElementById('favorecido')
+        .value
+        .trim();
+
+    const overlay = document.getElementById('transfer-overlay');
+    const barra = document.getElementById('transfer-bar');
+    const status = document.getElementById('transfer-status');
+
+    try {
+        overlay.style.display = "flex";
+
+        barra.style.width = "10%";
+        status.innerText = "🔍 Buscando usuário...";
+
+        await new Promise(r => setTimeout(r, 600));
+
+        barra.style.width = "35%";
+        status.innerText = "👤 Validando destinatário...";
+
+        await new Promise(r => setTimeout(r, 600));
+
+        barra.style.width = "60%";
+        status.innerText = "💸 Executando transferência...";
+
+        const res = await fetch('/transferencia', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                valor,
+                favorecido,
+                usuario_id: meuUsuarioId // Garante envio do ID caso a session falhe
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            barra.style.width = "100%";
+            status.innerText = "✅ Transferência finalizada";
+
+            await new Promise(r => setTimeout(r, 1200));
+
+            // Limpa o formulário de transferência
+            document.getElementById('favorecido').value = '';
+            document.getElementById('valor-transferencia').value = '';
+
+            overlay.style.display = "none";
+
+            // Mensagem de sucesso do remetente
+            alert(data.mensagem);
+
+            // REMOVIDO: location.reload(); 
+            // Não precisa recarregar! O evento 'atualizacao_saldo' do SocketIO 
+            // já vai atualizar o saldo na tela em tempo real sem piscar a página.
+
+        } else {
+            barra.style.width = "100%";
+            status.innerText = "❌ " + (data.erro || "Falha na transferência");
+
+            await new Promise(r => setTimeout(r, 1500));
+
+            overlay.style.display = "none";
+            alert(data.erro || 'Erro na transferência');
+        }
+
+    } catch (erro) {
+        console.error(erro);
+        barra.style.width = "100%";
+        status.innerText = "❌ Erro de conexão";
+
+        await new Promise(r => setTimeout(r, 1500));
+
+        overlay.style.display = "none";
+        alert("Erro ao conectar ao servidor.");
+
+    } finally {
+        barra.style.width = "0%";
+    }
 }
+
+
+
+
+
+
+// ========================================
+// RECEBER MENSAGENS (IMEDIATO)
+// ========================================
+const vendedor_id = "{{ vendedor_id }}";
+const usuario_id = "{{ usuario_id }}";
+
+const tipo = "usuario";
+const meu_id = usuario_id;
+const nome_usuario = "{{ nome_usuario }}";
+const nome_vendedor = "{{ nome_vendedor }}";
+
+
+const notificacoesContato = {};
+
+socket.on("connect", () => {
+    socket.emit("register", {
+        tipo: tipo,
+        id: meu_id,
+        conversando_com_id: vendedor_id // Conversando com o Vendedor
+    });
+});
+
+if ("Notification" in window && Notification.permission !== "granted") {
+    Notification.requestPermission();
+}
+
+socket.on("new_message", (data) => {
+
+    if ("Notification" in window && Notification.permission === "granted") {
+
+        new Notification(`Nova mensagem de ${nome_vendedor}`, {
+            body: data.mensagem || "📎 Arquivo enviado",
+            icon: "https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
+        });
+
+    }
+
+    const audio = new Audio("https://notificationsounds.com/storage/sounds/file-sounds-1150-pristine.mp3");
+    audio.play().catch(() => {});
+
+});
+
 </script>
 
 </body>
 </html>
+
+
+
 
 

@@ -3,13 +3,13 @@
 document.getElementById("formLogin").addEventListener("submit", async function(e) {
     e.preventDefault();
 
-    const cpf = document.getElementById("cpfLogin").value.trim();
+    const email = document.getElementById("emailLogin").value.trim();
 
     try {
         const res = await fetch("/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ cpf: cpf })
+            body: JSON.stringify({ email: email })
         });
 
         const data = await res.json();

@@ -8,11 +8,13 @@
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
     <title>Dashboard Financeiro</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-    html, body {
-    overscroll-behavior-y: none;
-    }
+        html, body {
+        overscroll-behavior-y: none;
+        }
         * {
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -28,7 +30,28 @@
             min-height: 100vh;
             height: auto;
         }
+        @font-face {
+        font-family: 'MinhaFonteCustomizada'; /* Nome que você vai dar para a fonte */
+        src: url('/static/fonts/Bigtimes.woff2') format('woff2'),
+            url('/static/fonts/Bigtimes.woff') format('woff');  
+        font-weight: normal;
+        font-style: normal;
+        }
 
+        @font-face {
+        font-family: 'MinhaFonte'; /* Nome que você vai dar para a fonte */
+        src: url('/static/fonts/Mitshuka_PERSONAL_USE_ONLY.otf') format('truetype'); /* Caminho correto do arquivo */
+        font-weight: normal;
+        font-style: normal;
+        }
+
+        @font-face {
+        font-family: 'MinhaFonteNumbers';
+        src: url('/static/fonts/Stoehr Numbers.woff2') format('woff2'),
+            url('/static/fonts/Stoehr Numbers.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+        }
         /* --- ESTILIZAÇÃO DO HEADER --- */
         .navbar {
             position: fixed;
@@ -1088,20 +1111,20 @@
 <div class="auth-overlay" id="authOverlay">
 
     <div class="auth-box">
-
         <img class="logo-raspadinha"
              src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
              alt="logo-raspadinha">
+        <h2 style="color:red; font-family:MinhaFonte; font-size: 1rem;">Ferrari Tech</h2>
 
         <div class="auth-tabs">
-            <button type="button" class="auth-tab active">Login</button>
-            <button type="button" class="auth-tab">Registro</button>
+            <button style="color:red; font-family:MinhaFonte; font-size: 1rem;" class="auth-tab active">Login</button>
+            <button style="color:gold; font-family:MinhaFonte; font-size: 1rem;" class="auth-tab">Registre-se</button>
         </div>
-
         <!-- LOGIN -->
         <form id="formLogin" class="auth-form active">
 
-            <h2>Entrar</h2>
+        <h2 style="color:#fff; font-family:MinhaFonte; font-size: 1.5rem;">Entrar na sala</h2>
+
 
             <div class="input-group">
                 <input
@@ -1119,7 +1142,7 @@
                 id="loginMsg">
             </div>
 
-            <button type="submit" class="auth-btn">
+            <button  style="color:#fff; font-family:MinhaFonte; font-size: 1.5rem;" type="submit" class="auth-btn">
                 Entrar
             </button>
 
@@ -1130,10 +1153,9 @@
 
             <div id="loadingOverlay">
                 <div class="spinner-border" role="status"></div>
-                <span id="loadingText">Verificando dados...</span>
+                <span style="color:yellow; font-family:MinhaFonte; font-size: 1rem;" id="loadingText">Verificando dados...</span>
             </div>
-
-            <h2>Criar Conta</h2>
+            <h2 style="color:#fff; font-family:MinhaFonte; font-size: 1rem;">Criar Conta</h2>
 
             <div class="form-grid">
 
@@ -1227,7 +1249,7 @@
                     required
                 >
 
-                <label for="aceitaTermos">
+                <label style="color:#fff; font-family:MinhaFonte; font-size: 0.8rem;" for="aceitaTermos">
                     Li e aceito os
                     <a href="/termos_contrato" target="_blank">
                         Termos de Uso
@@ -1244,6 +1266,7 @@
             </div>
 
             <button
+                style="color:#fff; font-family:MinhaFonte; font-size: 1.5rem;" 
                 id="btnSubmit"
                 type="submit"
                 class="auth-btn"
@@ -1623,11 +1646,46 @@
         <!-- <button class="btn-acao">
             <img onclick="abrirCompra()" style="width: 32px; height: 32px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778012674/icone-de-carrinho-de-compras-3d-em-fundo-de-circulo-azul-simbolo-de-varejo-online_84443-55705_dfmhp8.png"></img>
         </button> -->
-        <button class="btn-acao"> 
-            <img onclick="abrirSaques()" style="width: 32px; height: 32px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778720610/saque_k5hlcq.png"></img>
+        <button class="btn-acao"  onclick="abrirSaques()"> 
+        <span style="
+        color: #fff;
+        background: radial-gradient(circle, #000 0%, #013bfc 100%);
+        border-radius: 50%;
+        box-shadow: 
+            0 5px 10px rgb(0, 7, 10),
+            inset 0 3px 5px rgba(0, 5, 16, 0.979), 
+            inset 0 -3px 5px rgba(241, 242, 243, 0.945);
+        transition: all 0.1s ease-in-out;
+
+        width: 48px;
+        height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        vertical-align: middle;
+        " class="material-symbols-outlined">account_balance_wallet</span>
         </button>
+
         <button class="btn-acao "onclick="location.href='/chat/vendedor/{{ vendedor_id }}'">
-        <img style="width: 32px; height: 32px;" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778702172/Pngtree_3d_isolated_render_of_a_20808938_lxm032.png"></img>
+        <span style="
+        color: #fff;
+        background: radial-gradient(circle, #000 0%, #013bfc 100%);
+        border-radius: 50%;
+        box-shadow: 
+            0 5px 10px rgb(0, 7, 10),
+            inset 0 3px 5px rgba(0, 5, 16, 0.979), 
+            inset 0 -3px 5px rgba(241, 242, 243, 0.945);   
+        transition: all 0.1s ease-in-out;
+                 
+        width: 48px;
+        height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        vertical-align: middle;
+        " class="material-symbols-outlined">support_agent</span>
         </button>
 
                 <!-- MODAL -->
@@ -1642,8 +1700,24 @@
         </div>
 
         <!-- BOTÃO -->
-        <button style="font-size: 22px;" class="btn-acao" onclick="abrirdados()">
-            📄
+        <button class="btn-acao" onclick="abrirdados()">
+       <span style="
+        color: #fff;
+        background: radial-gradient(circle, #000 0%, #013bfc 100%);
+        border-radius: 50%;
+        box-shadow: 
+            0 5px 10px rgb(0, 7, 10),
+            inset 0 3px 5px rgba(0, 5, 16, 0.979), 
+            inset 0 -3px 5px rgba(241, 242, 243, 0.945);     
+        transition: all 0.1s ease-in-out;
+        width: 48px;
+        height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        vertical-align: middle;
+        " class="material-symbols-outlined" role="button" tabindex="0">account_circle</span>
         </button>
 
             </div>

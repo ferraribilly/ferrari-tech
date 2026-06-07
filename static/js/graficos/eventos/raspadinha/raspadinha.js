@@ -104,9 +104,9 @@ function init() {
 
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#000';
 
-    ctx.font = '24px Arial';
+    ctx.font = '32px MinhaFonte';
 
     ctx.textAlign = 'center';
 
@@ -122,7 +122,6 @@ function init() {
         raspandoAgora = false;
     }
 }
-
 
 
 
@@ -692,7 +691,7 @@ function solicitarSaque() {
         const inputSaque = document.getElementById('valor-saque');
         if (inputSaque) inputSaque.value = '';
 
-        alert('Vamos será direcionado sala saque!');
+        alert('Vamos fazer auditoria e alguns minutos estara em sua conta cadastrada!');
 
         const loadingDiv = document.createElement('div');
         loadingDiv.id = "loading-saque";
@@ -722,7 +721,8 @@ function solicitarSaque() {
 
         const usuario_id = document.getElementById("usuario_id").textContent.trim();
 
-        const url = `/chat/usuario/${usuario_id}/6a1cd78b784f32efa3666ba3?text=${encodeURIComponent(msg)}`;
+        // const url = `/chat/usuario/${usuario_id}/6a1cd78b784f32efa3666ba3?text=${encodeURIComponent(msg)}`;
+        const url = `/raspadinha/${usuario_id}`;
         
         
 
@@ -734,48 +734,6 @@ function solicitarSaque() {
     });
 }
 
-
-
-
-async function fazerTransferencia() {
-const valor = document
-    .getElementById('valor-transferencia')
-    .value
-    .replace(",", ".");
-
-const favorecido = document
-    .getElementById('favorecido')
-    .value
-    .trim();
-
-const res = await fetch('/transferencia', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-        valor,
-        favorecido
-    })
-});
-
-const data = await res.json();
-
-if (data.success) {
-
-    alert(data.mensagem);
-
-    document.getElementById('favorecido').value = '';
-
-    carregarMovimentacoes();
-
-} else {
-
-    alert(data.erro || 'Erro na transferência');
-
-}
-
-}
 
 
 // =========================

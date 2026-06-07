@@ -249,7 +249,7 @@ def criar_vendedor(
         "chave_pix": chave_pix.strip(),
         "comissao": comissao.strip(),
         "mensagem_usuarios": [],
-        "bloqueado": [],
+        "bloqueado": "ativo",
         "ip_usuario": ip_usuario,
         "aparelho": aparelho,
         "localizacao": localizacao.strip(),  # 💾 Salvando a localização no banco de dados
