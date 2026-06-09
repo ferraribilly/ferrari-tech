@@ -2171,6 +2171,8 @@ def listar_usuarios():
                 "navegador": u.get("navegador", ""),
                 "mensagem_saques": u.get("mensagem_saques", ""),
                 "status": u.get("status", ""),
+                "bloqueado": u.get("bloqueado", ""),
+                "foto_perfil": u.get("foto_perfil", ""),
                 "vendedor_id": u.get("vendedor_id", "")
 
                 
@@ -4237,10 +4239,14 @@ def handle_usuario_entrou(data):
         return
 
     nome_usuario = usuario.get("nome", "Usuário")
+    foto_perfil = usuario.get(
+        "foto_perfil",
+       ""
+    )
 
     # AQUI VAI O HTML DA IMAGEM
     mensagem = f'''
-    <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
+    <img src="{ foto_perfil }"
          style="width:32px;height:32px;vertical-align:middle;margin-right:5px;">
 
     {nome_usuario} entrou no jogo
@@ -4266,6 +4272,18 @@ def handle_usuario_entrou(data):
     socketio.emit('notificacao_geral', {
         'lista': [u["texto"] for u in usuarios]
     })
+    
+@socketio.on('enviar_mensagem')
+def handle_mensagem_jogo(dados):
+    nome_usuario = usuario.get("nome", "Usuário")
+    foto_perfil = usuario.get(
+        "foto_perfil",
+       ""
+    )
+    
+    # Recebe do usuário e repassa para TODOS os jogadores conectados
+    emit('receber_mensagem', dados, broadcast=True)
+
 
 @socketio.on('disconnect')
 def usuario_saiu_jogo():
@@ -4282,6 +4300,7 @@ def usuario_saiu_jogo():
 def resultado_raspadinha():
     dados = request.get_json() or {}
     usuario_id = dados.get("usuario_id")
+
     
     if not usuario_id:
         referer = request.headers.get("Referer", "")
@@ -4675,7 +4694,7 @@ def transferencia():
             },
             "$push": {
                 "saidas": {
-                    "status": "transferencia",
+                    "status": destinatario,
                     "valor": round(valor, 2),
                     "data": data_formatada,
                     "destinatario_id": str(destinatario["_id"]),

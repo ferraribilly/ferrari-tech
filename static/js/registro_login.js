@@ -295,3 +295,42 @@ document.addEventListener("DOMContentLoaded", function() {
     }, 5000);
 
 });
+
+
+const fotoInput = document.getElementById("foto");
+const preview = document.getElementById("preview");
+const removerBtn = document.getElementById("removerFoto");
+
+function abrirGaleria() {
+    fotoInput.removeAttribute("capture");
+    fotoInput.click();
+}
+
+// O nome da função mudou para evitar conflito com o ID do botão
+function limparFoto() {
+    if (fotoInput) fotoInput.value = ""; // Evita erro se o input não existir na tela
+    preview.src = "";
+    preview.classList.add("hidden");
+    removerBtn.classList.add("hidden");
+}
+
+function previewImagem() {
+    const arquivo = this.files[0];
+
+    if (!arquivo) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        preview.src = e.target.result;
+        preview.classList.remove("hidden");
+        removerBtn.classList.remove("hidden");
+    };
+
+    reader.readAsDataURL(arquivo);
+}
+
+// Só adiciona o evento se o input existir na página
+if (fotoInput) {
+    fotoInput.addEventListener("change", previewImagem);
+}

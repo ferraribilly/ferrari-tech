@@ -91,7 +91,8 @@ def criar_usuario(
         "ganhos": 0.00,
         "saques": 0.00,
         "mensagem_saques": [],
-        "bloqueado": [],
+        "bloqueado": "ativo",
+        "foto_perfil": "https://res.cloudinary.com/dptprh0xk/image/upload/v1780883398/307ce493-b254-4b2d-8ba4-d12c080d6651_qaihst.png",
 
         "ip_usuario": ip_usuario,
         "aparelho": aparelho,

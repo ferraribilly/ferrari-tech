@@ -326,7 +326,7 @@ canvas {
 }
 
 .saques-overlay{
-    background: rgb(0, 55, 0);
+    background:#333;
 }
 
 .buy-card{
@@ -474,7 +474,7 @@ canvas {
 
 
 .saques-card{
-    background: rgb(0, 79, 0);
+    background: #333;
 }
 
 .saques-card h2,
@@ -486,11 +486,11 @@ canvas {
 }
 .tabela-financeira {
     width: 100%;
-    background: #fff;
+    background: #222;
     border-collapse: collapse;
     border-radius: 3px;
     margin-top: 15px;
-    color:#000;
+    color:#fff;
     text-align: center;
     font-weight: bold;
     font-size: 14px;
@@ -665,12 +665,18 @@ th, .tabela-financeira td {
 
 
 
-.btn-acao img{
-    /* background-color:#fff;
-    border-radius: 50%; */
-    background-size:cover;
-    background-position: center;
-    background-repeat: no-repeat;
+
+/* Efeito ao clicar (botão afunda) */
+.btn-acao span:active {
+  box-shadow: 
+    0 2px 5px rgba(23, 0, 0, 0.96),
+    inset 0 3px 5px rgba(22, 0, 0, 0.942);
+  transform: translateY(2px);
+}
+
+.btn-acao span:disabled{
+    opacity:.5;
+    cursor:not-allowed;
 }
 
 
@@ -962,6 +968,10 @@ th, .tabela-financeira td {
 .input-group select:focus{
     border-color: #000;
     background: #554848;
+}
+
+#data_nascimento ::placeholder{
+    color:#fff;
 }
 
 .auth-form ::placeholder{
