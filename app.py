@@ -4275,12 +4275,7 @@ def handle_usuario_entrou(data):
     
 @socketio.on('enviar_mensagem')
 def handle_mensagem_jogo(dados):
-    nome_usuario = usuario.get("nome", "Usuário")
-    foto_perfil = usuario.get(
-        "foto_perfil",
-       ""
-    )
-    
+
     # Recebe do usuário e repassa para TODOS os jogadores conectados
     emit('receber_mensagem', dados, broadcast=True)
 

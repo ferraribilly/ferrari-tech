@@ -131,7 +131,7 @@
   position: fixed;
   top: 20px; /* Distância do topo da tela */
   left: 20px; /* ALTERADO: Agora alinhado à esquerda */
-  z-index: 100; /* Garante que o botão fique sempre na frente de todo o conteúdo */
+  z-index:9999; /* Garante que o botão fique sempre na frente de todo o conteúdo */
   
   /* Estilos visuais do botão */
   background-color: #ff4d5087; /* Cor de destaque para saída */
@@ -179,6 +179,7 @@
 
 .botao-som-flutuante {
   position: fixed;
+  z-index: 9999;
   top: 20px; /* Distância do topo da tela */
   right: 20px; /* Distância da borda direita */
   padding: 10px 20px;
