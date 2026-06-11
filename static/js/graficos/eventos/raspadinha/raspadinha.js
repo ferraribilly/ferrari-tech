@@ -94,9 +94,9 @@ function salvarEstadoRaspagem() {
 function init() {
 
     // NÃO RESETA SE ESTIVER RASPANDO
-    if (localStorage.getItem("raspandoAgora") === "1") {
-        return;
-    }
+    // if (localStorage.getItem("raspandoAgora") === "1") {
+    //     return;
+    // }
 
     ctx.globalCompositeOperation = 'source-over';
 
@@ -106,21 +106,21 @@ function init() {
 
     ctx.fillStyle = '#000';
 
-    ctx.font = '32px MinhaFonte';
+    ctx.font = '20px Arial';
 
     ctx.textAlign = 'center';
 
     ctx.fillText(
-        'Raspe aqui',
+        '',
         canvas.width / 2,
         canvas.height / 2 + 8
     );
 
     raspado = false;
 
-    if (!localStorage.getItem("raspandoAgora")) {
-        raspandoAgora = false;
-    }
+    // if (!localStorage.getItem("raspandoAgora")) {
+    //     raspandoAgora = false;
+    // }
 }
 
 

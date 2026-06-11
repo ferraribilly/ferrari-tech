@@ -1,0 +1,382 @@
+/* RESET */
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+/* BODY */
+body{
+  width:100vw;
+  height:100vh;
+  background-image:url("https://res.cloudinary.com/dptprh0xk/image/upload/v1765234639/hieroglifos-egipcios-na-parede_ny5mxy.jpg");
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  background-color:#000;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  font-family:monospace;
+  overflow:hidden;
+  touch-action:none;
+  padding-top:70px;
+}
+
+
+
+/* SLOT CANVAS */
+#slotCanvas{
+  animation: piscar_slotCanvas  1s infinite alternate;  
+  width:95vw;
+  max-width:900px;
+  aspect-ratio:3 / 3;
+  height:90%;
+  max-height:80vh;
+  min-height:360px;
+  background:transparent;
+  /* border:8px solid purple; */
+  border-radius:20px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:10px;
+  box-shadow:
+  0 0 10px #fff, /* Sombra branca básica */
+  0 0 20px #fff, /* Sombra de brilho ciano */
+  0 0 30px #fff, /* Sombra de brilho ciano mais espalhada */
+  0 0 40px #000, /* Sombra de brilho ciano ainda mais espalhada */
+  0 0 50px #000;  /* Sombra de brilho ciano com maior alcance */
+}
+
+@keyframes piscar_slotCanvas {                                
+  0% { border-color: gold; }                                
+  100% { border-color: gold; }                                
+}      
+
+
+#slotCanvas.inverted .reel {                                  
+  transform: scaleY(-1);                                
+  border: 10px solid blue;                              
+}                                
+        
+#slotCanvas.inverted .reel > .icons > img {                                  
+  transform: scaleY(-1);                              
+  border: 10px solid blue;                                
+}  
+
+/* ÁREA DOS REELS */
+#reels{
+  animation: piscar 1s infinite alternate;     
+  display:flex;
+  width:100%;
+  height:100%;
+  aspect-ratio:3 / 3;
+  max-height:60vh;
+  background:;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  border-radius:20px;
+  box-shadow:0 0 10px orange,0 0 20px #0ff,0 0 40px #0ff;
+  gap:6px;
+}
+
+@keyframes piscar {                                
+  0% { border-color: green }                                
+  100% { border-color: orange; }                                
+}      
+
+/* COLUNA */
+.reel{
+  flex:1;
+  height:100%;
+  overflow:hidden;
+  position:relative;
+  border-radius:12px;
+  background:rgba(0,0,0,0.2);
+  
+}
+
+/* COLUNA */
+.reel1{
+  flex:1;
+  height:100%;
+  overflow:hidden;
+  position:relative;
+  background:white;
+  border-radius:12px;
+  
+}
+
+
+
+
+
+
+/* PILHA */
+.reel .icons{
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  justify-content:flex-start;
+  gap:0;
+  position:relative;
+  will-change:transform;
+  transform:translateY(0);
+  z-index:2;
+  
+}
+
+/* CÉLULA */
+.reel .icons .symbol,
+.reel .icons img,
+.reel .icons .emoji-symbol{
+  flex:0 0 calc(100% / 3);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  height:calc(100% / 3);
+  box-sizing:border-box;
+  user-select:none;
+  -webkit-user-drag:none;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+  object-fit:contain;
+  pointer-events:none;
+  
+  
+}
+
+/* ÚLTIMA LINHA */
+.reel .icons .symbol:last-child,
+.reel .icons img:last-child,
+.reel .icons .emoji-symbol:last-child{
+  border-bottom:none;
+}
+
+/* WIN */
+.reel .icons .symbol.win,
+.reel .icons img.win,
+.reel .icons .emoji-symbol.win {
+  transform: scale(0.7);
+  z-index: 2;
+  animation: 
+    pulse-glow 1s infinite,
+    changeBackgroundColor 1s infinite;
+}
+
+/* brilho */
+@keyframes pulse-glow {          
+  0% { filter: brightness(100%); }          
+  50% { filter: brightness(150%); }          
+  100% { filter: brightness(100%); }          
+}
+
+/* fundo dourado */
+@keyframes changeBackgroundColor {          
+  /* from { background-color: gold; opacity: 50%; border-radius: 20px;height:calc(90% / 3); }           */
+  /* to   { background-color: gold; opacity: 50%; border-radius: 20px;height:calc(90% / 3); }           */
+}
+/* CONTROLS */
+#controls{
+  width:95vw;
+  max-width:850px;
+  background:#fff;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:10px;
+  border-radius:20px;
+  margin-top:10px;
+  height:10%;
+  opacity:60%
+
+  /* box-shadow:0 0 10px #fff,0 0 30px #0ff; */
+  
+}
+
+/* INFO */
+.secao-saldo,
+.secao-ganhos,
+.secao-apostas{
+  flex:1;
+  padding:20px;
+  text-align:center;
+  border-radius:12px;
+  /* background-image:url("https://res.cloudinary.com/dptprh0xk/image/upload/v1763614144/Pngtree_button_button_colorful__3911001_xudrfv.png"); */
+  background:#000;
+  background-size:cover;
+  background-position:center;
+  font-weight:bold;
+  height:100px;
+  opacity:90%;
+   
+}
+.secao-saldo{color:#00ff00;}
+.secao-ganhos{color:#ffd700;}
+.secao-apostas{color:#ff4444;}
+
+.titulo-saldo,
+.titulo-ganhos,
+.titulo-apostas{
+  font-size:22px;
+  opacity:.8;
+  font-family:monospace;
+  font-weight: bold;                            
+
+  }
+.valor-saldo,
+.valor-ganhos,
+.valor-apostas{
+  font-size:32px;
+  font-family:monospace;
+  font-weight: bold;    
+  display:block;                        
+
+}
+
+/* SPIN CONTROL */
+#spin-control{
+  width:95vw;
+  max-width:900px;
+  display:flex;
+  justify-content:space-between; /* espalha tudo */
+  align-items:center;
+  padding:20px 25px; /* aumenta o espaço lateral */
+  margin-top:15px;
+  border-radius:20px;
+  gap:0; /* distância controlada manualmente */
+}
+
+/* GRUPO BET */
+.bet-group{
+  display:flex;
+  align-items:center;
+  z-index:99999;
+  gap:35px; /* afasta - e + */
+}
+
+/* GRUPO AUTO/TURBO */
+.auto-turbo{
+  display:flex;
+  align-items:center;
+  gap:35px; /* afasta auto e turbo do bet */
+}
+
+/* BOTÕES */
+.auto{
+  width:110px;
+  height:110px;
+  border-radius:50%;
+  background-color: blue;
+  background-size:cover;
+  border:none;
+  text-align:center;
+  font-size:32px;
+  opacity:.8;
+  cursor:pointer;
+  box-shadow:0 0 10px #fff,0 0 30px #0ff;
+   /* Centraliza o texto horizontal e verticalmente */
+  display: flex; /* */
+  justify-content: center; /* Alinhamento horizontal */
+  align-items: center; /* Alinhamento vertical */
+  transition: background-color 0.3s;   
+}
+
+#autoplayBtn {
+    width:110px;
+    height:110px;
+    border-radius:50%;
+	background:trasnparent;
+    background-size: cover; /* Faz a imagem cobrir toda a área do botão, cortando as bordas se necessário */
+    background-position: center; /* Centraliza a imagem dentro do botão */
+    background-repeat: no-repeat; /* Evita que a imagem se repita */
+    box-shadow:0 0 10px #fff,0 0 30px #0ff;
+}
+
+.betminus {
+    width:80px;
+    height:80px;
+    border-radius:50%;
+	background:trasnparent;
+    background-size: cover; /* Faz a imagem cobrir toda a área do botão, cortando as bordas se necessário */
+    background-position: center; /* Centraliza a imagem dentro do botão */
+    background-repeat: no-repeat; /* Evita que a imagem se repita */
+    box-shadow:0 0 10px #fff,0 0 30px #0ff;
+}
+
+.turbo {
+    width:110px;
+    height:110px;
+    border-radius:50%;
+	background:trasnparent;
+    background-size: cover; /* Faz a imagem cobrir toda a área do botão, cortando as bordas se necessário */
+    background-position: center; /* Centraliza a imagem dentro do botão */
+    background-repeat: no-repeat; /* Evita que a imagem se repita */
+    box-shadow:0 0 10px #fff,0 0 30px #0ff;
+}
+
+.betplus {
+    width:80px;
+    height:80px;
+    border-radius:50%;
+	background:trasnparent;
+    background-size: cover; /* Faz a imagem cobrir toda a área do botão, cortando as bordas se necessário */
+    background-position: center; /* Centraliza a imagem dentro do botão */
+    background-repeat: no-repeat; /* Evita que a imagem se repita */
+    box-shadow:0 0 10px #fff,0 0 30px #0ff;
+}
+
+
+
+/* SPIN (NÃO MEXER) */
+#spin{
+  width:180px;
+  height:180px;
+  border-radius:50%;
+  background:transparent;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  animation: spin-rotate 2.5s linear infinite,pulse-glow-spin 1s infinite;
+  transform-origin: center;
+  box-shadow:0 0 10px #fff,0 0 30px #0ff;
+  
+}
+
+@keyframes pulse-glow-spin {          
+  0% { filter: brightness(100%); }          
+  50% { filter: brightness(150%); }          
+  100% { filter: brightness(100%); }          
+}        
+@keyframes spin-rotate{
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
+
+
+
+
+
+/* RESPONSIVO */
+@media(max-width:768px){
+  #reels{max-height:45vh;}
+  #spin{width:130px;height:130px;}
+  .betminus,.betplus,.auto,.turbo{
+    width:65px;
+    height:65px;
+  }
+}

@@ -1,20 +1,18 @@
 html, body {
-overscroll-behavior-y: none;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overscroll-behavior-y: none;
 }
 
-body{
-    background-image:url("https://res.cloudinary.com/dptprh0xk/image/upload/v1765234639/hieroglifos-egipcios-na-parede_ny5mxy.jpg");
+body {
+    background-image: url("https://res.cloudinary.com/dptprh0xk/image/upload/v1765234639/hieroglifos-egipcios-na-parede_ny5mxy.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    margin:0;
-    padding:0;
-    height: 100dvh;
-    font-family:Arial, Helvetica, sans-serif;
-    box-shadow: 0 10px 10px 4px #f6f6f6, 0 0 20px 8px rgba(248, 247, 248, 0.935);
 
+    font-family: Arial, Helvetica, sans-serif;
 }
-
 .top-header{
     width:100%;
     background: radial-gradient(circle, #000 0%, #013bfc 100%);
@@ -97,6 +95,7 @@ body{
     margin: 10px auto;
     border-radius: 10px;
     box-shadow: 0 10px 10px 4px #000a0f, 0 0 20px 8px rgba(17, 0, 17, 0.935);
+    z-index:9999;
 
 
 }
@@ -157,6 +156,7 @@ canvas {
     left: 0;
     border-radius: 10px;
     cursor: crosshair;
+    z-index:9999;
 }
 
 
@@ -375,6 +375,7 @@ canvas {
     height:100%;
     justify-content:center;
     align-items:center;
+    z-index:9999;
     animation: pulsarLentoWinOverlay 3s infinite ease-in-out;
     
 }

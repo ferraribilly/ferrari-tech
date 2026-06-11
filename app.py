@@ -5397,7 +5397,7 @@ def listar_raspadinhas():
 #---------------------------------------------------------------------------------------------
 
 
-@app.route("/admin", defaults={'vendedor_id': None})
+@app.route("/admin/", defaults={'vendedor_id': None})
 @app.route("/admin/<vendedor_id>", methods=["GET"])
 def fechamento_vendedores(vendedor_id=None):
 
@@ -6350,8 +6350,16 @@ def handle_ice_candidate(data):
     emit('receber-ice-candidate', {
         'candidate': data['candidate']
     }, room=str(destino_id))
+
+
+
+
+@app.route('/4f8c2d7e1a9b6f3d5c8e2a7d1f4b9c6e3a8d5f2c7b1e9a4d6f3c8b2e7a5d1f9')    
+def maquina():
+    return render_template("slotmachine3x3.html")
 #---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     socketio.run(
