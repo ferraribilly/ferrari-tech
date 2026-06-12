@@ -1,163 +1,179 @@
 /*TELAS CELULARES MOTO G5 */
-@media screen and (max-width: 600px) { /*536 largura máxima do moto g5 360px */
-    html, body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        height: auto;
-    }
+@media screen and (max-width: 600px) {
+  /*536 largura máxima do moto g5 360px */
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: auto;
+  }
 
-    .container {
-        width: 100%;
-        background: rgb(5, 0, 0);
-    }
+  .container {
+    width: 100%;
+    background: rgb(5, 0, 0);
+  }
 
-    .bola {
-        position: absolute;
-        top: 10px;
-        width: 80px;
-        left: 10px;
-        height: 80px;
-        /* Sombra interna (brilho) + Sombra externa (projeção) */
-        box-shadow:
-            inset -5px -5px 10px rgba(0,0,0,0.5),
-            3px 5px 8px rgb(249, 249, 249);
-        display: flex;
-        flex-flow: column;
-        align-items: center;
-        justify-content: center;
-        /* border:1px solid #ffffff; */
-        border-radius: 100%;
-        background: radial-gradient(circle at 30% 30%, #ff5722, #b71c1c); /* Efeito 3D na cor */
-    }
+  .bola {
+    position: absolute;
+    top: 10px;
+    width: 80px;
+    left: 10px;
+    height: 80px;
+    /* Sombra interna (brilho) + Sombra externa (projeção) */
+    box-shadow:
+      inset -5px -5px 10px rgba(0, 0, 0, 0.5),
+      3px 5px 8px rgb(249, 249, 249);
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    /* border:1px solid #ffffff; */
+    border-radius: 100%;
+    background: radial-gradient(
+      circle at 30% 30%,
+      #ff5722,
+      #b71c1c
+    ); /* Efeito 3D na cor */
+  }
 
-    .numero_sorteado {
-        margin-top: -25px;
-        font-size: 8em;
-    }
+  .numero_sorteado {
+    margin-top: -25px;
+    font-size: 8em;
+  }
 
-    .marcado {
-        color: rgb(248, 248, 248);
-        border-radius: 50%;
-        border: 1px solid #000;
-        background: radial-gradient(circle at 30% 30%, #ff5722, #b71c1c); /* Efeito 3D na cor */
-        /* Sombra interna (brilho) + Sombra externa (projeção) */
-        box-shadow:
-            inset -5px -5px 10px rgba(11, 11, 11, 0.5),
-            3px 5px 8px rgba(253, 253, 253, 0.544);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        width: 30px;
-        height: 30px;
-        font-size: 14px;
-        font-family: sans, serif;
-    }
+  .marcado {
+    color: rgb(248, 248, 248);
+    border-radius: 50%;
+    border: 1px solid #000;
+    background: radial-gradient(
+      circle at 30% 30%,
+      #ff5722,
+      #b71c1c
+    ); /* Efeito 3D na cor */
+    /* Sombra interna (brilho) + Sombra externa (projeção) */
+    box-shadow:
+      inset -5px -5px 10px rgba(11, 11, 11, 0.5),
+      3px 5px 8px rgba(253, 253, 253, 0.544);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+    font-family: sans, serif;
+  }
 
-       .ultimasbolas, .ultimasbolas2, .ultimasbolas3, .ultimasbolas4{
-        position:relative;
-        color: white;
-        margin: 0 auto;
-        width:50px;
-        height:50px;
-        /* Sombra interna (brilho) + Sombra externa (projeção) */
-        box-shadow: 
-        inset -5px -5px 10px rgba(0,0,0,0.5), 
-        3px 5px 8px rgba(247, 247, 247, 0.796);        
-        display:flex;
-        flex-flow: column;
-        align-items: center;
-        justify-content: center;
-        border:1px solid #ccc;
-        border-radius:100%;
-        font-family: sans, serif;
-        font-weight: bold;
-        background: radial-gradient(circle at 30% 30%, #ff5722, #b71c1c); /* Efeito 3D na cor */
-        left:40px;
-    }
+  .ultimasbolas,
+  .ultimasbolas2,
+  .ultimasbolas3,
+  .ultimasbolas4 {
+    position: relative;
+    color: white;
+    margin: 0 auto;
+    width: 50px;
+    height: 50px;
+    /* Sombra interna (brilho) + Sombra externa (projeção) */
+    box-shadow:
+      inset -5px -5px 10px rgba(0, 0, 0, 0.5),
+      3px 5px 8px rgba(247, 247, 247, 0.796);
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    border-radius: 100%;
+    font-family: sans, serif;
+    font-weight: bold;
+    background: radial-gradient(
+      circle at 30% 30%,
+      #ff5722,
+      #b71c1c
+    ); /* Efeito 3D na cor */
+    left: 40px;
+  }
 
+  .bingo {
+    top: 12px;
+    font-size: 1em;
+    width: 130px;
+    font-weight: bold;
+    color: #d55;
+    background-color: rgb(231, 186, 88);
+    border-radius: 5px;
+    padding: 30px 5px;
+    text-align: center;
+    left: 28%;
+  }
 
-    .bingo {
-        top: 12px;
-        font-size: 1em;
-        width: 130px;
-        font-weight: bold;
-        color: #d55;
-        background-color: rgb(231, 186, 88);
-        border-radius: 5px;
-        padding: 30px 5px;
-        text-align: center;
-        left: 28%
-    }
+  .tabela {
+    background: #0c0000;
+    position: relative;
+    margin-top: 100px;
+    padding: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
 
-    .tabela {
-        background: #0c0000;
-        position: relative;
-        margin-top: 100px;
-        padding: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-    }
+  .td {
+    padding: 1px 3px;
+  }
 
-    .td {
-        padding: 1px 3px;
-    }
+  .bolinha {
+    margin: 0;
+    font-weight: normal;
+    background-color: #eee;
+    border-color: #eee;
+    width: 30px;
+    height: 30px;
+  }
 
-    .bolinha {
-        margin: 0;
-        font-weight: normal;
-        background-color: #eee;
-        border-color: #eee;
-        width: 30px;
-        height: 30px;
-    }
+  .bolinha2 {
+    margin: 0;
+    font-weight: normal;
+    background-color: #eee;
+    border-color: #eee;
+    width: 30px;
+    height: 30px;
+  }
 
-    .bolinha2 {
-        margin: 0;
-        font-weight: normal;
-        background-color: #eee;
-        border-color: #eee;
-        width: 30px;
-        height: 30px;
-    }
+  .barra {
+    height: 7px;
+    border-radius: 0;
+  }
 
-    .barra {
-        height: 7px;
-        border-radius: 0;
-    }
+  .barra .progress-bar {
+    border-radius: 0;
+  }
 
-    .barra .progress-bar {
-        border-radius: 0;
-    }
+  .numero_sorteado {
+    top: 12px;
+    font-size: 6em;
+  }
 
-    .numero_sorteado {
-        top: 12px;
-        font-size: 6em;
-    }
+  .img {
+    top: 5px;
+    margin-right: 10px;
+    /* Sombra interna (brilho) + Sombra externa (projeção) */
+    box-shadow:
+      inset -5px -5px 10px rgba(0, 0, 0, 0.5),
+      3px 5px 8px rgb(249, 249, 249);
+  }
 
-    .img {
-        top: 5px;
-        margin-right: 10px;
-        /* Sombra interna (brilho) + Sombra externa (projeção) */
-        box-shadow:
-            inset -5px -5px 10px rgba(0,0,0,0.5),
-            3px 5px 8px rgb(249, 249, 249);        
-    }
+  img {
+    width: 100px;
+    height: auto;
+    border-radius: 5px;
+  }
 
-    img {
-        width: 100px;
-        height: auto;
-        border-radius: 5px;
-    }
+  #imgExpandida {
+    width: 300px;
+    height: auto;
+  }
 
-    #imgExpandida {
-        width: 300px;
-        height: auto;
-    }
-
-    .teclado{
+  .teclado {
     background: #050000;
     border-radius: 8px;
     height: 200px;
@@ -165,30 +181,28 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-}
+  }
 
-.teclado button{
+  .teclado button {
     background: radial-gradient(circle at 30% 30%, #ff5722, #b71c1c);
-    color:#fff;
-    border:none;
-    border-radius:6px;
-    font-size:16px;
-    font-weight:bold;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
 
     box-shadow:
-        inset -4px -4px 8px rgba(0,0,0,0.5),
-        2px 3px 6px rgba(0,0,0,0.4);
+      inset -4px -4px 8px rgba(0, 0, 0, 0.5),
+      2px 3px 6px rgba(0, 0, 0, 0.4);
 
-    cursor:pointer;
-}
+    cursor: pointer;
+  }
 
-.teclado button:hover{
-    filter:brightness(1.1);
-}
+  .teclado button:hover {
+    filter: brightness(1.1);
+  }
 
-.teclado button:active{
-    transform:scale(0.95);
-}  
-
-    
+  .teclado button:active {
+    transform: scale(0.95);
+  }
 }

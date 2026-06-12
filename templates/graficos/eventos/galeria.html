@@ -1,170 +1,238 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Galeria de Jogos</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
 
-        body {
-            background-color: #0f1115;
-            color: #ffffff;
-            padding: 20px;
-        }
+      body {
+        background-color: #0f1115;
+        color: #ffffff;
+        padding: 20px;
+      }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
 
-        .section-title {
-            display: flex;
-            align-items: center;
-            font-size: 1.25rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            gap: 8px;
-        }
+      .section-title {
+        display: flex;
+        align-items: center;
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-bottom: 15px;
+        gap: 8px;
+      }
 
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 12px;
-        }
+      .games-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+      }
 
-        .game-card {
-            position: relative;
-            border-radius: 12px;
-            overflow: hidden;
-            aspect-ratio: 3 / 4;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
-        }
+      .game-card {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        aspect-ratio: 3 / 4;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s;
+      }
 
-        .game-card:hover {
-            transform: scale(1.03);
-        }
+      .game-card:hover {
+        transform: scale(1.03);
+      }
 
-        /* Mantendo os gradientes originais como fallback caso a imagem falhe */
-        .rabbit-bg { background-color: #000; }
-        .ox-bg { background-color: #393b44; }
-        .tiger-bg { background-color: #ff4e50; }
-        .scroll-bg { background-color: #1d976c; }
+      /* Mantendo os gradientes originais como fallback caso a imagem falhe */
+      .rabbit-bg {
+        background-color: #000;
+      }
+      .ox-bg {
+        background-color: #393b44;
+      }
+      .tiger-bg {
+        background-color: #ff4e50;
+      }
+      .scroll-bg {
+        background-color: #1d976c;
+      }
 
-        .game-content {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 10px;
-            text-align: center;
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 50%, rgba(0,0,0,0.2) 80%, transparent);
-        }
+      .game-content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        text-align: center;
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.9) 50%,
+          rgba(0, 0, 0, 0.2) 80%,
+          transparent
+        );
+      }
 
-        .game-name {
-            font-size: 0.9rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,1);
-        }
+      .game-name {
+        font-size: 0.9rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 1);
+      }
 
-        .play-btn {
-            display: block;
-            width: 100%;
-            background-color: #ff0055;
-            color: #ffffff;
-            border: none;
-            padding: 6px 0;
-            font-size: 0.75rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            border-radius: 6px;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(255, 0, 85, 0.4);
-        }
+      .play-btn {
+        display: block;
+        width: 100%;
+        background-color: #ff0055;
+        color: #ffffff;
+        border: none;
+        padding: 6px 0;
+        font-size: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        border-radius: 6px;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(255, 0, 85, 0.4);
+      }
 
-        .play-btn:hover {
-            background-color: #e6004c;
-        }
+      .play-btn:hover {
+        background-color: #e6004c;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <div class="container">
+      <div class="section-title">🔥 Jogos Lançamentos</div>
 
-<div class="container">
-    <div class="section-title">
-        🔥 Jogos Lançamentos
+      <div class="games-grid">
+        <div
+          class="game-card rabbit-bg"
+          style="
+            background-image: url(&quot;https://res.cloudinary.com/dptprh0xk/image/upload/v1780284016/Screenshot_20260531_235631_Google_bamp7c.png&quot;);
+          "
+        >
+          <div class="game-content">
+            <div class="game-name">Roleta Black Pix</div>
+            <button
+              class="play-btn"
+              onclick="location.href='/black/acesso/afiliados/4f8c2d7e1a9b6f3d5c8e2a7d1f4b9c6e3a8d5f2c7b1e9a4d6f3c8b2e7a5d1f9/{{ vendedor_id }}'"
+            >
+              em desenvolvimento
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="game-card ox-bg"
+          style="
+            background-image: url(&quot;https://res.cloudinary.com/dptprh0xk/image/upload/v1778632848/1778632824626_hszmjz.png&quot;);
+          "
+        >
+          <div class="game-content">
+            <div class="game-name">Raspadinha Online</div>
+            <button class="play-btn" onclick="location.href = '/raspadinha'">
+              Jogar Agora
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="game-card tiger-bg"
+          style="
+            background-image: url(&quot;https://res.cloudinary.com/dptprh0xk/image/upload/v1765490175/Screenshot_20251211-185016_2_gaa74o.jpg&quot;);
+          "
+        >
+          <div class="game-content">
+            <div class="game-name">Fortune Duends Gold</div>
+            <button class="play-btn">em desenvolvimento</button>
+          </div>
+        </div>
+
+        <div
+          class="game-card scroll-bg"
+          style="
+            background-image: url(&quot;https://res.cloudinary.com/dptprh0xk/image/upload/v1765403339/Screenshot_20251210-184433_2_abzq81.jpg&quot;);
+          "
+        >
+          <div class="game-content">
+            <div class="game-name">Fortune Egpcia</div>
+            <button
+              class="play-btn"
+              onclick="
+                location.href =
+                  '/4f8c2d7e1a9b6f3d5c8e2a7d1f4b9c6e3a8d5f2c7b1e9a4d6f3c8b2e7a5d1f9'
+              "
+            >
+              em desenvolvimento
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="game-card rabbit-bg"
+          style="
+            background-image: url(&quot;https://res.cloudinary.com/dptprh0xk/image/upload/v1765494227/pngwing.com_10_gtuhzs.png&quot;);
+          "
+        >
+          <div class="game-content">
+            <div class="game-name">Jogos Dados</div>
+            <button class="play-btn">em desenvolvimento</button>
+          </div>
+        </div>
+
+        <div
+          class="game-card ox-bg"
+          style="
+            background-image: url(&quot;https://res.cloudinary.com/dptprh0xk/image/upload/v1765459482/Screenshot_20251211-101658_2_l62kgf.jpg&quot;);
+          "
+        >
+          <div class="game-content">
+            <div class="game-name">Fortune Dollar</div>
+            <button class="play-btn">em desenvolvimento</button>
+          </div>
+        </div>
+
+        <div
+          class="game-card tiger-bg"
+          style="
+            background-image: url(&quot;https://res.cloudinary.com/dptprh0xk/image/upload/v1765238905/ticket_juifuh.png&quot;);
+          "
+        >
+          <div class="game-content">
+            <div class="game-name">Rifas Onlines</div>
+            <button
+              class="play-btn"
+              onclick="location.href='/access/codigo_servico/1722/{{ vendedor_id }}'"
+            >
+              em auditoria contabil
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="game-card scroll-bg"
+          style="
+            background-image: url(&quot;https://res.cloudinary.com/dptprh0xk/image/upload/v1780367345/image_fa4704a0_1_dglyeq.png&quot;);
+          "
+        >
+          <div class="game-content">
+            <div class="game-name">Fortune Adega city</div>
+            <button class="play-btn">em desenvolvimento</button>
+          </div>
+        </div>
+      </div>
     </div>
-    
-    <div class="games-grid">
-        <div class="game-card rabbit-bg" style="background-image: url('https://res.cloudinary.com/dptprh0xk/image/upload/v1780284016/Screenshot_20260531_235631_Google_bamp7c.png');">
-            <div class="game-content">
-                <div class="game-name">Roleta Black Pix</div>
-                <button class="play-btn"  onclick="location.href='/black/acesso/afiliados/4f8c2d7e1a9b6f3d5c8e2a7d1f4b9c6e3a8d5f2c7b1e9a4d6f3c8b2e7a5d1f9/{{ vendedor_id }}'">em desenvolvimento</button>
-            </div>
-        </div>
-
-        <div class="game-card ox-bg" style="background-image: url('https://res.cloudinary.com/dptprh0xk/image/upload/v1778632848/1778632824626_hszmjz.png');">
-            <div class="game-content">
-                <div class="game-name">Raspadinha Online</div>
-                <button class="play-btn"  onclick="location.href='/raspadinha'">Jogar Agora</button>
-            </div>
-        </div>
-
-        <div class="game-card tiger-bg " style="background-image: url('https://res.cloudinary.com/dptprh0xk/image/upload/v1765490175/Screenshot_20251211-185016_2_gaa74o.jpg');">
-            <div class="game-content">
-                <div class="game-name">Fortune Duends Gold</div>
-                <button class="play-btn">em desenvolvimento</button>
-            </div>
-        </div>
-
-        <div class="game-card scroll-bg" style="background-image: url('https://res.cloudinary.com/dptprh0xk/image/upload/v1765403339/Screenshot_20251210-184433_2_abzq81.jpg');">
-            <div class="game-content">
-                <div class="game-name">Fortune Egpcia</div>
-                <button class="play-btn" onclick="location.href='/4f8c2d7e1a9b6f3d5c8e2a7d1f4b9c6e3a8d5f2c7b1e9a4d6f3c8b2e7a5d1f9'">em desenvolvimento</button>
-            </div>
-        </div>
-
-
-        <div class="game-card rabbit-bg" style="background-image: url('https://res.cloudinary.com/dptprh0xk/image/upload/v1765494227/pngwing.com_10_gtuhzs.png');">
-            <div class="game-content">
-                <div class="game-name">Jogos Dados</div>
-                <button class="play-btn">em desenvolvimento</button>
-            </div>
-        </div>
-
-        <div class="game-card ox-bg" style="background-image: url('https://res.cloudinary.com/dptprh0xk/image/upload/v1765459482/Screenshot_20251211-101658_2_l62kgf.jpg');">
-            <div class="game-content">
-                <div class="game-name">Fortune Dollar</div>
-                <button class="play-btn">em desenvolvimento</button>
-            </div>
-        </div>
-
-        <div class="game-card tiger-bg" style="background-image: url('https://res.cloudinary.com/dptprh0xk/image/upload/v1765238905/ticket_juifuh.png');">
-            <div class="game-content">
-                <div class="game-name">Rifas Onlines</div>
-                <button class="play-btn"  onclick="location.href='/access/codigo_servico/1722/{{ vendedor_id }}'">em auditoria contabil</button>
-            </div>
-        </div>
-
-        <div class="game-card scroll-bg" style="background-image: url('https://res.cloudinary.com/dptprh0xk/image/upload/v1780367345/image_fa4704a0_1_dglyeq.png');">
-            <div class="game-content">
-                <div class="game-name">Fortune Adega city</div>
-                <button class="play-btn">em desenvolvimento</button>
-            </div>
-        </div>        
-    </div>
-</div>
-
-</body>
+  </body>
 </html>

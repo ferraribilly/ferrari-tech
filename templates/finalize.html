@@ -1,82 +1,103 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">   
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/finalize.css') }}"> 
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='w.png') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/finalize.css') }}"
+    />
     <title>Pagamento via{{ nome }} | Pix</title>
-    <style>
-
-
-    </style>
+    <style></style>
 
     <!-- SOCKET.IO CDN -->
-   
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-</head>
 
-<body>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-
-
-<main>
-    <div class="pix-container">
+  <body>
+    <main>
+      <div class="pix-container">
         <div class="payment">
+          <p>Abra seu aplicativo de pagamento e escolha <b>Ler QR Code</b></p>
+          <span>Aponte a câmera do seu celular</span>
 
-            <p>Abra seu aplicativo de pagamento e escolha <b>Ler QR Code</b></p>
-            <span>Aponte a câmera do seu celular</span>
-            
-            <div class="qrcode-info">
-                <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1764290948/cellphone-icon_remhjc.svg" draggable="false">
-            </div>
+          <div class="qrcode-info">
+            <img
+              src="https://res.cloudinary.com/dptprh0xk/image/upload/v1764290948/cellphone-icon_remhjc.svg"
+              draggable="false"
+            />
+          </div>
 
-            <div class="qrcode">
-                <img src="{{ qrcode }}" alt="QR CODE">
-            </div>
+          <div class="qrcode">
+            <img src="{{ qrcode }}" alt="QR CODE" />
+          </div>
 
-            <div class="pix-value">
-                <span style="font-family: monospace; font-weight: bold;">ID transação:</span>
-                <strong id="id-payment" style="color: brown; font-weight: bold;">{{ payment_id | default('') }}</strong>
-            </div>            
+          <div class="pix-value">
+            <span style="font-family: monospace; font-weight: bold"
+              >ID transação:</span
+            >
+            <strong id="id-payment" style="color: brown; font-weight: bold"
+              >{{ payment_id | default('') }}</strong
+            >
+          </div>
 
-            <div class="pix-value">
-                <strong>Dia das Mães</strong>
-            </div>
+          <div class="pix-value">
+            <strong>Dia das Mães</strong>
+          </div>
 
-            <div class="pix-value">
-                <span style="font-family: monospace; font-weight: bold;">Valor Pagamento:</span>
-                <strong style="color: brown; font-weight: bold;">{{ valor }}</strong>
-            </div>
-            <div id="notifications"></div>
-            <span id="status">{{status}}</span>
+          <div class="pix-value">
+            <span style="font-family: monospace; font-weight: bold"
+              >Valor Pagamento:</span
+            >
+            <strong style="color: brown; font-weight: bold">{{ valor }}</strong>
+          </div>
+          <div id="notifications"></div>
+          <span id="status">{{status}}</span>
 
-            <div id="copy-mobile" class="pix-copy-mobile">
-                <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1764290949/copy-icon_z8ur77.svg" draggable="false">
-                <span>Copiar código</span>
+          <div id="copy-mobile" class="pix-copy-mobile">
+            <img
+              src="https://res.cloudinary.com/dptprh0xk/image/upload/v1764290949/copy-icon_z8ur77.svg"
+              draggable="false"
+            />
+            <span>Copiar código</span>
+          </div>
+          <div class="pix-copy-and-past">
+            <span
+              >Você também pode pagar usando <b>Pix Copia e Cola</b>. Copie o
+              código abaixo:</span
+            >
+            <div class="qrcode-text">
+              <img
+                id="copy"
+                src="https://res.cloudinary.com/dptprh0xk/image/upload/v1764290949/copy-icon_z8ur77.svg"
+                draggable="false"
+              />
+              <div id="copied-code">Código copiado.</div>
+              <p id="qrcode-text">{{ qr_code_cola }}</p>
             </div>
-     <div class="pix-copy-and-past">
-                <span>Você também pode pagar usando <b>Pix Copia e Cola</b>. Copie o código abaixo:</span>
-                <div class="qrcode-text">
-                    <img id="copy" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1764290949/copy-icon_z8ur77.svg" draggable="false">
-                    <div id="copied-code">Código copiado.</div>
-                    <p  id="qrcode-text">{{ qr_code_cola }}</p>
-                </div>
-            </div>
+          </div>
         </div>
-    </div>
-</main>
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
-<script src="{{ url_for('static', filename='js/pix_cola.js') }}"></script>
-<script src="{{ url_for('static', filename='js/pagamento.js') }}"></script>
+      </div>
+    </main>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/pix_cola.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/pagamento.js') }}"></script>
 
-<script>
-    
-</script>
-
-</body>
+    <script></script>
+  </body>
 </html>

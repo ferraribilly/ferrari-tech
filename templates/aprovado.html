@@ -1,18 +1,21 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">
-<title>Pagamento Aprovado!</title>
-<style>
-    * {
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='w.png') }}"
+    />
+    <title>Pagamento Aprovado!</title>
+    <style>
+      * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-    }
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         background: linear-gradient(135deg, #00c853, #009624);
         color: #fff;
         display: flex;
@@ -20,8 +23,8 @@
         align-items: center;
         height: 100vh;
         padding: 20px;
-    }
-   .container {
+      }
+      .container {
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
         border-radius: 20px;
@@ -29,14 +32,20 @@
         max-width: 400px;
         width: 100%;
         text-align: center;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         animation: fadeIn 0.8s ease-in-out;
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-   .checkmark {
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .checkmark {
         width: 80px;
         height: 80px;
         border-radius: 50%;
@@ -45,13 +54,19 @@
         position: relative;
         animation: pop 0.5s ease forwards;
         margin-bottom: 20px;
-    }
-    @keyframes pop {
-        0% { transform: scale(0); opacity: 0; }
-        100% { transform: scale(1); opacity: 1; }
-    }
-   .checkmark::after {
-        content: '';
+      }
+      @keyframes pop {
+        0% {
+          transform: scale(0);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .checkmark::after {
+        content: "";
         position: absolute;
         left: 22px;
         top: 40px;
@@ -62,20 +77,22 @@
         transform: rotate(45deg);
         animation: draw 0.5s ease forwards 0.5s;
         opacity: 0;
-    }
-    @keyframes draw {
-        to { opacity: 1; }
-    }
-    h1 {
+      }
+      @keyframes draw {
+        to {
+          opacity: 1;
+        }
+      }
+      h1 {
         font-size: 1.8rem;
         margin-bottom: 10px;
-    }
-    p {
+      }
+      p {
         font-size: 1rem;
         opacity: 0.9;
         margin-bottom: 20px;
-    }
-   .btn {
+      }
+      .btn {
         display: inline-block;
         padding: 12px 25px;
         background: #fff;
@@ -84,37 +101,39 @@
         border-radius: 30px;
         text-decoration: none;
         transition: all 0.3s ease;
-    }
-   .btn:hover {
+      }
+      .btn:hover {
         background: #f1f1f1;
         transform: translateY(-2px);
-    }
-    @media (min-width: 600px) {
-        h1 { font-size: 2rem; }
-        p { font-size: 1.1rem; }
-    }
-</style>
-</head>
-<body>
+      }
+      @media (min-width: 600px) {
+        h1 {
+          font-size: 2rem;
+        }
+        p {
+          font-size: 1.1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="checkmark"></div>
+      <h1>Pagamento Aprovado!</h1>
+      <p>Seu pagamento foi processado com sucesso. Obrigado pela sua compra!</p>
+      <p>Acesse login</p>
 
-<div class="container">
-    <div class="checkmark"></div>
-    <h1>Pagamento Aprovado!</h1>
-    <p>Seu pagamento foi processado com sucesso. Obrigado pela sua compra!</p>
-    <p>Acesse login </p>
+      <a href="#" class="btn" id="linkHome">Voltar à Pagina Inicial</a>
+    </div>
 
-    <a href="#" class="btn" id="linkHome">Voltar à Pagina Inicial</a>
-</div>
-
-<script>
-window.onload = function() {
-    const id = sessionStorage.getItem('usuario_id');
-    const btn = document.getElementById('linkHome');
-    if(id && btn){
-        btn.href = `/raspadinha/${id}`;
-    }
-};
-</script>
-
-</body>
+    <script>
+      window.onload = function () {
+        const id = sessionStorage.getItem("usuario_id");
+        const btn = document.getElementById("linkHome");
+        if (id && btn) {
+          btn.href = `/raspadinha/${id}`;
+        }
+      };
+    </script>
+  </body>
 </html>

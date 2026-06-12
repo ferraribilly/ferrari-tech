@@ -1,100 +1,126 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta http-equiv="refresh" content="5">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='w.png') }}">   
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/finalize.css') }}"> 
-    <title>Pagamento via Pix | </title>
-    <style> 
-       
-/* Isso centraliza o ícone dentro da div do QR Code */
-.qrcode {
-    position: relative; /* Referência para o ícone absoluto */
-    display: inline-flex; /* Ajusta o tamanho da div ao tamanho da imagem */
-    align-items: center;
-    justify-content: center;
-}
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="refresh" content="5" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='w.png') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/finalize.css') }}"
+    />
+    <title>Pagamento via Pix |</title>
+    <style>
+      /* Isso centraliza o ícone dentro da div do QR Code */
+      .qrcode {
+        position: relative; /* Referência para o ícone absoluto */
+        display: inline-flex; /* Ajusta o tamanho da div ao tamanho da imagem */
+        align-items: center;
+        justify-content: center;
+      }
 
-.qr-icon {
-    position: absolute;
-    width: 100px; 
-    height: 100px;
-    padding: 4px;
-    border-radius: 8px;
-    
-    /* Garante a centralização exata */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
+      .qr-icon {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        padding: 4px;
+        border-radius: 8px;
 
-/* Garante que a imagem do QR Code não mude de tamanho */
-.qrcode img:not(.qr-icon) {
-    display: block;
-    width: 250px; /* Ou o tamanho que você já estiver usando */
-    height: auto;
-}
+        /* Garante a centralização exata */
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
 
-
+      /* Garante que a imagem do QR Code não mude de tamanho */
+      .qrcode img:not(.qr-icon) {
+        display: block;
+        width: 250px; /* Ou o tamanho que você já estiver usando */
+        height: auto;
+      }
     </style>
-</head>
-<body>
-<main>
-    <div class="pix-container">
+  </head>
+  <body>
+    <main>
+      <div class="pix-container">
         <div class="payment">
-            <p>Abra seu aplicativo de pagamento e escolha <b>Ler QR Code</b></p>
-            <span>Aponte a câmera do seu celular</span>
-            
-            
-            <div class="qrcode-info">
-                <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1764290948/cellphone-icon_remhjc.svg" draggable="false">
-            </div>
+          <p>Abra seu aplicativo de pagamento e escolha <b>Ler QR Code</b></p>
+          <span>Aponte a câmera do seu celular</span>
 
-            <div class="qrcode">
-                <img src="{{ qrcode }}" alt="QR CODE">
-                <!-- <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778018729/mercado-pago_aycs9m.png" class="qr-icon"> -->
-                
-            </div>
-            <div class="pix-value">
-                <span style="font-family: monospace; font-weight: bold;">ID transação:</span>
-                <strong id="usuario-id" style="color: brown; font-weight: bold;">{{ usuario_id }}</strong>
-            </div>                 
+          <div class="qrcode-info">
+            <img
+              src="https://res.cloudinary.com/dptprh0xk/image/upload/v1764290948/cellphone-icon_remhjc.svg"
+              draggable="false"
+            />
+          </div>
 
-            <div class="pix-value">
-                <span style="font-family: monospace; font-weight: bold;">ID transação:</span>
-                <strong id="payment_id" style="color: brown; font-weight: bold;">{{ payment_id | default('') }}</strong>
-            </div>            
+          <div class="qrcode">
+            <img src="{{ qrcode }}" alt="QR CODE" />
+            <!-- <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778018729/mercado-pago_aycs9m.png" class="qr-icon"> -->
+          </div>
+          <div class="pix-value">
+            <span style="font-family: monospace; font-weight: bold"
+              >ID transação:</span
+            >
+            <strong id="usuario-id" style="color: brown; font-weight: bold"
+              >{{ usuario_id }}</strong
+            >
+          </div>
 
-            <div class="pix-value">
-                 <strong style="color: brown; font-weight: bold;">Ferrari Tech Serviço Digital</strong>
-            </div>
-           
-            <div class="pix-value">
-                <span style="font-family: monospace; font-weight: bold;">Valor Pagamento:</span>
-                <strong style="color: brown; font-weight: bold;">{{ valor }}</strong>
-            </div>
+          <div class="pix-value">
+            <span style="font-family: monospace; font-weight: bold"
+              >ID transação:</span
+            >
+            <strong id="payment_id" style="color: brown; font-weight: bold"
+              >{{ payment_id | default('') }}</strong
+            >
+          </div>
 
-             <strong id="status" style="color: brown; font-weight: bold;">{{ status }}</strong>
-            <div class="pix-copy-and-past">
-                <span>Você também pode pagar usando <b>Pix Copia e Cola</b>. Copie o código abaixo:</span>
-                <div class="qrcode-text">
-                    <img id="copy" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1764290949/copy-icon_z8ur77.svg" draggable="false">
-                    <div id="copied-code">Código copiado.</div>
-                    <p id="qrcode-text" data-usuario-id="{{ usuario_id }}">{{ qr_code_cola }}</p>
-                </div>
+          <div class="pix-value">
+            <strong style="color: brown; font-weight: bold"
+              >Ferrari Tech Serviço Digital</strong
+            >
+          </div>
+
+          <div class="pix-value">
+            <span style="font-family: monospace; font-weight: bold"
+              >Valor Pagamento:</span
+            >
+            <strong style="color: brown; font-weight: bold">{{ valor }}</strong>
+          </div>
+
+          <strong id="status" style="color: brown; font-weight: bold"
+            >{{ status }}</strong
+          >
+          <div class="pix-copy-and-past">
+            <span
+              >Você também pode pagar usando <b>Pix Copia e Cola</b>. Copie o
+              código abaixo:</span
+            >
+            <div class="qrcode-text">
+              <img
+                id="copy"
+                src="https://res.cloudinary.com/dptprh0xk/image/upload/v1764290949/copy-icon_z8ur77.svg"
+                draggable="false"
+              />
+              <div id="copied-code">Código copiado.</div>
+              <p id="qrcode-text" data-usuario-id="{{ usuario_id }}">
+                {{ qr_code_cola }}
+              </p>
             </div>
+          </div>
         </div>
-    </div>
-</main>
+      </div>
+    </main>
 
-<script src="{{ url_for('static', filename='js/finalize1.js') }}"></script>
-<script>
-
- 
-
-</script>
-</body>
+    <script src="{{ url_for('static', filename='js/finalize1.js') }}"></script>
+    <script></script>
+  </body>
 </html>

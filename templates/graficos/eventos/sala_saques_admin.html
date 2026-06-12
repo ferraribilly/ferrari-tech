@@ -1,50 +1,88 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <!-- Configurações para o X / Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Ferrari Tech">
-    <meta name="twitter:description" content="Conheça a Ferrari Tech. Soluções e inovação em tecnologia.">
-    <meta name="twitter:image" content="https://ferrari-tech.onrender.com">
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Ferrari Tech" />
+    <meta
+      name="twitter:description"
+      content="Conheça a Ferrari Tech. Soluções e inovação em tecnologia."
+    />
+    <meta name="twitter:image" content="https://ferrari-tech.onrender.com" />
     <!-- Configurações para WhatsApp, Facebook e LinkedIn (Open Graph) -->
-    <meta property="og:title" content="Ferrari Tech">
-    <meta property="og:description" content="Conheça a Ferrari Tech. Soluções e inovação em tecnologia.">
-    <meta property="og:image" content="https://ferrari-tech.onrender.com">
-    <meta property="og:url" content="https://ferrari-tech.onrender.com">
-    <meta property="og:type" content="website">
-    <meta name="theme-color" content="#fff">
-    <link rel="apple-touch-icon" href="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png">
-    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-    <link rel="shortcut icon" href="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"  type="image/x-icon">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+    <meta property="og:title" content="Ferrari Tech" />
+    <meta
+      property="og:description"
+      content="Conheça a Ferrari Tech. Soluções e inovação em tecnologia."
+    />
+    <meta property="og:image" content="https://ferrari-tech.onrender.com" />
+    <meta property="og:url" content="https://ferrari-tech.onrender.com" />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#fff" />
+    <link
+      rel="apple-touch-icon"
+      href="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
+    />
+    <link
+      rel="manifest"
+      href="{{ url_for('static', filename='manifest.json') }}"
+    />
+    <link
+      rel="shortcut icon"
+      href="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/chat.css') }}"
+    />
     <title>Sala Online Ferrari Tech</title>
-
-</head>
-<body>
-<div id="notificacao-chat"></div>
-
+  </head>
+  <body>
+    <div id="notificacao-chat"></div>
 
     <!-- NAV BAR SUPERIOR -->
     <nav class="navbar">
-        <div class="navbar-brand">
-            <span style="color:#fff;" class="material-symbols-outlined" role="button" tabindex="0" onclick="location.href='/admin/{{ vendedor_id }}'">arrow_back</span>
-            <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png" alt="Logo" class="navbar-logo">
-            <h1>{{ usuario.nome or "Admin" }}<br>
-            <span style="font-size: 12px;" class="user-status">Administrador</span>
-             </h1>
-        </div>
-            <div class="header-actions">
-                <!-- <span class="material-symbols-outlined">videocam</span> -->
-                <!-- BOTÃO LIGAR -->
-                <!-- <button style="background: none;" type="button" onclick="iniciarLigacao()">
+      <div class="navbar-brand">
+        <span
+          style="color: #fff"
+          class="material-symbols-outlined"
+          role="button"
+          tabindex="0"
+          onclick="location.href='/admin/{{ vendedor_id }}'"
+          >arrow_back</span
+        >
+        <img
+          src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
+          alt="Logo"
+          class="navbar-logo"
+        />
+        <h1>
+          {{ usuario.nome or "Admin" }}<br />
+          <span style="font-size: 12px" class="user-status">Administrador</span>
+        </h1>
+      </div>
+      <div class="header-actions">
+        <!-- <span class="material-symbols-outlined">videocam</span> -->
+        <!-- BOTÃO LIGAR -->
+        <!-- <button style="background: none;" type="button" onclick="iniciarLigacao()">
                 <span class="material-symbols-outlined">call</span>
                 </button> -->
-                        <!-- MODAL CHAMADA -->
-                <!-- <div id="modal-ligacao" style="display:none;">
+        <!-- MODAL CHAMADA -->
+        <!-- <div id="modal-ligacao" style="display:none;">
                     <div>
                         <h3>Ligação em andamento</h3>
 
@@ -55,261 +93,289 @@
                         </button>
                     </div>
                 </div>    -->
-                
-                <!-- <span 
+
+        <!-- <span 
                     class="material-symbols-outlined" 
                     onclick="window.location.href='/conversa/{{ vendedor_id }}'"
                     style="cursor:pointer;"
                 >
                     chat
                 </span>           -->
-                <span class="material-symbols-outlined" role="button" tabindex="0"  id="openMenuBtn">person</span>
-
-            </div>
-
+        <span
+          class="material-symbols-outlined"
+          role="button"
+          tabindex="0"
+          id="openMenuBtn"
+          >person</span
+        >
+      </div>
     </nav>
 
     <!-- WRAPPER DO LAYOUT -->
-<div class="main-wrapper">
-    <!-- Cabeçalho Principal -->
+    <div class="main-wrapper">
+      <!-- Cabeçalho Principal -->
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar closed" id="chatSidebar">
- 
-    <div class="sidebar-title"></div>
-    <!-- Barra de Pesquisa -->
-    <div class="search-container">
-        <div class="search-box">
-          <span class="material-symbols-outlined">search</span>
-            <input type="text" placeholder="Pesquisar...">
-        </div>
-    </div>
-
-    <!-- LISTA TEMPO REAL -->
-<ul class="contacts-list">
-
-    {% for usuario in usuarios %}
-
-    <a
-        href="/chat/vendedor/{{ vendedor._id }}/{{ usuario._id }}"
-        class="contact-item"
-        id="contato-{{ usuario._id }}"
-    >
-
-        <div class="contact-avatar">
-            {{ usuario.nome[0] | upper }}
+      <!-- SIDEBAR -->
+      <aside class="sidebar closed" id="chatSidebar">
+        <div class="sidebar-title"></div>
+        <!-- Barra de Pesquisa -->
+        <div class="search-container">
+          <div class="search-box">
+            <span class="material-symbols-outlined">search</span>
+            <input type="text" placeholder="Pesquisar..." />
+          </div>
         </div>
 
-        <div class="contact-info">
+        <!-- LISTA TEMPO REAL -->
+        <ul class="contacts-list">
+          {% for usuario in usuarios %}
 
-            <strong>
+          <a
+            href="/chat/vendedor/{{ vendedor._id }}/{{ usuario._id }}"
+            class="contact-item"
+            id="contato-{{ usuario._id }}"
+          >
+            <div class="contact-avatar">{{ usuario.nome[0] | upper }}</div>
 
+            <div class="contact-info">
+              <strong>
                 {{ usuario.nome }}
 
                 <!-- BOLINHA -->
                 <span
-                    class="badge-msg"
-                    id="badge-{{ usuario._id }}"
-                    style="display:none;"
+                  class="badge-msg"
+                  id="badge-{{ usuario._id }}"
+                  style="display: none"
                 >
-                    1
+                  1
                 </span>
+              </strong>
 
-            </strong>
+              <small>Player</small>
+            </div>
+          </a>
 
-            <small>Player</small>
+          {% endfor %}
+        </ul>
+      </aside>
 
-        </div>
-
-    </a>
-
-    {% endfor %}
-
-</ul>
-
-</aside>
-
-
-    <!-- CHAT -->
-    <div class="chat-container">
-
-            <!-- MENSAGENS -->
-        <div id="mensagens">
-            
-        </div>
+      <!-- CHAT -->
+      <div class="chat-container">
+        <!-- MENSAGENS -->
+        <div id="mensagens"></div>
 
         <!-- PREVIEW -->
-        <div
-            class="image-preview-container" id="image-preview-container"><img id="image-preview" src="">
-            <button id="remove-image"><i class="fas fa-close"></i></button>
-
+        <div class="image-preview-container" id="image-preview-container">
+          <img id="image-preview" src="" />
+          <button id="remove-image"><i class="fas fa-close"></i></button>
         </div>
-
 
         <!-- INPUT -->
-        <div class="input-area">                   
-            <button class="botao-anexo" type="button" aria-label="Anexar arquivo" onclick="document.getElementById('uploadImg').click()">
+        <div class="input-area">
+          <button
+            class="botao-anexo"
+            type="button"
+            aria-label="Anexar arquivo"
+            onclick="document.getElementById('uploadImg').click()"
+          >
             <span class="material-symbols-outlined">attach_file</span>
-            </button>
-            <button class="botao-camera" type="button" aria-label="Anexar arquivo" onclick="document.getElementById('uploadImg').click()">
-              <span class="material-symbols-outlined">photo_camera</span>
-            </button>     
-            <!-- <span style="color:#fff;" class="material-symbols-outlined">sticker</span> -->
-            <input type="text" id="mensagemInput" placeholder="Digite sua mensagem...">
-            <!-- INPUT FILE -->
-            <input type="file" id="uploadImg" accept="image/*, video/*, audio/*, .pdf, application/pdf">
-            <!-- ENVIAR -->
-            <button id="btnEnviar"><span class="material-symbols-outlined">mic</span></button>
+          </button>
+          <button
+            class="botao-camera"
+            type="button"
+            aria-label="Anexar arquivo"
+            onclick="document.getElementById('uploadImg').click()"
+          >
+            <span class="material-symbols-outlined">photo_camera</span>
+          </button>
+          <!-- <span style="color:#fff;" class="material-symbols-outlined">sticker</span> -->
+          <input
+            type="text"
+            id="mensagemInput"
+            placeholder="Digite sua mensagem..."
+          />
+          <!-- INPUT FILE -->
+          <input
+            type="file"
+            id="uploadImg"
+            accept="image/*, video/*, audio/*, .pdf, application/pdf"
+          />
+          <!-- ENVIAR -->
+          <button id="btnEnviar">
+            <span class="material-symbols-outlined">mic</span>
+          </button>
         </div>
+      </div>
     </div>
-</div>
 
-        <!-- Bottom Sheet (Menu de Anexos) -->
-        <div style="display: none" class="bottom-sheet" id="bottom-sheet">
-            <div class="sheet-handle"></div>
-            
-            <!-- Grid de Botões -->
-            <div class="actions-grid">
-                <div class="action-item">
-                  
-                    <div class="icon-wrapper violet">  <span class="material-symbols-outlined">docs</span></div>
-                    <span>Documento</span>
-                </div>
-                <div class="action-item">
-                    <div class="icon-wrapper blue"><span class="material-symbols-outlined">assignment</span></div>
-                    <span>Formulários</span>
-                </div>
-                <div class="action-item">
-                    <div class="icon-wrapper teal"><span class="material-symbols-outlined">qr_code_2</span></div>
-                    <span>Pix</span>
-                </div>
-                <div class="action-item">
-                    <div class="icon-wrapper navy"><span class="material-symbols-outlined">store</span></div>
-                    <span>Catálogo</span>
-                </div>
-                <div class="action-item">
-                    <div class="icon-wrapper orange"><span style="color:yellow;" class="material-symbols-outlined">bolt</span></div>
-                    <span>Resposta rápida</span>
-                </div>
-                <div class="action-item">
-                    <div class="icon-wrapper green"><span class="material-symbols-outlined">distance</span></div>
-                    <span>Localização</span>
-                </div>
-                <div class="action-item">
-                    <div class="icon-wrapper light-blue"><span class="material-symbols-outlined">person</span></div>
-                    <span>Contato</span>
-                </div>
-                <div class="action-item">
-                    <div class="icon-wrapper yellow"><span class="material-symbols-outlined">bar_chart</span></div>
-                    <span>Enquete</span>
-                </div>
-                <div class="action-item">
-                    <div class="icon-wrapper pink"><span class="material-symbols-outlined">calendar_today</span></div>
-                    <span>Evento</span>
-                </div>
-            </div>
+    <!-- Bottom Sheet (Menu de Anexos) -->
+    <div style="display: none" class="bottom-sheet" id="bottom-sheet">
+      <div class="sheet-handle"></div>
 
-            <!-- Aqui vai msotrar todas as imagen videos e audios e documentos renderiza  aqui
+      <!-- Grid de Botões -->
+      <div class="actions-grid">
+        <div class="action-item">
+          <div class="icon-wrapper violet">
+            <span class="material-symbols-outlined">docs</span>
+          </div>
+          <span>Documento</span>
+        </div>
+        <div class="action-item">
+          <div class="icon-wrapper blue">
+            <span class="material-symbols-outlined">assignment</span>
+          </div>
+          <span>Formulários</span>
+        </div>
+        <div class="action-item">
+          <div class="icon-wrapper teal">
+            <span class="material-symbols-outlined">qr_code_2</span>
+          </div>
+          <span>Pix</span>
+        </div>
+        <div class="action-item">
+          <div class="icon-wrapper navy">
+            <span class="material-symbols-outlined">store</span>
+          </div>
+          <span>Catálogo</span>
+        </div>
+        <div class="action-item">
+          <div class="icon-wrapper orange">
+            <span style="color: yellow" class="material-symbols-outlined"
+              >bolt</span
+            >
+          </div>
+          <span>Resposta rápida</span>
+        </div>
+        <div class="action-item">
+          <div class="icon-wrapper green">
+            <span class="material-symbols-outlined">distance</span>
+          </div>
+          <span>Localização</span>
+        </div>
+        <div class="action-item">
+          <div class="icon-wrapper light-blue">
+            <span class="material-symbols-outlined">person</span>
+          </div>
+          <span>Contato</span>
+        </div>
+        <div class="action-item">
+          <div class="icon-wrapper yellow">
+            <span class="material-symbols-outlined">bar_chart</span>
+          </div>
+          <span>Enquete</span>
+        </div>
+        <div class="action-item">
+          <div class="icon-wrapper pink">
+            <span class="material-symbols-outlined">calendar_today</span>
+          </div>
+          <span>Evento</span>
+        </div>
+      </div>
+
+      <!-- Aqui vai msotrar todas as imagen videos e audios e documentos renderiza  aqui
              Galeria Inferior -->
-            <div class="gallery-section">
-                <div class="gallery-item"><img src="https://placeholder.com" alt="Vaga 1"></div>
-                <div class="gallery-item"><img src="https://placeholder.com" alt="Vaga 2"></div>
-                <div class="gallery-item"><img src="https://placeholder.com" alt="Vaga 3"></div>
-                <div class="gallery-item"><img src="https://placeholder.com" alt="Vaga 4"></div>
-            </div>
+      <div class="gallery-section">
+        <div class="gallery-item">
+          <img src="https://placeholder.com" alt="Vaga 1" />
         </div>
-
+        <div class="gallery-item">
+          <img src="https://placeholder.com" alt="Vaga 2" />
+        </div>
+        <div class="gallery-item">
+          <img src="https://placeholder.com" alt="Vaga 3" />
+        </div>
+        <div class="gallery-item">
+          <img src="https://placeholder.com" alt="Vaga 4" />
+        </div>
+      </div>
     </div>
 
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
-<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+      const vendedor_id = "{{ vendedor_id }}";
+      const usuario_id = "{{ usuario_id }}";
+      const nome_usuario = "{{ nome_usuario }}";
+      const nome_vendedor = "{{ nome_vendedor }}";
 
-<script>
-const vendedor_id = "{{ vendedor_id }}";
-const usuario_id = "{{ usuario_id }}";
-const nome_usuario = "{{ nome_usuario }}";
-const nome_vendedor = "{{ nome_vendedor }}";
+      const tipo = "vendedor";
+      const meu_id = vendedor_id;
 
-const tipo = "vendedor";
-const meu_id = vendedor_id;
+      const notificacoesContato = {};
 
-const notificacoesContato = {};
+      const input = document.getElementById("mensagemInput");
+      const btnEnviar = document.getElementById("btnEnviar");
+      const mensagens = document.getElementById("mensagens");
+      const uploadInput = document.getElementById("uploadImg");
+      const previewContainer = document.getElementById(
+        "image-preview-container",
+      );
+      const sidebar = document.getElementById("chatSidebar");
 
-const input = document.getElementById("mensagemInput");
-const btnEnviar = document.getElementById("btnEnviar");
-const mensagens = document.getElementById("mensagens");
-const uploadInput = document.getElementById("uploadImg");
-const previewContainer = document.getElementById("image-preview-container");
-const sidebar = document.getElementById('chatSidebar');
+      // ========================================
+      // CONEXÃO SOCKET E REGISTRO
+      // ========================================
+      const socket = io({ transports: ["websocket"] });
 
-// ========================================
-// CONEXÃO SOCKET E REGISTRO
-// ========================================
-const socket = io({ transports: ['websocket'] });
+      socket.on("connect", () => {
+        socket.emit("register", {
+          tipo: tipo,
+          id: meu_id,
+          conversando_com_id: usuario_id,
+        });
+      });
 
-socket.on("connect", () => {
-    socket.emit("register", {
-        tipo: tipo,
-        id: meu_id,
-        conversando_com_id: usuario_id
-    });
-});
+      if (document.getElementById("openMenuBtn")) {
+        document.getElementById("openMenuBtn").onclick = function (e) {
+          e.stopPropagation();
+          sidebar.classList.toggle("closed");
+        };
+      }
 
-if (document.getElementById('openMenuBtn')) {
-    document.getElementById('openMenuBtn').onclick = function(e){
-        e.stopPropagation();
-        sidebar.classList.toggle('closed');
-    };
-}
+      // function toggleAttach(){
+      //     const menu = document.getElementById('attachMenu');
+      //     if (menu) {
+      //         menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+      //     }
+      // }
 
-// function toggleAttach(){
-//     const menu = document.getElementById('attachMenu');
-//     if (menu) {
-//         menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-//     }
-// }
+      function toggleAttach() {
+        const bottomSheet = document.getElementById("bottom-sheet");
+        // Alterna a exibição (flex para mostrar, none para esconder)
+        bottomSheet.style.display =
+          bottomSheet.style.display === "flex" ? "none" : "flex";
+      }
 
+      // ========================================
+      // PREVIEW DE ARQUIVOS
+      // ========================================
+      if (uploadInput) {
+        uploadInput.addEventListener("change", () => {
+          const file = uploadInput.files[0];
+          if (!file || !previewContainer) return;
 
-function toggleAttach() {
-    const bottomSheet = document.getElementById('bottom-sheet');
-    // Alterna a exibição (flex para mostrar, none para esconder)
-    bottomSheet.style.display = (bottomSheet.style.display === 'flex') ? 'none' : 'flex';
-}
+          previewContainer.style.display = "block";
+          const reader = new FileReader();
 
-
-
-// ========================================
-// PREVIEW DE ARQUIVOS
-// ========================================
-if (uploadInput) {
-    uploadInput.addEventListener('change', () => {
-        const file = uploadInput.files[0];
-        if (!file || !previewContainer) return;
-
-        previewContainer.style.display = 'block';
-        const reader = new FileReader();
-
-        if (file.type.startsWith('image/')) {
-            reader.onload = e => {
-                previewContainer.innerHTML = `
+          if (file.type.startsWith("image/")) {
+            reader.onload = (e) => {
+              previewContainer.innerHTML = `
                     <img id="image-preview" src="${e.target.result}" style="max-width:220px; border-radius:10px;">
                    
                 `;
-                // ativarRemoverPreview();
+              // ativarRemoverPreview();
             };
             reader.readAsDataURL(file);
-        }
-        else if (file.type.startsWith('video/')) {
-            reader.onload = e => {
-                previewContainer.innerHTML = `
+          } else if (file.type.startsWith("video/")) {
+            reader.onload = (e) => {
+              previewContainer.innerHTML = `
                     <video controls style="max-width:240px; border-radius:10px;"><source src="${e.target.result}"></video>
                    
                 `;
-                // ativarRemoverPreview();
+              // ativarRemoverPreview();
             };
             reader.readAsDataURL(file);
-        }
-        else if (file.type === "application/pdf") {
+          } else if (file.type === "application/pdf") {
             previewContainer.innerHTML = `
                 <div style="background:#222; color:white; padding:15px; border-radius:10px; display:flex; align-items:center; gap:10px;">
                     📄 ${file.name}
@@ -317,11 +383,11 @@ if (uploadInput) {
                
             `;
             // ativarRemoverPreview();
-        }
-        else if (file.type.startsWith('audio/')) {
-            const audioId = "audio_" + Date.now() + "_" + Math.floor(Math.random() * 9999);
-            reader.onload = e => {
-                previewContainer.innerHTML = `
+          } else if (file.type.startsWith("audio/")) {
+            const audioId =
+              "audio_" + Date.now() + "_" + Math.floor(Math.random() * 9999);
+            reader.onload = (e) => {
+              previewContainer.innerHTML = `
                     <div style="background: #fff;" class="audio-bubble">
 
                         <button class="play-btn" onclick="toggleAudio('${audioId}', this)">
@@ -356,57 +422,57 @@ if (uploadInput) {
                     </div>
                
                 `;
-                // ativarRemoverPreview();
+              // ativarRemoverPreview();
             };
             reader.readAsDataURL(file);
-        }
-    });
-}
+          }
+        });
+      }
 
-function activarRemoverPreview(){
-    const btnRemove = document.getElementById("remove-image");
-    if (btnRemove) btnRemove.addEventListener("click", limparPreview);
-}
+      function activarRemoverPreview() {
+        const btnRemove = document.getElementById("remove-image");
+        if (btnRemove) btnRemove.addEventListener("click", limparPreview);
+      }
 
-function limparPreview(){
-    if (!previewContainer) return;
-    previewContainer.innerHTML = "";
-    previewContainer.style.display = "none";
-    if (uploadInput) uploadInput.value = "";
-}
+      function limparPreview() {
+        if (!previewContainer) return;
+        previewContainer.innerHTML = "";
+        previewContainer.style.display = "none";
+        if (uploadInput) uploadInput.value = "";
+      }
 
-// ========================================
-// PINTA TUDO DE AZUL (SEM DEPENDER DE ID)
-// ========================================
-// O evento que pinta de azul quando a mensagem é lida
-socket.on("message_read_confirm", () => {
-    document.querySelectorAll(".double-check").forEach(check => {
-        check.style.color = "#53bdeb"; // Azul solicitado originalmente
-    });
-});
-// ========================================
-// RECEBER MENSAGENS (IMEDIATO)
-// ========================================
-socket.on("new_message", (data) => {
-    console.log("Nova mensagem recebida no Vendedor:", data);
+      // ========================================
+      // PINTA TUDO DE AZUL (SEM DEPENDER DE ID)
+      // ========================================
+      // O evento que pinta de azul quando a mensagem é lida
+      socket.on("message_read_confirm", () => {
+        document.querySelectorAll(".double-check").forEach((check) => {
+          check.style.color = "#53bdeb"; // Azul solicitado originalmente
+        });
+      });
+      // ========================================
+      // RECEBER MENSAGENS (IMEDIATO)
+      // ========================================
+      socket.on("new_message", (data) => {
+        console.log("Nova mensagem recebida no Vendedor:", data);
 
-    if (!mensagens) return;
+        if (!mensagens) return;
 
-    const idRemetente = String(data.from_id).trim();
-    const idMeu = String(meu_id).trim();
-    const enviada = (idRemetente === idMeu);
+        const idRemetente = String(data.from_id).trim();
+        const idMeu = String(meu_id).trim();
+        const enviada = idRemetente === idMeu;
 
-    const tipoMensagem = enviada ? "enviada" : "recebida";
-    const div = document.createElement("div");
-    div.classList.add("bolha", tipoMensagem);
+        const tipoMensagem = enviada ? "enviada" : "recebida";
+        const div = document.createElement("div");
+        div.classList.add("bolha", tipoMensagem);
 
-    // --- Sua lógica de animação de digitação ---
-    let typingDiv = null;
+        // --- Sua lógica de animação de digitação ---
+        let typingDiv = null;
 
-    if (!enviada) {
-        typingDiv = document.createElement("div");
-        typingDiv.className = "bolha recebida";
-        typingDiv.innerHTML = `
+        if (!enviada) {
+          typingDiv = document.createElement("div");
+          typingDiv.className = "bolha recebida";
+          typingDiv.innerHTML = `
             <div class="topo-msg">
                 <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png">
                 <span>${nome_usuario} (${usuario_id})</span>
@@ -415,26 +481,26 @@ socket.on("new_message", (data) => {
                 <span></span><span></span><span></span>
             </div>
         `;
-        mensagens.appendChild(typingDiv);
-        mensagens.scrollTop = mensagens.scrollHeight;
-    }
-
-    // Executa o delay para sumir o "digitando" e mostrar a mensagem real
-    setTimeout(() => {
-        if (typingDiv) typingDiv.remove();
-
-        let conteudo = '';
-
-        if (data.mensagem) {
-            conteudo += `<div class="texto">${data.mensagem.replace(/\n/g, "<br>")}</div>`;
+          mensagens.appendChild(typingDiv);
+          mensagens.scrollTop = mensagens.scrollHeight;
         }
 
-        // Continuação da montagem dos seus arquivos de mídia
-        if (data.arquivo_tipo === "imagem") {
+        // Executa o delay para sumir o "digitando" e mostrar a mensagem real
+        setTimeout(() => {
+          if (typingDiv) typingDiv.remove();
+
+          let conteudo = "";
+
+          if (data.mensagem) {
+            conteudo += `<div class="texto">${data.mensagem.replace(/\n/g, "<br>")}</div>`;
+          }
+
+          // Continuação da montagem dos seus arquivos de mídia
+          if (data.arquivo_tipo === "imagem") {
             conteudo += `<img src="${data.arquivo}" style="max-width:220px; border-radius:10px; margin-top:8px;">`;
-        } else if (data.arquivo_tipo === "video") {
+          } else if (data.arquivo_tipo === "video") {
             conteudo += `<video controls style="max-width:240px; border-radius:10px; margin-top:8px;"><source src="${data.arquivo}"></video>`;
-        } else if (data.arquivo_tipo === "pdf") {
+          } else if (data.arquivo_tipo === "pdf") {
             conteudo += `
             <a href="${data.arquivo}" target="_blank" style="display: flex; flex-direction: column; background: #202c33; color: white; padding: 4px; border-radius: 8px; text-decoration: none; margin-top: 8px; max-width: 250px; font-family: sans-serif;">
                 <!-- Miniatura/Preview no topo -->
@@ -445,18 +511,18 @@ socket.on("new_message", (data) => {
                 <!-- Textos na parte inferior -->
                 <div style="padding: 10px 12px 8px 12px; display: flex; flex-direction: column; gap: 2px;">
                     <div style="font-size: 14px; font-weight: normal; color: #e9edef; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        ${data.arquivo.split('/').pop().split('?')[0] || 'Documento.pdf'}
+                        ${data.arquivo.split("/").pop().split("?")[0] || "Documento.pdf"}
                     </div>
                     <div style="font-size: 11px; color: #8696a0;">
                         1 página • PDF
                     </div>
                 </div>
             </a>`;
-           } else if (data.arquivo_tipo === "audio") {
+          } else if (data.arquivo_tipo === "audio") {
+            const audioId =
+              "audio_" + Date.now() + "_" + Math.floor(Math.random() * 9999);
 
-                const audioId = "audio_" + Date.now() + "_" + Math.floor(Math.random() * 9999);
-
-                conteudo += `
+            conteudo += `
                     <div class="audio-bubble">
 
                         <button class="play-btn" onclick="toggleAudio('${audioId}', this)">
@@ -490,15 +556,20 @@ socket.on("new_message", (data) => {
 
                     </div>
                 `;
-            }
-                // Pega a hora atual no formato HH:MM
-        const horaAtual = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+          }
+          // Pega a hora atual no formato HH:MM
+          const horaAtual = new Date().toLocaleTimeString("pt-BR", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
 
-        // Se foi enviada por mim, coloca os dois checks. Se foi recebida, deixa vazio.
-        // Adicionamos uma ID única baseada na ID da mensagem para conseguir pintar de azul depois
-        const checksHTML = enviada ? `<span class="double-check" id="check_${data.id}">✓✓</span>` : '';
+          // Se foi enviada por mim, coloca os dois checks. Se foi recebida, deixa vazio.
+          // Adicionamos uma ID única baseada na ID da mensagem para conseguir pintar de azul depois
+          const checksHTML = enviada
+            ? `<span class="double-check" id="check_${data.id}">✓✓</span>`
+            : "";
 
-        div.innerHTML = `
+          div.innerHTML = `
             <div class="topo-msg">
                 <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png">
                 <span>${enviada ? `${nome_vendedor} (${vendedor_id})` : `${nome_usuario} (${usuario_id})`}</span>
@@ -510,314 +581,310 @@ socket.on("new_message", (data) => {
             </div>
         `;
 
+          mensagens.appendChild(div);
+          mensagens.scrollTop = mensagens.scrollHeight;
 
-        mensagens.appendChild(div);
-        mensagens.scrollTop = mensagens.scrollHeight;
-
-        // Notificação e som apenas para mensagens recebidas após o término do timer
-        if (!enviada) {
-
+          // Notificação e som apenas para mensagens recebidas após o término do timer
+          if (!enviada) {
             // 👉 AQUI ESTÁ A LINHA: Emite para o servidor que a mensagem foi lida
             socket.emit("message_read", { message_id: data.id, de_id: meu_id });
-            if ("Notification" in window && Notification.permission === "granted") {
-                const notificacao = new Notification(`Nova mensagem de ${nome_usuario}`, {
-                    body: data.mensagem || "📎 Arquivo enviado",
-                    icon: "https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
-                });
+            if (
+              "Notification" in window &&
+              Notification.permission === "granted"
+            ) {
+              const notificacao = new Notification(
+                `Nova mensagem de ${nome_usuario}`,
+                {
+                  body: data.mensagem || "📎 Arquivo enviado",
+                  icon: "https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png",
+                },
+              );
             }
 
-            const audio = new Audio("https://notificationsounds.com/storage/sounds/file-sounds-1150-pristine.mp3");
-            audio.play().catch(e => console.log("Bloqueio de som evitado"));
-        }
-    }, 2000); // Mantive 2 segundos de delay, ajuste se o seu tempo original era diferente
-});
+            const audio = new Audio(
+              "https://notificationsounds.com/storage/sounds/file-sounds-1150-pristine.mp3",
+            );
+            audio.play().catch((e) => console.log("Bloqueio de som evitado"));
+          }
+        }, 2000); // Mantive 2 segundos de delay, ajuste se o seu tempo original era diferente
+      });
 
+      // ========================================
+      // ENVIAR MENSAGEM (VENDEDOR -> USUÁRIO)
+      // ========================================
+      async function enviarMensagem(e) {
+        if (e && e.preventDefault) e.preventDefault();
 
+        const mensagem = input.value.trim();
+        const arquivo = uploadInput ? uploadInput.files[0] : null;
 
+        if (!mensagem && !arquivo) return;
 
+        if (btnEnviar) btnEnviar.disabled = true;
 
-// ========================================
-// ENVIAR MENSAGEM (VENDEDOR -> USUÁRIO)
-// ========================================
-async function enviarMensagem(e) {
-    if (e && e.preventDefault) e.preventDefault();
-
-    const mensagem = input.value.trim();
-    const arquivo = uploadInput ? uploadInput.files[0] : null;
-
-    if (!mensagem && !arquivo) return;
-
-    if (btnEnviar) btnEnviar.disabled = true;
-
-    // Cenário 1: Enviar apenas texto (Direto pelo Socket)
-    if (!arquivo) {
-        socket.emit("private_message", {
+        // Cenário 1: Enviar apenas texto (Direto pelo Socket)
+        if (!arquivo) {
+          socket.emit("private_message", {
             from_tipo: tipo,
             from_id: meu_id,
             to_tipo: "usuario",
             to_id: usuario_id,
             mensagem: mensagem,
             arquivo: "",
-            arquivo_tipo: ""
-        });
-        input.value = "";
-        if (btnEnviar) btnEnviar.disabled = false;
-        return;
-    }
-
-    // Cenário 2: Enviar arquivo (Passa pelo Fetch primeiro)
-    try {
-        const formData = new FormData();
-        formData.append('file', arquivo);
-
-        const response = await fetch('/upload', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!response.ok) {
-            throw new Error("Resposta do servidor não foi OK");
+            arquivo_tipo: "",
+          });
+          input.value = "";
+          if (btnEnviar) btnEnviar.disabled = false;
+          return;
         }
 
-        const resultado = await response.json();
-        const urlCloudinary = resultado.url;
-        const mimeType = resultado.tipo;
+        // Cenário 2: Enviar arquivo (Passa pelo Fetch primeiro)
+        try {
+          const formData = new FormData();
+          formData.append("file", arquivo);
 
-        let arquivo_tipo = "";
-        if (mimeType.startsWith("image/")) arquivo_tipo = "imagem";
-        else if (mimeType.startsWith("video/")) arquivo_tipo = "video";
-        else if (mimeType.startsWith("audio/")) arquivo_tipo = "audio";
-        else if (mimeType === "application/pdf") arquivo_tipo = "pdf";
+          const response = await fetch("/upload", {
+            method: "POST",
+            body: formData,
+          });
 
-        socket.emit("private_message", {
+          if (!response.ok) {
+            throw new Error("Resposta do servidor não foi OK");
+          }
+
+          const resultado = await response.json();
+          const urlCloudinary = resultado.url;
+          const mimeType = resultado.tipo;
+
+          let arquivo_tipo = "";
+          if (mimeType.startsWith("image/")) arquivo_tipo = "imagem";
+          else if (mimeType.startsWith("video/")) arquivo_tipo = "video";
+          else if (mimeType.startsWith("audio/")) arquivo_tipo = "audio";
+          else if (mimeType === "application/pdf") arquivo_tipo = "pdf";
+
+          socket.emit("private_message", {
             from_tipo: tipo,
             from_id: meu_id,
             to_tipo: "usuario",
             to_id: usuario_id,
             mensagem: mensagem,
             arquivo: urlCloudinary,
-            arquivo_tipo: arquivo_tipo
+            arquivo_tipo: arquivo_tipo,
+          });
+
+          input.value = "";
+          limparPreview();
+        } catch (erro) {
+          console.error("Erro ao subir arquivo do Vendedor:", erro);
+          alert("Erro ao enviar o arquivo. O texto puro ainda funciona.");
+        } finally {
+          if (btnEnviar) btnEnviar.disabled = false;
+        }
+      }
+
+      // Escutadores corrigidos para passar o evento
+      if (btnEnviar) {
+        btnEnviar.onclick = function (e) {
+          enviarMensagem(e);
+        };
+      }
+      if (input) {
+        input.onkeypress = function (e) {
+          if (e.key === "Enter") enviarMensagem(e);
+        };
+      }
+
+      // ========================================
+      // LIGAÇAO DE VOZ (VENDEDOR -> USUÁRIO)
+      // ========================================
+
+      // const socket = io({ transports: ['websocket'] });
+
+      function abrirModalLigacao() {
+        document.getElementById("modal-ligacao").style.display = "block";
+      }
+
+      function fecharModalLigacao() {
+        document.getElementById("modal-ligacao").style.display = "none";
+      }
+
+      function encerrarLigacao() {
+        if (streamLocal) {
+          streamLocal.getTracks().forEach((track) => track.stop());
+        }
+
+        if (conexaoPeer) {
+          conexaoPeer.close();
+        }
+
+        fecharModalLigacao();
+      }
+
+      let conexaoPeer;
+      let streamLocal;
+
+      // --- CONFIGURAÇÃO DINÂMICA ---
+      const MEU_ID = "{{ vendedor_id }}";
+      const DESTINO_ID = "{{ usuario_id }}";
+
+      const configuracaoWebRTC = {
+        iceServers: [
+          { urls: "stun:stun.l.google.com:19302" },
+          { urls: "stun:stun1.l.google.com:19302" },
+        ],
+      };
+
+      // Avisa o servidor quem sou eu
+      socket.on("connect", () => {
+        socket.emit("conectar_chamada", {
+          meu_id: MEU_ID,
+        });
+      });
+
+      // ========================================
+      // BOTÃO LIGAR
+      // ========================================
+      async function iniciarLigacao() {
+        streamLocal = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: false,
         });
 
-        input.value = "";
-        limparPreview();
+        abrirModalLigacao();
 
-    } catch (erro) {
-        console.error("Erro ao subir arquivo do Vendedor:", erro);
-        alert("Erro ao enviar o arquivo. O texto puro ainda funciona.");
-    } finally {
-        if (btnEnviar) btnEnviar.disabled = false;
-    }
-}
+        conexaoPeer = new RTCPeerConnection(configuracaoWebRTC);
 
-// Escutadores corrigidos para passar o evento
-if (btnEnviar) {
-    btnEnviar.onclick = function(e) { enviarMensagem(e); };
-}
-if (input) {
-    input.onkeypress = function(e) {
-        if (e.key === "Enter") enviarMensagem(e);
-    };
-    
-}
+        streamLocal.getTracks().forEach((track) => {
+          conexaoPeer.addTrack(track, streamLocal);
+        });
 
+        conexaoPeer.ontrack = (event) => {
+          const audioRemoto = document.getElementById("audio-da-chamada");
+          audioRemoto.srcObject = event.streams[0];
+        };
 
-
-
-// ========================================
-// LIGAÇAO DE VOZ (VENDEDOR -> USUÁRIO)
-// ========================================
-
-// const socket = io({ transports: ['websocket'] });
-
-function abrirModalLigacao(){
-    document.getElementById("modal-ligacao").style.display = "block";
-}
-
-function fecharModalLigacao(){
-    document.getElementById("modal-ligacao").style.display = "none";
-}
-
-function encerrarLigacao(){
-
-    if(streamLocal){
-        streamLocal.getTracks().forEach(track => track.stop());
-    }
-
-    if(conexaoPeer){
-        conexaoPeer.close();
-    }
-
-    fecharModalLigacao();
-}
-
-let conexaoPeer;
-let streamLocal;
-
-// --- CONFIGURAÇÃO DINÂMICA ---
-const MEU_ID = "{{ vendedor_id }}";
-const DESTINO_ID = "{{ usuario_id }}";
-
-const configuracaoWebRTC = {
-    iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' }
-    ]
-};
-
-// Avisa o servidor quem sou eu
-socket.on('connect', () => {
-    socket.emit('conectar_chamada', {
-        meu_id: MEU_ID
-    });
-});
-
-// ========================================
-// BOTÃO LIGAR
-// ========================================
-async function iniciarLigacao() {
-
-    streamLocal = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: false
-    });
-
-    abrirModalLigacao();
-
-    conexaoPeer = new RTCPeerConnection(configuracaoWebRTC);
-
-    streamLocal.getTracks().forEach(track => {
-        conexaoPeer.addTrack(track, streamLocal);
-    });
-
-    conexaoPeer.ontrack = (event) => {
-        const audioRemoto = document.getElementById('audio-da-chamada');
-        audioRemoto.srcObject = event.streams[0];
-    };
-
-    conexaoPeer.onicecandidate = (event) => {
-        if(event.candidate){
-            socket.emit('enviar-ice-candidate', {
-                destino_id: DESTINO_ID,
-                candidate: event.candidate
+        conexaoPeer.onicecandidate = (event) => {
+          if (event.candidate) {
+            socket.emit("enviar-ice-candidate", {
+              destino_id: DESTINO_ID,
+              candidate: event.candidate,
             });
-        }
-    };
+          }
+        };
 
-    const offer = await conexaoPeer.createOffer();
+        const offer = await conexaoPeer.createOffer();
 
-    await conexaoPeer.setLocalDescription(offer);
+        await conexaoPeer.setLocalDescription(offer);
 
-    socket.emit('enviar-convite-chamada', {
-        origem_id: MEU_ID,
-        destino_id: DESTINO_ID,
-        dadosConexao: offer
-    });
-}
+        socket.emit("enviar-convite-chamada", {
+          origem_id: MEU_ID,
+          destino_id: DESTINO_ID,
+          dadosConexao: offer,
+        });
+      }
 
-// ========================================
-// RECEBE CONVITE
-// ========================================
-socket.on('receber-convite-chamada', async ({ origem_id, dadosConexao }) => {
+      // ========================================
+      // RECEBE CONVITE
+      // ========================================
+      socket.on(
+        "receber-convite-chamada",
+        async ({ origem_id, dadosConexao }) => {
+          if (origem_id != DESTINO_ID) return;
 
-    if(origem_id != DESTINO_ID) return;
+          abrirModalLigacao();
 
-    abrirModalLigacao();
+          streamLocal = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: false,
+          });
 
-    streamLocal = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: false
-    });
+          conexaoPeer = new RTCPeerConnection(configuracaoWebRTC);
 
-    conexaoPeer = new RTCPeerConnection(configuracaoWebRTC);
+          streamLocal.getTracks().forEach((track) => {
+            conexaoPeer.addTrack(track, streamLocal);
+          });
 
-    streamLocal.getTracks().forEach(track => {
-        conexaoPeer.addTrack(track, streamLocal);
-    });
+          conexaoPeer.ontrack = (event) => {
+            const audioRemoto = document.getElementById("audio-da-chamada");
+            audioRemoto.srcObject = event.streams[0];
+          };
 
-    conexaoPeer.ontrack = (event) => {
-        const audioRemoto = document.getElementById('audio-da-chamada');
-        audioRemoto.srcObject = event.streams[0];
-    };
-
-    conexaoPeer.onicecandidate = (event) => {
-        if(event.candidate){
-            socket.emit('enviar-ice-candidate', {
+          conexaoPeer.onicecandidate = (event) => {
+            if (event.candidate) {
+              socket.emit("enviar-ice-candidate", {
                 destino_id: origem_id,
-                candidate: event.candidate
-            });
-        }
-    };
+                candidate: event.candidate,
+              });
+            }
+          };
 
-    await conexaoPeer.setRemoteDescription(
-        new RTCSessionDescription(dadosConexao)
-    );
+          await conexaoPeer.setRemoteDescription(
+            new RTCSessionDescription(dadosConexao),
+          );
 
-    const answer = await conexaoPeer.createAnswer();
+          const answer = await conexaoPeer.createAnswer();
 
-    await conexaoPeer.setLocalDescription(answer);
+          await conexaoPeer.setLocalDescription(answer);
 
-    socket.emit('responder-chamada', {
-        destino_id: origem_id,
-        dadosConexao: answer
-    });
-});
+          socket.emit("responder-chamada", {
+            destino_id: origem_id,
+            dadosConexao: answer,
+          });
+        },
+      );
 
-// ========================================
-// CHAMADA ACEITA
-// ========================================
-socket.on('chamada-aceita', async ({ dadosConexao }) => {
-
-    await conexaoPeer.setRemoteDescription(
-        new RTCSessionDescription(dadosConexao)
-    );
-
-});
-
-// ========================================
-// ICE CANDIDATE
-// ========================================
-socket.on('receber-ice-candidate', async ({ candidate }) => {
-
-    if(conexaoPeer){
-        await conexaoPeer.addIceCandidate(
-            new RTCIceCandidate(candidate)
+      // ========================================
+      // CHAMADA ACEITA
+      // ========================================
+      socket.on("chamada-aceita", async ({ dadosConexao }) => {
+        await conexaoPeer.setRemoteDescription(
+          new RTCSessionDescription(dadosConexao),
         );
-    }
+      });
 
-});
+      // ========================================
+      // ICE CANDIDATE
+      // ========================================
+      socket.on("receber-ice-candidate", async ({ candidate }) => {
+        if (conexaoPeer) {
+          await conexaoPeer.addIceCandidate(new RTCIceCandidate(candidate));
+        }
+      });
 
-// ========================================
-// CARREGAR MENSAGENS SALVAS (BANCO DE DADOS)
-// ========================================
-async function carregarHistoricoBanco() {
-    if (!mensagens) return;
+      // ========================================
+      // CARREGAR MENSAGENS SALVAS (BANCO DE DADOS)
+      // ========================================
+      async function carregarHistoricoBanco() {
+        if (!mensagens) return;
 
-    try {
-        const response = await fetch(`/historico/${usuario_id}/${vendedor_id}`);
-        if (!response.ok) throw new Error("Erro ao carregar histórico.");
+        try {
+          const response = await fetch(
+            `/historico/${usuario_id}/${vendedor_id}`,
+          );
+          if (!response.ok) throw new Error("Erro ao carregar histórico.");
 
-        const historico = await response.json();
-        mensagens.innerHTML = "";
+          const historico = await response.json();
+          mensagens.innerHTML = "";
 
-        historico.forEach(data => {
+          historico.forEach((data) => {
             const idRemetente = String(data.from_id).trim();
             const idMeu = String(meu_id).trim();
-            const enviada = (idRemetente === idMeu);
+            const enviada = idRemetente === idMeu;
 
             const div = document.createElement("div");
             div.classList.add("bolha", enviada ? "enviada" : "recebida");
 
-            let conteudo = '';
-            if (data.mensagem) conteudo += `<div class="texto">${data.mensagem.replace(/\n/g, "<br>")}</div>`;
+            let conteudo = "";
+            if (data.mensagem)
+              conteudo += `<div class="texto">${data.mensagem.replace(/\n/g, "<br>")}</div>`;
             // ... (mantenha sua lógica de mídia aqui)
             // Continuação da montagem dos seus arquivos de mídia
             if (data.arquivo_tipo === "imagem") {
-                conteudo += `<img src="${data.arquivo}" style="max-width:220px; border-radius:10px; margin-top:8px;">`;
+              conteudo += `<img src="${data.arquivo}" style="max-width:220px; border-radius:10px; margin-top:8px;">`;
             } else if (data.arquivo_tipo === "video") {
-                conteudo += `<video controls style="max-width:240px; border-radius:10px; margin-top:8px;"><source src="${data.arquivo}"></video>`;
+              conteudo += `<video controls style="max-width:240px; border-radius:10px; margin-top:8px;"><source src="${data.arquivo}"></video>`;
             } else if (data.arquivo_tipo === "pdf") {
-                conteudo += `
+              conteudo += `
                 <a href="${data.arquivo}" target="_blank" style="display: flex; flex-direction: column; background: #202c33; color: white; padding: 4px; border-radius: 8px; text-decoration: none; margin-top: 8px; max-width: 250px; font-family: sans-serif;">
                     <!-- Miniatura/Preview no topo -->
                     <div style="background: white; border-radius: 6px 6px 0 0; padding: 12px; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid #ffffff1a;">
@@ -827,7 +894,7 @@ async function carregarHistoricoBanco() {
                     <!-- Textos na parte inferior -->
                     <div style="padding: 10px 12px 8px 12px; display: flex; flex-direction: column; gap: 2px;">
                         <div style="font-size: 14px; font-weight: normal; color: #e9edef; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                            ${data.arquivo.split('/').pop().split('?')[0] || 'Documento.pdf'}
+                            ${data.arquivo.split("/").pop().split("?")[0] || "Documento.pdf"}
                         </div>
                         <div style="font-size: 11px; color: #8696a0;">
                             1 página • PDF
@@ -835,10 +902,10 @@ async function carregarHistoricoBanco() {
                     </div>
                 </a>`;
             } else if (data.arquivo_tipo === "audio") {
+              const audioId =
+                "audio_" + Date.now() + "_" + Math.floor(Math.random() * 9999);
 
-                const audioId = "audio_" + Date.now() + "_" + Math.floor(Math.random() * 9999);
-
-                conteudo += `
+              conteudo += `
                     <div class="audio-bubble">
 
                         <button class="play-btn" onclick="toggleAudio('${audioId}', this)">
@@ -875,11 +942,19 @@ async function carregarHistoricoBanco() {
             }
             // Lógica de status de leitura corrigida
             // data.lida vem do JSON, Python envia como booleano puro
-            const isLida = (data.lida === false || data.lida === "true" || data.lida === 1);
-            const corCheck = isLida ? "#53bdeb" : "#999"; 
-            const checksHTML = enviada ? `<span class="double-check" id="check_${data.id}" style="color: ${corCheck};">✓✓</span>` : '';
+            const isLida =
+              data.lida === false || data.lida === "true" || data.lida === 1;
+            const corCheck = isLida ? "#53bdeb" : "#999";
+            const checksHTML = enviada
+              ? `<span class="double-check" id="check_${data.id}" style="color: ${corCheck};">✓✓</span>`
+              : "";
 
-            const horaMsg = data.timestamp ? new Date(data.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : "";
+            const horaMsg = data.timestamp
+              ? new Date(data.timestamp).toLocaleTimeString("pt-BR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "";
 
             div.innerHTML = `
                 <div class="topo-msg">
@@ -893,220 +968,180 @@ async function carregarHistoricoBanco() {
                 </div>
             `;
             mensagens.appendChild(div);
+          });
+
+          mensagens.scrollTop = mensagens.scrollHeight;
+        } catch (erro) {
+          console.error("Erro:", erro);
+        }
+      }
+      carregarHistoricoBanco();
+
+      // ========================================
+      // AUDIO
+      // ========================================
+      let mediaRecorder;
+      let audioChunks = [];
+
+      async function iniciarGravacao() {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
         });
 
-        mensagens.scrollTop = mensagens.scrollHeight;
-    } catch (erro) {
-        console.error("Erro:", erro);
-    }
-}
-carregarHistoricoBanco();
+        mediaRecorder = new MediaRecorder(stream);
 
-// ========================================
-// AUDIO
-// ========================================
-let mediaRecorder;
-let audioChunks = [];
+        audioChunks = [];
 
-async function iniciarGravacao(){
+        mediaRecorder.ondataavailable = (e) => {
+          audioChunks.push(e.data);
+        };
 
-    const stream =
-        await navigator.mediaDevices.getUserMedia({
-            audio: true
-        });
+        mediaRecorder.onstop = async () => {
+          const audioBlob = new Blob(audioChunks, {
+            type: "audio/webm",
+          });
 
-    mediaRecorder = new MediaRecorder(stream);
+          const formData = new FormData();
 
-    audioChunks = [];
+          formData.append("file", audioBlob, "audio.webm");
 
-    mediaRecorder.ondataavailable = e => {
+          const response = await fetch("/upload", {
+            method: "POST",
+            body: formData,
+          });
 
-        audioChunks.push(e.data);
-    };
+          const result = await response.json();
 
-    mediaRecorder.onstop = async () => {
-
-        const audioBlob = new Blob(audioChunks, {
-
-            type: 'audio/webm'
-        });
-
-        const formData = new FormData();
-
-        formData.append(
-            'file',
-            audioBlob,
-            'audio.webm'
-        );
-
-        const response = await fetch('/upload', {
-
-            method: 'POST',
-            body: formData
-
-        });
-
-        const result = await response.json();
-
-        socket.emit("enviar_mensagem_saque", {
-
+          socket.emit("enviar_mensagem_saque", {
             mensagem: "",
             arquivo: result.url,
             arquivo_tipo: "audio",
-            tipo: "enviada"
+            tipo: "enviada",
+          });
+        };
 
-        });
+        mediaRecorder.start();
+      }
 
-    };
-
-    mediaRecorder.start();
-}
-
-function pararGravacao(){
-
-    if (
-        mediaRecorder &&
-        mediaRecorder.state === "recording"
-    ) {
-
-        mediaRecorder.stop();
-    }
-}
-
-
-
-
-function formatTime(segundos){
-
-    if(isNaN(segundos) || segundos < 0) return "00:00";
-
-    const min = Math.floor(segundos / 60);
-    const sec = Math.floor(segundos % 60);
-
-    return String(min).padStart(2,'0') + ":" +
-           String(sec).padStart(2,'0');
-}
-
-function toggleAudio(id, botao){
-
-    const audio = document.getElementById(id);
-
-    if(!audio) return;
-
-    const waves = botao
-        .closest('.audio-bubble')
-        .querySelectorAll('.wave');
-
-    if(audio.paused){
-
-        document.querySelectorAll('.audio-bubble audio').forEach(a=>{
-
-            if(a !== audio){
-
-                a.pause();
-                a.currentTime = 0;
-
-                const bubble = a.closest('.audio-bubble');
-
-                if(bubble){
-
-                    const btn = bubble.querySelector('.play-btn');
-
-                    if(btn){
-                        btn.innerHTML = "▶";
-                    }
-
-                    bubble.querySelectorAll('.wave').forEach(w=>{
-                        w.classList.remove('playing');
-                    });
-
-                    const spanTempo = bubble.querySelector('.audio-time');
-
-                    if(spanTempo && !isNaN(a.duration)){
-                        spanTempo.innerText = formatTime(a.duration);
-                    }
-                }
-            }
-        });
-
-        audio.play();
-
-        botao.innerHTML = "❚❚";
-
-        waves.forEach(w=>{
-            w.classList.add('playing');
-        });
-
-    }else{
-
-        audio.pause();
-
-        botao.innerHTML = "▶";
-
-        waves.forEach(w=>{
-            w.classList.remove('playing');
-        });
-    }
-
-    audio.onloadedmetadata = function(){
-
-        const tempo = document.getElementById("time_" + id);
-
-        if(tempo){
-            tempo.innerText = formatTime(audio.duration);
+      function pararGravacao() {
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+          mediaRecorder.stop();
         }
-    };
+      }
 
-    audio.ontimeupdate = function(){
+      function formatTime(segundos) {
+        if (isNaN(segundos) || segundos < 0) return "00:00";
 
-        const tempo = document.getElementById("time_" + id);
+        const min = Math.floor(segundos / 60);
+        const sec = Math.floor(segundos % 60);
 
-        if(!tempo) return;
-
-        const restante = Math.max(
-            0,
-            audio.duration - audio.currentTime
+        return (
+          String(min).padStart(2, "0") + ":" + String(sec).padStart(2, "0")
         );
+      }
 
-        tempo.innerText = formatTime(restante);
-    };
+      function toggleAudio(id, botao) {
+        const audio = document.getElementById(id);
 
-    audio.onpause = function(){
+        if (!audio) return;
 
-        botao.innerHTML = "▶";
+        const waves = botao.closest(".audio-bubble").querySelectorAll(".wave");
 
-        waves.forEach(w=>{
-            w.classList.remove('playing');
-        });
-    };
+        if (audio.paused) {
+          document.querySelectorAll(".audio-bubble audio").forEach((a) => {
+            if (a !== audio) {
+              a.pause();
+              a.currentTime = 0;
 
-    audio.onplay = function(){
+              const bubble = a.closest(".audio-bubble");
 
-        botao.innerHTML = "❚❚";
+              if (bubble) {
+                const btn = bubble.querySelector(".play-btn");
 
-        waves.forEach(w=>{
-            w.classList.add('playing');
-        });
-    };
+                if (btn) {
+                  btn.innerHTML = "▶";
+                }
 
-    audio.onended = function(){
+                bubble.querySelectorAll(".wave").forEach((w) => {
+                  w.classList.remove("playing");
+                });
 
-        botao.innerHTML = "▶";
+                const spanTempo = bubble.querySelector(".audio-time");
 
-        waves.forEach(w=>{
-            w.classList.remove('playing');
-        });
+                if (spanTempo && !isNaN(a.duration)) {
+                  spanTempo.innerText = formatTime(a.duration);
+                }
+              }
+            }
+          });
 
-        audio.currentTime = 0;
+          audio.play();
 
-        const tempo = document.getElementById("time_" + id);
+          botao.innerHTML = "❚❚";
 
-        if(tempo){
-            tempo.innerText = formatTime(audio.duration);
+          waves.forEach((w) => {
+            w.classList.add("playing");
+          });
+        } else {
+          audio.pause();
+
+          botao.innerHTML = "▶";
+
+          waves.forEach((w) => {
+            w.classList.remove("playing");
+          });
         }
-    };
-}
 
-</script>
-</body>
+        audio.onloadedmetadata = function () {
+          const tempo = document.getElementById("time_" + id);
+
+          if (tempo) {
+            tempo.innerText = formatTime(audio.duration);
+          }
+        };
+
+        audio.ontimeupdate = function () {
+          const tempo = document.getElementById("time_" + id);
+
+          if (!tempo) return;
+
+          const restante = Math.max(0, audio.duration - audio.currentTime);
+
+          tempo.innerText = formatTime(restante);
+        };
+
+        audio.onpause = function () {
+          botao.innerHTML = "▶";
+
+          waves.forEach((w) => {
+            w.classList.remove("playing");
+          });
+        };
+
+        audio.onplay = function () {
+          botao.innerHTML = "❚❚";
+
+          waves.forEach((w) => {
+            w.classList.add("playing");
+          });
+        };
+
+        audio.onended = function () {
+          botao.innerHTML = "▶";
+
+          waves.forEach((w) => {
+            w.classList.remove("playing");
+          });
+
+          audio.currentTime = 0;
+
+          const tempo = document.getElementById("time_" + id);
+
+          if (tempo) {
+            tempo.innerText = formatTime(audio.duration);
+          }
+        };
+      }
+    </script>
+  </body>
 </html>

@@ -1,140 +1,145 @@
 /*TELAS DEITADAS SANSUNG A35*/
 /* Estilos gerais para dispositivos móveis em modo paisagem */
 @media only screen and (max-width: 900px) and (orientation: landscape) {
-
-
-
 }
 
 /* Focando especificamente em telas com largura de A35 deitado (aprox ~850px+ lógicos) */
 @media only screen and (min-width: 600px) and (max-width: 950px) and (orientation: landscape) {
-        .bola {
-            position: absolute;
-            top: 0;
-            width: 100px;
-            left: 10px;
-            height: 100px;
-            /* Sombra interna (brilho) + Sombra externa (projeção) */
-            box-shadow:
-                inset -5px -5px 10px rgba(0,0,0,0.5),
-                3px 5px 8px rgb(249, 249, 249);
-            display: flex;
-            flex-flow: column;
-            align-items: center;
-            justify-content: center;
-            /* border:1px solid #ffffff; */
-            border-radius: 100%;
-            background: radial-gradient(circle at 30% 30%, #ff5722, #b71c1c); /* Efeito 3D na cor */
-        }
-    
-        .numero_sorteado {
-            margin-top: -25px;
-            font-size: 10em;
-        }
-    
-        .marcado {
-            color: rgb(248, 248, 248);
-            border-radius: 50%;
-            border: 1px solid #000;
-            background: radial-gradient(circle at 30% 30%, #ff5722, #b71c1c); /* Efeito 3D na cor */
-            /* Sombra interna (brilho) + Sombra externa (projeção) */
-            box-shadow:
-                inset -5px -5px 10px rgba(11, 11, 11, 0.5),
-                3px 5px 8px rgba(253, 253, 253, 0.544);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            width: 40px;
-            height: 40px;
-            font-size: 16px;
-            font-family: sans, serif;
-        }
-    
-        .ultimasbolas, .ultimasbolas2, .ultimasbolas3, .ultimasbolas4{
-            position:relative;
-            color: white;
-            margin: 0 auto;
-            width:50px;
-            height:50px;
-            /* Sombra interna (brilho) + Sombra externa (projeção) */
-            box-shadow: 
-            inset -5px -5px 10px rgba(0,0,0,0.5), 
-            3px 5px 8px rgba(247, 247, 247, 0.796);        
-            display:flex;   
-            flex-flow: column;
-            align-items: center;
-            left:40px;
+  .bola {
+    position: absolute;
+    top: 0;
+    width: 100px;
+    left: 10px;
+    height: 100px;
+    /* Sombra interna (brilho) + Sombra externa (projeção) */
+    box-shadow:
+      inset -5px -5px 10px rgba(0, 0, 0, 0.5),
+      3px 5px 8px rgb(249, 249, 249);
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    /* border:1px solid #ffffff; */
+    border-radius: 100%;
+    background: radial-gradient(
+      circle at 30% 30%,
+      #ff5722,
+      #b71c1c
+    ); /* Efeito 3D na cor */
+  }
 
-}
+  .numero_sorteado {
+    margin-top: -25px;
+    font-size: 10em;
+  }
 
-        .bingo {
-            top: 12px;
-            font-size: 1.5em;
-            width: 150px;
-            font-weight: bold;
-            color: #d55;
-            background-color: rgb(231, 186, 88);
-            border-radius: 5px;
-            padding: 30px 5px;
-            text-align: center;
-            left: 28%
-        }
-    
-        .tabela {
-            background: #0c0000;
-            position: relative;
-            margin-top: 100px;
-            padding: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-        }
-    
-        .td {
-            padding: 1px 3px;
-        }
-    
-        .bolinha {
-            margin: 0;
-            font-weight: normal;
-            background-color: #eee;
-            border-color: #eee;
-            width: 40px;
-            height: 40px;
-        }
-    
-        .bolinha2 {
-            margin: 0;
-            font-weight: normal;
-            background-color: #eee;
-            border-color: #eee;
-            width: 40px;
-            height: 40px;
-        }
-    
-        .barra {
-            height: 7px;
-            border-radius: 0;
-        }
-    
-        .barra .progress-bar {
-            border-radius: 0;
-        }
-    
-        .numero_sorteado {
-            top: 12px;
-            font-size: 8em;
-        }
-    
-        .img {
-            top: 5px;
-            margin-right: 10px;
-            /* Sombra interna (brilho) + Sombra externa (projeção) */
-            box-shadow:
-                inset -5px -5px 10px rgba(0,0,0,0.5),
-                3px 5px 8px rgb(249, 249, 249); 
-        }
+  .marcado {
+    color: rgb(248, 248, 248);
+    border-radius: 50%;
+    border: 1px solid #000;
+    background: radial-gradient(
+      circle at 30% 30%,
+      #ff5722,
+      #b71c1c
+    ); /* Efeito 3D na cor */
+    /* Sombra interna (brilho) + Sombra externa (projeção) */
+    box-shadow:
+      inset -5px -5px 10px rgba(11, 11, 11, 0.5),
+      3px 5px 8px rgba(253, 253, 253, 0.544);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+    font-family: sans, serif;
+  }
 
-        
+  .ultimasbolas,
+  .ultimasbolas2,
+  .ultimasbolas3,
+  .ultimasbolas4 {
+    position: relative;
+    color: white;
+    margin: 0 auto;
+    width: 50px;
+    height: 50px;
+    /* Sombra interna (brilho) + Sombra externa (projeção) */
+    box-shadow:
+      inset -5px -5px 10px rgba(0, 0, 0, 0.5),
+      3px 5px 8px rgba(247, 247, 247, 0.796);
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    left: 40px;
+  }
+
+  .bingo {
+    top: 12px;
+    font-size: 1.5em;
+    width: 150px;
+    font-weight: bold;
+    color: #d55;
+    background-color: rgb(231, 186, 88);
+    border-radius: 5px;
+    padding: 30px 5px;
+    text-align: center;
+    left: 28%;
+  }
+
+  .tabela {
+    background: #0c0000;
+    position: relative;
+    margin-top: 100px;
+    padding: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
+
+  .td {
+    padding: 1px 3px;
+  }
+
+  .bolinha {
+    margin: 0;
+    font-weight: normal;
+    background-color: #eee;
+    border-color: #eee;
+    width: 40px;
+    height: 40px;
+  }
+
+  .bolinha2 {
+    margin: 0;
+    font-weight: normal;
+    background-color: #eee;
+    border-color: #eee;
+    width: 40px;
+    height: 40px;
+  }
+
+  .barra {
+    height: 7px;
+    border-radius: 0;
+  }
+
+  .barra .progress-bar {
+    border-radius: 0;
+  }
+
+  .numero_sorteado {
+    top: 12px;
+    font-size: 8em;
+  }
+
+  .img {
+    top: 5px;
+    margin-right: 10px;
+    /* Sombra interna (brilho) + Sombra externa (projeção) */
+    box-shadow:
+      inset -5px -5px 10px rgba(0, 0, 0, 0.5),
+      3px 5px 8px rgb(249, 249, 249);
+  }
 }

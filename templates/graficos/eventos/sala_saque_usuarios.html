@@ -1,366 +1,388 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#000">
-    <link rel="apple-touch-icon" href="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png">
-    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-    <link rel="shortcut icon" href="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="theme-color" content="#000" />
+    <link
+      rel="apple-touch-icon"
+      href="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
+    />
+    <link
+      rel="manifest"
+      href="{{ url_for('static', filename='manifest.json') }}"
+    />
+    <link
+      rel="shortcut icon"
+      href="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/chat.css') }}"
+    />
     <title>Chat de Suporte</title>
-<style>
-    
-#modal-ligacao{
-    display:none;
-    /* margin: 50px auto; */
-    position:fixed;
-    inset:0;
-    background:#1111118b;
-    z-index:999999;
+    <style>
+      #modal-ligacao {
+        display: none;
+        /* margin: 50px auto; */
+        position: fixed;
+        inset: 0;
+        background: #1111118b;
+        z-index: 999999;
 
-    align-items:center;
-    justify-content:center;
-}
+        align-items: center;
+        justify-content: center;
+      }
 
-.ligacao-card{
-    text-align:center;
-    color:#fff;
-}
+      .ligacao-card {
+        text-align: center;
+        color: #fff;
+      }
 
-#foto-ligacao{
-    width:100px;
-    height:100px;
-    border-radius:50%;
-    object-fit:cover;
-    margin-bottom:20px;
-}
+      #foto-ligacao {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 20px;
+      }
 
-#nome-ligacao{
-    font-size:28px;
-    margin-bottom:10px;
-}
+      #nome-ligacao {
+        font-size: 28px;
+        margin-bottom: 10px;
+      }
 
-#status-ligacao{
-    font-size:18px;
-    opacity:.8;
-    margin-bottom:15px;
-}
+      #status-ligacao {
+        font-size: 18px;
+        opacity: 0.8;
+        margin-bottom: 15px;
+      }
 
-#tempo-ligacao{
-    font-size:22px;
-    margin-bottom:40px;
-}
+      #tempo-ligacao {
+        font-size: 22px;
+        margin-bottom: 40px;
+      }
 
-.btn-encerrar{
-    width:80px;
-    height:80px;
-    border:none;
-    border-radius:50%;
-    font-size:30px;
-    cursor:pointer;
-}
-
-
-
-</style>
-</head>
-<body>
-<div id="notificacao-chat"></div>
-    <!-- NAV BAR SUPERIOR -->
-  </div>
-</div>
+      .btn-encerrar {
+        width: 80px;
+        height: 80px;
+        border: none;
+        border-radius: 50%;
+        font-size: 30px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="notificacao-chat">
+      <!-- NAV BAR SUPERIOR -->
+    </div>
 
     <nav class="navbar">
-        <div class="navbar-brand">
-            <span style="color:#fff;" class="material-symbols-outlined" role="button" tabindex="0" onclick="location.href='/raspadinha/{{ usuario_id }}'">arrow_back</span>
-            <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png" alt="Logo" class="navbar-logo">
-            <h1>{{ usuario.nome or "Player" }}<br>
-            <span style="font-size: 12px;" class="user-status">user_ID: {{ usuario_id }}</span>
-             </h1>
+      <div class="navbar-brand">
+        <span
+          style="color: #fff"
+          class="material-symbols-outlined"
+          role="button"
+          tabindex="0"
+          onclick="location.href='/raspadinha/{{ usuario_id }}'"
+          >arrow_back</span
+        >
+        <img
+          src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
+          alt="Logo"
+          class="navbar-logo"
+        />
+        <h1>
+          {{ usuario.nome or "Player" }}<br />
+          <span style="font-size: 12px" class="user-status"
+            >user_ID: {{ usuario_id }}</span
+          >
+        </h1>
+      </div>
+      <div class="header-actions">
+        <span
+          style="display: none"
+          class="material-symbols-outlined"
+          role="button"
+          tabindex="0"
+          >videocam</span
+        >
+
+        <span
+          style="display: none"
+          class="material-symbols-outlined"
+          role="button"
+          tabindex="0"
+          onclick="iniciarLigacao()"
+          >call</span
+        >
+
+        <!-- MODAL CHAMADA -->
+        <div style="display: none" id="modal-ligacao">
+          <div class="ligacao-card">
+            <img
+              id="foto-ligacao"
+              src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
+              alt="Perfil"
+            />
+
+            <h2 id="nome-ligacao">{{ nome_vendedor }}</h2>
+
+            <p id="status-ligacao">Chamando...</p>
+
+            <div id="tempo-ligacao">00:00</div>
+
+            <audio id="audio-da-chamada" autoplay></audio>
+
+            <button class="btn-encerrar" onclick="encerrarLigacao()">📞</button>
+          </div>
         </div>
-            <div class="header-actions">
-                <span style="display: none;" class="material-symbols-outlined" role="button" tabindex="0">videocam</span>
-               
-                <span  style="display: none;" class="material-symbols-outlined" role="button" tabindex="0" onclick="iniciarLigacao()">call</span>
-                
-                                        <!-- MODAL CHAMADA -->
-                <div  style="display: none;" id="modal-ligacao">
 
-                    <div class="ligacao-card">
-
-                        <img id="foto-ligacao" src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png" alt="Perfil">
-
-                        <h2 id="nome-ligacao">
-                            {{ nome_vendedor }}
-                        </h2>
-
-                        <p id="status-ligacao">
-                            Chamando...
-                        </p>
-
-                        <div id="tempo-ligacao">
-                            00:00
-                        </div>
-
-                        <audio id="audio-da-chamada" autoplay></audio>
-
-                        <button class="btn-encerrar" onclick="encerrarLigacao()">
-                            📞
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <!-- <span 
+        <!-- <span 
                     class="material-symbols-outlined" 
                     onclick="window.location.href='/conversa/{{ vendedor_id }}'"
                     style="cursor:pointer;"
                 >
                     chat
                 </span>           -->
-                <span class="material-symbols-outlined" role="button" tabindex="0"  id="openMenuBtn">person</span>
-            </div>
+        <span
+          class="material-symbols-outlined"
+          role="button"
+          tabindex="0"
+          id="openMenuBtn"
+          >person</span
+        >
+      </div>
     </nav>
 
-
     <!-- WRAPPER DO LAYOUT -->
-<div class="main-wrapper">
-
-    <!-- SIDEBAR -->
-    <aside class="sidebar closed" id="chatSidebar">
+    <div class="main-wrapper">
+      <!-- SIDEBAR -->
+      <aside class="sidebar closed" id="chatSidebar">
         <div class="sidebar-title"></div>
 
-<ul class="contacts-list">
+        <ul class="contacts-list">
+          <!-- VENDEDORES -->
+          {% for vendedor in vendedores %}
 
-    <!-- VENDEDORES -->
-    {% for vendedor in vendedores %}
+          <a
+            href="/chat/usuario/{{ usuario._id }}/{{ vendedor._id }}"
+            class="contact-item"
+            id="contato-{{ vendedor._id }}"
+          >
+            <div class="contact-avatar">{{ vendedor.nome[0] | upper }}</div>
 
-    <a
-        href="/chat/usuario/{{ usuario._id }}/{{ vendedor._id }}"
-        class="contact-item"
-        id="contato-{{ vendedor._id }}"
-    >
-
-        <div class="contact-avatar">
-            {{ vendedor.nome[0] | upper }}
-        </div>
-
-        <div class="contact-info">
-
-            <strong>
-
+            <div class="contact-info">
+              <strong>
                 {{ vendedor.nome }}
 
                 <!-- BOLINHA -->
                 <span
-                    class="badge-msg"
-                    id="badge-{{ vendedor._id }}"
-                    style="display:none;"
+                  class="badge-msg"
+                  id="badge-{{ vendedor._id }}"
+                  style="display: none"
                 >
-                    1
+                  1
                 </span>
+              </strong>
 
-            </strong>
+              <small>Administrador</small>
+            </div>
+          </a>
 
-            <small>Administrador</small>
+          {% endfor %}
 
-        </div>
+          <!-- USUÁRIOS -->
+          {% for user in usuarios %} {% if user._id != usuario._id %}
 
-    </a>
+          <a
+            href="#"
+            class="contact-item"
+            onclick="
+              alert(
+                'Por privacidade e segurança do sistema, jogadores só podem conversar com administradores.',
+              )
+            "
+          >
+            <div class="contact-avatar">{{ user.nome[0] | upper }}</div>
 
-    {% endfor %}
+            <div class="contact-info">
+              <strong>{{ user.nome }}</strong>
 
+              <small>Player</small>
+            </div>
+          </a>
 
-    <!-- USUÁRIOS -->
-    {% for user in usuarios %}
+          {% endif %} {% endfor %}
+        </ul>
+      </aside>
 
-    {% if user._id != usuario._id %}
-
-    <a
-        href="#"
-        class="contact-item"
-        onclick="alert('Por privacidade e segurança do sistema, jogadores só podem conversar com administradores.')"
-    >
-
-        <div class="contact-avatar">
-            {{ user.nome[0] | upper }}
-        </div>
-
-        <div class="contact-info">
-
-            <strong>{{ user.nome }}</strong>
-
-            <small>Player</small>
-
-        </div>
-
-    </a>
-
-    {% endif %}
-
-    {% endfor %}
-
-</ul>
-
-    </aside>
-
-
-   
-    <!-- CHAT -->
-    <div class="chat-container">
+      <!-- CHAT -->
+      <div class="chat-container">
         <!-- MENSAGENS -->
         <div id="mensagens">
-        <p style="color: gold; font-size: 14px; text-align: center;">🔐As mensagens e ligações são protegidas<br> com a criptografia de ponta a ponta. Somente as pessoas que fazem parte da conversa podem ler,<br> ouvir e compartilhar esse conteúdo. Saiba mais</p>
+          <p style="color: gold; font-size: 14px; text-align: center">
+            🔐As mensagens e ligações são protegidas<br />
+            com a criptografia de ponta a ponta. Somente as pessoas que fazem
+            parte da conversa podem ler,<br />
+            ouvir e compartilhar esse conteúdo. Saiba mais
+          </p>
         </div>
 
         <!-- PREVIEW -->
-        <div
-            class="image-preview-container"
-            id="image-preview-container"
-        >
+        <div class="image-preview-container" id="image-preview-container">
+          <img id="image-preview" src="" />
 
-            <img id="image-preview" src="">
-
-            <button id="remove-image">
-
-                <i class="fas fa-close"></i>
-
-            </button>
-
+          <button id="remove-image">
+            <i class="fas fa-close"></i>
+          </button>
         </div>
-
 
         <!-- INPUT -->
         <div class="input-area">
-
-            <!-- <button
+          <!-- <button
                 class="btn-circle btn-attach"
                
             >
             </button>      -->
-                   
-            <button class="botao-anexo" type="button" aria-label="Anexar arquivo" onclick="document.getElementById('uploadImg').click()">
-              <span class="material-symbols-outlined" role="button" tabindex="0">attach_file</span>
-            </button>
-            <button class="botao-camera" type="button" aria-label="Anexar arquivo" onclick="document.getElementById('uploadImg').click()">
-              <span class="material-symbols-outlined" role="button" tabindex="0">photo_camera</span>
-            </button>     
 
-            <input
-                type="text"
-                id="mensagemInput"
-                placeholder="Digite sua mensagem..."
+          <button
+            class="botao-anexo"
+            type="button"
+            aria-label="Anexar arquivo"
+            onclick="document.getElementById('uploadImg').click()"
+          >
+            <span class="material-symbols-outlined" role="button" tabindex="0"
+              >attach_file</span
             >
-
-            <!-- INPUT FILE -->
-            <input
-                type="file"
-                id="uploadImg"
-
-                accept="image/*, video/*, audio/*, .pdf, application/pdf"
-                
+          </button>
+          <button
+            class="botao-camera"
+            type="button"
+            aria-label="Anexar arquivo"
+            onclick="document.getElementById('uploadImg').click()"
+          >
+            <span class="material-symbols-outlined" role="button" tabindex="0"
+              >photo_camera</span
             >
+          </button>
 
-            <!-- ENVIAR -->
-            <button id="btnEnviar">
-                <span class="material-symbols-outlined">send</span>
-            </button>
+          <input
+            type="text"
+            id="mensagemInput"
+            placeholder="Digite sua mensagem..."
+          />
 
+          <!-- INPUT FILE -->
+          <input
+            type="file"
+            id="uploadImg"
+            accept="image/*, video/*, audio/*, .pdf, application/pdf"
+          />
+
+          <!-- ENVIAR -->
+          <button id="btnEnviar">
+            <span class="material-symbols-outlined">send</span>
+          </button>
         </div>
-
+      </div>
     </div>
 
-</div>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
-    
-<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+      const vendedor_id = "{{ vendedor_id }}";
+      const usuario_id = "{{ usuario_id }}";
+      const nome_usuario = "{{ nome_usuario }}";
+      const nome_vendedor = "{{ nome_vendedor }}";
 
-<script>
-const vendedor_id = "{{ vendedor_id }}";
-const usuario_id = "{{ usuario_id }}";
-const nome_usuario = "{{ nome_usuario }}";
-const nome_vendedor = "{{ nome_vendedor }}";
+      // CORRIGIDO AQUI: O usuário precisa se registrar como usuario!
+      const tipo = "usuario";
+      const meu_id = usuario_id;
 
-// CORRIGIDO AQUI: O usuário precisa se registrar como usuario!
-const tipo = "usuario";
-const meu_id = usuario_id;
+      const notificacoesContato = {};
 
-const notificacoesContato = {};
+      const input = document.getElementById("mensagemInput");
+      const btnEnviar = document.getElementById("btnEnviar");
+      const mensagens = document.getElementById("mensagens");
+      const uploadInput = document.getElementById("uploadImg");
+      const previewContainer = document.getElementById(
+        "image-preview-container",
+      );
+      const sidebar = document.getElementById("chatSidebar");
 
-const input = document.getElementById("mensagemInput");
-const btnEnviar = document.getElementById("btnEnviar");
-const mensagens = document.getElementById("mensagens");
-const uploadInput = document.getElementById("uploadImg");
-const previewContainer = document.getElementById("image-preview-container");
-const sidebar = document.getElementById('chatSidebar');
+      // ========================================
+      // CONEXÃO SOCKET E REGISTRO
+      // ========================================
+      const socket = io();
 
-// ========================================
-// CONEXÃO SOCKET E REGISTRO
-// ========================================
-const socket = io();
+      socket.on("connect", () => {
+        socket.emit("register", {
+          tipo: tipo,
+          id: meu_id,
+          conversando_com_id: vendedor_id, // Conversando com o Vendedor
+        });
+      });
 
-socket.on("connect", () => {
-    socket.emit("register", {
-        tipo: tipo,
-        id: meu_id,
-        conversando_com_id: vendedor_id // Conversando com o Vendedor
-    });
-});
+      if (document.getElementById("openMenuBtn")) {
+        document.getElementById("openMenuBtn").onclick = function (e) {
+          e.stopPropagation();
+          sidebar.classList.toggle("closed");
+        };
+      }
 
-if (document.getElementById('openMenuBtn')) {
-    document.getElementById('openMenuBtn').onclick = function(e){
-        e.stopPropagation();
-        sidebar.classList.toggle('closed');
-    };
-}
+      function toggleAttach() {
+        const menu = document.getElementById("attachMenu");
+        if (menu) {
+          menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+        }
+      }
 
-function toggleAttach(){
-    const menu = document.getElementById('attachMenu');
-    if (menu) {
-        menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-    }
-}
+      function abrirModalLigacao() {
+        document.getElementById("modal-ligacao").style.display = "flex";
+      }
+      // ========================================
+      // PREVIEW DE ARQUIVOS
+      // ========================================
+      if (uploadInput) {
+        uploadInput.addEventListener("change", () => {
+          const file = uploadInput.files[0];
+          if (!file || !previewContainer) return;
 
+          previewContainer.style.display = "block";
+          const reader = new FileReader();
 
-function abrirModalLigacao(){
-    document.getElementById("modal-ligacao").style.display = "flex";
-}
-// ========================================
-// PREVIEW DE ARQUIVOS
-// ========================================
-if (uploadInput) {
-    uploadInput.addEventListener('change', () => {
-        const file = uploadInput.files[0];
-        if (!file || !previewContainer) return;
-
-        previewContainer.style.display = 'block';
-        const reader = new FileReader();
-
-        if (file.type.startsWith('image/')) {
-            reader.onload = e => {
-                previewContainer.innerHTML = `
+          if (file.type.startsWith("image/")) {
+            reader.onload = (e) => {
+              previewContainer.innerHTML = `
                     <img id="image-preview" src="${e.target.result}" style="max-width:220px; border-radius:10px;">
                     <button id="remove-image">✖</button>
                 `;
-                ativarRemoverPreview();
+              ativarRemoverPreview();
             };
             reader.readAsDataURL(file);
-        }
-        else if (file.type.startsWith('video/')) {
-            reader.onload = e => {
-                previewContainer.innerHTML = `
+          } else if (file.type.startsWith("video/")) {
+            reader.onload = (e) => {
+              previewContainer.innerHTML = `
                     <video controls style="max-width:240px; border-radius:10px;"><source src="${e.target.result}"></video>
                     <button id="remove-image">✖</button>
                 `;
-                ativarRemoverPreview();
+              ativarRemoverPreview();
             };
             reader.readAsDataURL(file);
-        }
-        else if (file.type === "application/pdf") {
+          } else if (file.type === "application/pdf") {
             previewContainer.innerHTML = `
                 <div style="background:#222; color:white; padding:15px; border-radius:10px; display:flex; align-items:center; gap:10px;">
                     <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1779934113/pdf_136522_oiueax.png"
@@ -371,11 +393,11 @@ if (uploadInput) {
                 <button id="remove-image">✖</button>
             `;
             ativarRemoverPreview();
-        }
-        else if (file.type.startsWith('audio/')) {
-            const audioId = "audio_" + Date.now() + "_" + Math.floor(Math.random() * 9999);
-            reader.onload = e => {
-                previewContainer.innerHTML = `
+          } else if (file.type.startsWith("audio/")) {
+            const audioId =
+              "audio_" + Date.now() + "_" + Math.floor(Math.random() * 9999);
+            reader.onload = (e) => {
+              previewContainer.innerHTML = `
                     <div style="background: #fff;" class="audio-bubble">
 
                         <button class="play-btn" onclick="toggleAudio('${audioId}', this)">
@@ -410,60 +432,60 @@ if (uploadInput) {
                     </div>
                 <button id="remove-image">✖</button>
                 `;
-                ativarRemoverPreview();
+              ativarRemoverPreview();
             };
             reader.readAsDataURL(file);
-        }
-    });
-}
+          }
+        });
+      }
 
-function activarRemoverPreview(){
-    const btnRemove = document.getElementById("remove-image");
-    if (btnRemove) btnRemove.addEventListener("click", limparPreview);
-}
+      function activarRemoverPreview() {
+        const btnRemove = document.getElementById("remove-image");
+        if (btnRemove) btnRemove.addEventListener("click", limparPreview);
+      }
 
-function limparPreview(){
-    if (!previewContainer) return;
-    previewContainer.innerHTML = "";
-    previewContainer.style.display = "none";
-    if (uploadInput) uploadInput.value = "";
-}
+      function limparPreview() {
+        if (!previewContainer) return;
+        previewContainer.innerHTML = "";
+        previewContainer.style.display = "none";
+        if (uploadInput) uploadInput.value = "";
+      }
 
-// ========================================
-// ESCUTAR CONFIRMAÇÃO DE LEITURA (PINTAR DE AZUL)
-// ========================================
-// ========================================
-// PINTA TUDO DE AZUL (SEM DEPENDER DE ID)
-// ========================================
-// O evento que pinta de azul quando a mensagem é lida
-socket.on("message_read_confirm", () => {
-    document.querySelectorAll(".double-check").forEach(check => {
-        check.style.color = "#53bdeb"; // Azul solicitado originalmente
-    });
-});
-// ========================================
-// RECEBER MENSAGENS (IMEDIATO)
-// ========================================
-socket.on("new_message", (data) => {
-    console.log("Nova mensagem recebida no Usuário:", data);
+      // ========================================
+      // ESCUTAR CONFIRMAÇÃO DE LEITURA (PINTAR DE AZUL)
+      // ========================================
+      // ========================================
+      // PINTA TUDO DE AZUL (SEM DEPENDER DE ID)
+      // ========================================
+      // O evento que pinta de azul quando a mensagem é lida
+      socket.on("message_read_confirm", () => {
+        document.querySelectorAll(".double-check").forEach((check) => {
+          check.style.color = "#53bdeb"; // Azul solicitado originalmente
+        });
+      });
+      // ========================================
+      // RECEBER MENSAGENS (IMEDIATO)
+      // ========================================
+      socket.on("new_message", (data) => {
+        console.log("Nova mensagem recebida no Usuário:", data);
 
-    if (!mensagens) return;
+        if (!mensagens) return;
 
-    const idRemetente = String(data.from_id).trim();
-    const idMeu = String(meu_id).trim();
-    const enviada = (idRemetente === idMeu);
+        const idRemetente = String(data.from_id).trim();
+        const idMeu = String(meu_id).trim();
+        const enviada = idRemetente === idMeu;
 
-    const tipoMensagem = enviada ? "enviada" : "recebida";
-    const div = document.createElement("div");
-    div.classList.add("bolha", tipoMensagem);
+        const tipoMensagem = enviada ? "enviada" : "recebida";
+        const div = document.createElement("div");
+        div.classList.add("bolha", tipoMensagem);
 
-    // --- Sua lógica de animação de digitação de recebimento ---
-    let typingDiv = null;
+        // --- Sua lógica de animação de digitação de recebimento ---
+        let typingDiv = null;
 
-    if (!enviada) {
-        typingDiv = document.createElement("div");
-        typingDiv.className = "bolha recebida";
-        typingDiv.innerHTML = `
+        if (!enviada) {
+          typingDiv = document.createElement("div");
+          typingDiv.className = "bolha recebida";
+          typingDiv.innerHTML = `
             <div class="topo-msg">
                 <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png">
                 <span>${nome_vendedor} (${vendedor_id})</span>
@@ -472,27 +494,25 @@ socket.on("new_message", (data) => {
                 <span></span><span></span><span></span>
             </div>
         `;
-        mensagens.appendChild(typingDiv);
-        mensagens.scrollTop = mensagens.scrollHeight;
-    }
-
-    // Executa o delay para sumir a animação e injetar o conteúdo real
-    setTimeout(() => {
-        if (typingDiv) typingDiv.remove();
-
-        let conteudo = '';
-
-        if (data.mensagem) {
-            conteudo += `<div class="texto">${data.mensagem.replace(/\n/g, "<br>")}</div>`;
+          mensagens.appendChild(typingDiv);
+          mensagens.scrollTop = mensagens.scrollHeight;
         }
 
-        if (data.arquivo_tipo === "imagem") {
-            conteudo += `<img src="${data.arquivo}" style="max-width:220px; border-radius:10px; margin-top:8px;">`;
-            
-        } else if (data.arquivo_tipo === "video") {
-            conteudo += `<video controls style="max-width:240px; border-radius:10px; margin-top:8px;"><source src="${data.arquivo}"></video>`;
+        // Executa o delay para sumir a animação e injetar o conteúdo real
+        setTimeout(() => {
+          if (typingDiv) typingDiv.remove();
 
-        } else if (data.arquivo_tipo === "pdf") {
+          let conteudo = "";
+
+          if (data.mensagem) {
+            conteudo += `<div class="texto">${data.mensagem.replace(/\n/g, "<br>")}</div>`;
+          }
+
+          if (data.arquivo_tipo === "imagem") {
+            conteudo += `<img src="${data.arquivo}" style="max-width:220px; border-radius:10px; margin-top:8px;">`;
+          } else if (data.arquivo_tipo === "video") {
+            conteudo += `<video controls style="max-width:240px; border-radius:10px; margin-top:8px;"><source src="${data.arquivo}"></video>`;
+          } else if (data.arquivo_tipo === "pdf") {
             conteudo += `
             <a href="${data.arquivo}" target="_blank" style="display: flex; flex-direction: column; background: #202c33; color: white; padding: 4px; border-radius: 8px; text-decoration: none; margin-top: 8px; max-width: 250px; font-family: sans-serif;">
                 <!-- Miniatura/Preview no topo -->
@@ -503,19 +523,18 @@ socket.on("new_message", (data) => {
                 <!-- Textos na parte inferior -->
                 <div style="padding: 10px 12px 8px 12px; display: flex; flex-direction: column; gap: 2px;">
                     <div style="font-size: 14px; font-weight: normal; color: #e9edef; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        ${data.arquivo.split('/').pop().split('?')[0] || 'Documento.pdf'}
+                        ${data.arquivo.split("/").pop().split("?")[0] || "Documento.pdf"}
                     </div>
                     <div style="font-size: 11px; color: #8696a0;">
                         1 página • PDF
                     </div>
                 </div>
             </a>`;
+          } else if (data.arquivo_tipo === "audio") {
+            const audioId =
+              "audio_" + Date.now() + "_" + Math.floor(Math.random() * 9999);
 
-        } else if (data.arquivo_tipo === "audio") {
-
-                const audioId = "audio_" + Date.now() + "_" + Math.floor(Math.random() * 9999);
-
-                conteudo += `
+            conteudo += `
                     <div class="audio-bubble">
 
                         <button class="play-btn" onclick="toggleAudio('${audioId}', this)">
@@ -549,14 +568,18 @@ socket.on("new_message", (data) => {
 
                     </div>
                 `;
-            }
+          }
 
-
-        const horaAtual = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        // Se foi enviada por mim, coloca os dois checks. Se foi recebida, deixa vazio.
-        // Adicionamos uma ID única baseada na ID da mensagem para conseguir pintar de azul depois
-        const checksHTML = enviada ? `<span class="double-check" id="check_${data.id}">✓✓</span>` : '';
-        div.innerHTML = `
+          const horaAtual = new Date().toLocaleTimeString("pt-BR", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          // Se foi enviada por mim, coloca os dois checks. Se foi recebida, deixa vazio.
+          // Adicionamos uma ID única baseada na ID da mensagem para conseguir pintar de azul depois
+          const checksHTML = enviada
+            ? `<span class="double-check" id="check_${data.id}">✓✓</span>`
+            : "";
+          div.innerHTML = `
             <div class="topo-msg">
                 <img src="https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png">
                 <span>${enviada ? `${nome_usuario} (${usuario_id})` : `${nome_vendedor} (${vendedor_id})`}</span>
@@ -568,222 +591,245 @@ socket.on("new_message", (data) => {
             </div>
         `;
 
-        mensagens.appendChild(div);
-        mensagens.scrollTop = mensagens.scrollHeight;
+          mensagens.appendChild(div);
+          mensagens.scrollTop = mensagens.scrollHeight;
 
-        if (!enviada) {
+          if (!enviada) {
             // 👉 AQUI ESTÁ A LINHA: Emite para o servidor que a mensagem foi lida
             socket.emit("message_read", { message_id: data.id, de_id: meu_id });
-            if ("Notification" in window && Notification.permission === "granted") {
-                const notificacao = new Notification(`Nova mensagem de ${nome_vendedor}`, {
-                    body: data.mensagem || "📎 Arquivo enviado",
-                    icon: "https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png"
-                });
+            if (
+              "Notification" in window &&
+              Notification.permission === "granted"
+            ) {
+              const notificacao = new Notification(
+                `Nova mensagem de ${nome_vendedor}`,
+                {
+                  body: data.mensagem || "📎 Arquivo enviado",
+                  icon: "https://res.cloudinary.com/dptprh0xk/image/upload/v1778788561/HcUcY_jxukft.png",
+                },
+              );
             }
 
-            const audio = new Audio("https://notificationsounds.com/storage/sounds/file-sounds-1150-pristine.mp3");
-            audio.play().catch(e => console.log("Bloqueio de som evitado"));
-        }
-    }, 2000);
-});
+            const audio = new Audio(
+              "https://notificationsounds.com/storage/sounds/file-sounds-1150-pristine.mp3",
+            );
+            audio.play().catch((e) => console.log("Bloqueio de som evitado"));
+          }
+        }, 2000);
+      });
 
+      // ========================================
+      // ENVIAR MENSAGEM (USUÁRIO -> VENDEDOR)
+      // ========================================
+      function enviarMensagem() {
+        const mensagem = input.value.trim();
+        const arquivo = uploadInput ? uploadInput.files[0] : null;
 
+        if (!mensagem && !arquivo) return;
 
-// ========================================
-// ENVIAR MENSAGEM (USUÁRIO -> VENDEDOR)
-// ========================================
-function enviarMensagem() {
-    const mensagem = input.value.trim();
-    const arquivo = uploadInput ? uploadInput.files[0] : null;
-
-    if (!mensagem && !arquivo) return;
-
-    if (!arquivo) {
-        socket.emit("private_message", {
+        if (!arquivo) {
+          socket.emit("private_message", {
             from_tipo: tipo,
             from_id: meu_id,
             to_tipo: "vendedor", // Enviando para o vendedor
             to_id: vendedor_id,
-            mensagem: message = mensagem
-        });
-        input.value = "";
-        return;
-    }
+            mensagem: (message = mensagem),
+          });
+          input.value = "";
+          return;
+        }
 
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        let arquivo_tipo = "";
-        if (arquivo.type.startsWith("image/")) arquivo_tipo = "imagem";
-        else if (arquivo.type.startsWith("video/")) arquivo_tipo = "video";
-        else if (arquivo.type.startsWith("audio/")) arquivo_tipo = "audio";
-        else if (arquivo.type === "application/pdf") arquivo_tipo = "pdf";
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          let arquivo_tipo = "";
+          if (arquivo.type.startsWith("image/")) arquivo_tipo = "imagem";
+          else if (arquivo.type.startsWith("video/")) arquivo_tipo = "video";
+          else if (arquivo.type.startsWith("audio/")) arquivo_tipo = "audio";
+          else if (arquivo.type === "application/pdf") arquivo_tipo = "pdf";
 
-        socket.emit("private_message", {
+          socket.emit("private_message", {
             from_tipo: tipo,
             from_id: meu_id,
             to_tipo: "vendedor",
             to_id: vendedor_id,
             mensagem: mensagem,
             arquivo: event.target.result,
-            arquivo_tipo: arquivo_tipo
+            arquivo_tipo: arquivo_tipo,
+          });
+
+          input.value = "";
+          limparPreview();
+        };
+        reader.readAsDataURL(arquivo);
+      }
+
+      if (btnEnviar) btnEnviar.addEventListener("click", enviarMensagem);
+      if (input) {
+        input.addEventListener("keypress", (e) => {
+          if (e.key === "Enter") enviarMensagem();
+        });
+      }
+
+      // ========================================
+      // LIGAÇAO  (USUÁRIO -> VENDEDOR)
+      // ========================================
+      // Conexão com o Socket do Render
+      // const socket = io({ transports: ['websocket'] });
+
+      let conexaoPeer;
+      let streamLocal;
+
+      // --- CONFIGURAÇÃO DINÂMICA ---
+      // injete aqui as variáveis que você já usa no seu chat do Flask:
+      const MEU_ID = "{{ usuario_id }}"; // Se você for o vendedor, inverta para vendedor_id
+      const DESTINO_ID = "{{ vendedor_id }}"; // O ID de com quem a janela de chat está aberta
+
+      const configuracaoWebRTC = {
+        iceServers: [
+          { urls: "stun:://google.com" },
+          { urls: "stun:://google.com" },
+        ],
+      };
+
+      // Avisa o servidor quem sou eu assim que a página carrega
+      socket.on("connect", () => {
+        socket.emit("conectar_chamada", { meu_id: MEU_ID });
+      });
+
+      // --- FUNÇÃO PARA O BOTÃO "LIGAR" ---
+      // ========================================
+      // BOTÃO LIGAR
+      // ========================================
+      async function iniciarLigacao() {
+        streamLocal = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: false,
         });
 
-        input.value = "";
-        limparPreview();
-    };
-    reader.readAsDataURL(arquivo);
-}
+        abrirModalLigacao();
 
-if (btnEnviar) btnEnviar.addEventListener("click", enviarMensagem);
-if (input) {
-    input.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") enviarMensagem();
-    });
-}
+        conexaoPeer = new RTCPeerConnection(configuracaoWebRTC);
 
+        streamLocal.getTracks().forEach((track) => {
+          conexaoPeer.addTrack(track, streamLocal);
+        });
 
+        conexaoPeer.ontrack = (event) => {
+          const audioRemoto = document.getElementById("audio-da-chamada");
+          audioRemoto.srcObject = event.streams[0];
+        };
 
-// ========================================
-// LIGAÇAO  (USUÁRIO -> VENDEDOR)
-// ========================================
-// Conexão com o Socket do Render
-// const socket = io({ transports: ['websocket'] });
-
-let conexaoPeer;
-let streamLocal;
-
-// --- CONFIGURAÇÃO DINÂMICA ---
-// injete aqui as variáveis que você já usa no seu chat do Flask:
-const MEU_ID = "{{ usuario_id }}"; // Se você for o vendedor, inverta para vendedor_id
-const DESTINO_ID = "{{ vendedor_id }}"; // O ID de com quem a janela de chat está aberta
-
-const configuracaoWebRTC = {
-    iceServers: [
-        { urls: 'stun:://google.com' },
-        { urls: 'stun:://google.com' }
-    ]
-};
-
-// Avisa o servidor quem sou eu assim que a página carrega
-socket.on('connect', () => {
-    socket.emit('conectar_chamada', { meu_id: MEU_ID });
-});
-
-// --- FUNÇÃO PARA O BOTÃO "LIGAR" ---
-// ========================================
-// BOTÃO LIGAR
-// ========================================
-async function iniciarLigacao() {
-
-    streamLocal = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: false
-    });
-
-    abrirModalLigacao();
-
-    conexaoPeer = new RTCPeerConnection(configuracaoWebRTC);
-
-    streamLocal.getTracks().forEach(track => {
-        conexaoPeer.addTrack(track, streamLocal);
-    });
-
-    conexaoPeer.ontrack = (event) => {
-        const audioRemoto = document.getElementById('audio-da-chamada');
-        audioRemoto.srcObject = event.streams[0];
-    };
-
-    conexaoPeer.onicecandidate = (event) => {
-        if(event.candidate){
-            socket.emit('enviar-ice-candidate', {
-                destino_id: DESTINO_ID,
-                candidate: event.candidate
+        conexaoPeer.onicecandidate = (event) => {
+          if (event.candidate) {
+            socket.emit("enviar-ice-candidate", {
+              destino_id: DESTINO_ID,
+              candidate: event.candidate,
             });
+          }
+        };
+
+        const offer = await conexaoPeer.createOffer();
+
+        await conexaoPeer.setLocalDescription(offer);
+
+        socket.emit("enviar-convite-chamada", {
+          origem_id: MEU_ID,
+          destino_id: DESTINO_ID,
+          dadosConexao: offer,
+        });
+      }
+
+      // --- ESCUTADORES PARA QUEM RECEBE A LIGAÇÃO ---
+
+      socket.on(
+        "receber-convite-chamada",
+        async ({ origem_id, dadosConexao }) => {
+          // Só aceita ou mostra o pop-up se a chamada vier exatamente do ID esperado (ou altere para aceitar de qualquer um)
+          if (origem_id != DESTINO_ID) return;
+
+          // Ativa microfone de quem está recebendo
+          streamLocal = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: false,
+          });
+
+          conexaoPeer = new RTCPeerConnection(configuracaoWebRTC);
+          streamLocal
+            .getTracks()
+            .forEach((track) => conexaoPeer.addTrack(track, streamLocal));
+
+          conexaoPeer.ontrack = (event) => {
+            const audioRemoto = document.getElementById("audio-da-chamada");
+            audioRemoto.srcObject = event.streams[0];
+          };
+
+          conexaoPeer.onicecandidate = (event) => {
+            if (event.candidate) {
+              socket.emit("enviar-ice-candidate", {
+                destino_id: origem_id,
+                candidate: event.candidate,
+              });
+            }
+          };
+
+          await conexaoPeer.setRemoteDescription(
+            new RTCSessionDescription(dadosConexao),
+          );
+          const answer = await conexaoPeer.createAnswer();
+          await conexaoPeer.setLocalDescription(answer);
+
+          socket.emit("responder-chamada", {
+            destino_id: origem_id,
+            dadosConexao: answer,
+          });
+        },
+      );
+
+      socket.on("chamada-aceita", async ({ dadosConexao }) => {
+        await conexaoPeer.setRemoteDescription(
+          new RTCSessionDescription(dadosConexao),
+        );
+      });
+
+      socket.on("receber-ice-candidate", async ({ candidate }) => {
+        if (conexaoPeer) {
+          await conexaoPeer.addIceCandidate(new RTCIceCandidate(candidate));
         }
-    };
+      });
 
-    const offer = await conexaoPeer.createOffer();
+      // ========================================
+      // CARREGAR MENSAGENS SALVAS (BANCO DE DADOS)
+      // ========================================
+      async function carregarHistoricoBanco() {
+        if (!mensagens) return;
 
-    await conexaoPeer.setLocalDescription(offer);
+        try {
+          const response = await fetch(
+            `/historico/${usuario_id}/${vendedor_id}`,
+          );
+          if (!response.ok) throw new Error("Erro ao carregar histórico.");
 
-    socket.emit('enviar-convite-chamada', {
-        origem_id: MEU_ID,
-        destino_id: DESTINO_ID,
-        dadosConexao: offer
-    });
-}
+          const historico = await response.json();
+          mensagens.innerHTML = "";
 
-// --- ESCUTADORES PARA QUEM RECEBE A LIGAÇÃO ---
-
-socket.on('receber-convite-chamada', async ({ origem_id, dadosConexao }) => {
-    // Só aceita ou mostra o pop-up se a chamada vier exatamente do ID esperado (ou altere para aceitar de qualquer um)
-    if (origem_id != DESTINO_ID) return; 
-
-    // Ativa microfone de quem está recebendo
-    streamLocal = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-    
-    conexaoPeer = new RTCPeerConnection(configuracaoWebRTC);
-    streamLocal.getTracks().forEach(track => conexaoPeer.addTrack(track, streamLocal));
-
-    conexaoPeer.ontrack = (event) => {
-        const audioRemoto = document.getElementById('audio-da-chamada');
-        audioRemoto.srcObject = event.streams[0];
-    };
-
-    conexaoPeer.onicecandidate = (event) => {
-        if (event.candidate) {
-            socket.emit('enviar-ice-candidate', { destino_id: origem_id, candidate: event.candidate });
-        }
-    };
-
-    await conexaoPeer.setRemoteDescription(new RTCSessionDescription(dadosConexao));
-    const answer = await conexaoPeer.createAnswer();
-    await conexaoPeer.setLocalDescription(answer);
-    
-    socket.emit('responder-chamada', { destino_id: origem_id, dadosConexao: answer });
-});
-
-socket.on('chamada-aceita', async ({ dadosConexao }) => {
-    await conexaoPeer.setRemoteDescription(new RTCSessionDescription(dadosConexao));
-});
-
-socket.on('receber-ice-candidate', async ({ candidate }) => {
-    if (conexaoPeer) {
-        await conexaoPeer.addIceCandidate(new RTCIceCandidate(candidate));
-    }
-});
-
-
-// ========================================
-// CARREGAR MENSAGENS SALVAS (BANCO DE DADOS)
-// ========================================
-async function carregarHistoricoBanco() {
-    if (!mensagens) return;
-
-    try {
-        const response = await fetch(`/historico/${usuario_id}/${vendedor_id}`);
-        if (!response.ok) throw new Error("Erro ao carregar histórico.");
-
-        const historico = await response.json();
-        mensagens.innerHTML = "";
-
-        historico.forEach(data => {
+          historico.forEach((data) => {
             const idRemetente = String(data.from_id).trim();
             const idMeu = String(meu_id).trim();
-            const enviada = (idRemetente === idMeu);
+            const enviada = idRemetente === idMeu;
 
             const div = document.createElement("div");
             div.classList.add("bolha", enviada ? "enviada" : "recebida");
 
-            let conteudo = '';
-            if (data.mensagem) conteudo += `<div class="texto">${data.mensagem.replace(/\n/g, "<br>")}</div>`;
+            let conteudo = "";
+            if (data.mensagem)
+              conteudo += `<div class="texto">${data.mensagem.replace(/\n/g, "<br>")}</div>`;
             // Continuação da montagem dos seus arquivos de mídia
             if (data.arquivo_tipo === "imagem") {
-                conteudo += `<img src="${data.arquivo}" style="max-width:220px; border-radius:10px; margin-top:8px;">`;
+              conteudo += `<img src="${data.arquivo}" style="max-width:220px; border-radius:10px; margin-top:8px;">`;
             } else if (data.arquivo_tipo === "video") {
-                conteudo += `<video controls style="max-width:240px; border-radius:10px; margin-top:8px;"><source src="${data.arquivo}"></video>`;
+              conteudo += `<video controls style="max-width:240px; border-radius:10px; margin-top:8px;"><source src="${data.arquivo}"></video>`;
             } else if (data.arquivo_tipo === "pdf") {
-                conteudo += `
+              conteudo += `
                 <a href="${data.arquivo}" target="_blank" style="display: flex; flex-direction: column; background: #202c33; color: white; padding: 4px; border-radius: 8px; text-decoration: none; margin-top: 8px; max-width: 250px; font-family: sans-serif;">
                     <!-- Miniatura/Preview no topo -->
                     <div style="background: white; border-radius: 6px 6px 0 0; padding: 12px; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid #ffffff1a;">
@@ -793,7 +839,7 @@ async function carregarHistoricoBanco() {
                     <!-- Textos na parte inferior -->
                     <div style="padding: 10px 12px 8px 12px; display: flex; flex-direction: column; gap: 2px;">
                         <div style="font-size: 14px; font-weight: normal; color: #e9edef; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                            ${data.arquivo.split('/').pop().split('?')[0] || 'Documento.pdf'}
+                            ${data.arquivo.split("/").pop().split("?")[0] || "Documento.pdf"}
                         </div>
                         <div style="font-size: 11px; color: #8696a0;">
                             1 página • PDF
@@ -801,10 +847,10 @@ async function carregarHistoricoBanco() {
                     </div>
                 </a>`;
             } else if (data.arquivo_tipo === "audio") {
+              const audioId =
+                "audio_" + Date.now() + "_" + Math.floor(Math.random() * 9999);
 
-                const audioId = "audio_" + Date.now() + "_" + Math.floor(Math.random() * 9999);
-
-                conteudo += `
+              conteudo += `
                     <div class="audio-bubble">
 
                         <button class="play-btn" onclick="toggleAudio('${audioId}', this)">
@@ -839,13 +885,21 @@ async function carregarHistoricoBanco() {
                     </div>
                 `;
             }
-            // Lógica de status de leitura 
+            // Lógica de status de leitura
             // data.lida vem do JSON, Python envia como booleano puro
-            const isLida = (data.lida === false || data.lida === "true" || data.lida === 1);
-            const corCheck = isLida ? "#53bdeb" : "#999"; 
-            const checksHTML = enviada ? `<span class="double-check" id="check_${data.id}" style="color: ${corCheck};">✓✓</span>` : '';
+            const isLida =
+              data.lida === false || data.lida === "true" || data.lida === 1;
+            const corCheck = isLida ? "#53bdeb" : "#999";
+            const checksHTML = enviada
+              ? `<span class="double-check" id="check_${data.id}" style="color: ${corCheck};">✓✓</span>`
+              : "";
 
-            const horaMsg = data.timestamp ? new Date(data.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : "";
+            const horaMsg = data.timestamp
+              ? new Date(data.timestamp).toLocaleTimeString("pt-BR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "";
 
             div.innerHTML = `
                 <div class="topo-msg">
@@ -859,149 +913,129 @@ async function carregarHistoricoBanco() {
                 </div>
             `;
             mensagens.appendChild(div);
-        });
+          });
 
-        mensagens.scrollTop = mensagens.scrollHeight;
-    } catch (erro) {
-        console.error("Erro:", erro);
-    }
-}
-
-carregarHistoricoBanco();
-
-
-function formatTime(segundos){
-
-    if(isNaN(segundos) || segundos < 0) return "00:00";
-
-    const min = Math.floor(segundos / 60);
-    const sec = Math.floor(segundos % 60);
-
-    return String(min).padStart(2,'0') + ":" +
-           String(sec).padStart(2,'0');
-}
-
-function toggleAudio(id, botao){
-
-    const audio = document.getElementById(id);
-
-    if(!audio) return;
-
-    const waves = botao
-        .closest('.audio-bubble')
-        .querySelectorAll('.wave');
-
-    if(audio.paused){
-
-        document.querySelectorAll('.audio-bubble audio').forEach(a=>{
-
-            if(a !== audio){
-
-                a.pause();
-                a.currentTime = 0;
-
-                const bubble = a.closest('.audio-bubble');
-
-                if(bubble){
-
-                    const btn = bubble.querySelector('.play-btn');
-
-                    if(btn){
-                        btn.innerHTML = "▶";
-                    }
-
-                    bubble.querySelectorAll('.wave').forEach(w=>{
-                        w.classList.remove('playing');
-                    });
-
-                    const spanTempo = bubble.querySelector('.audio-time');
-
-                    if(spanTempo && !isNaN(a.duration)){
-                        spanTempo.innerText = formatTime(a.duration);
-                    }
-                }
-            }
-        });
-
-        audio.play();
-
-        botao.innerHTML = "❚❚";
-
-        waves.forEach(w=>{
-            w.classList.add('playing');
-        });
-
-    }else{
-
-        audio.pause();
-
-        botao.innerHTML = "▶";
-
-        waves.forEach(w=>{
-            w.classList.remove('playing');
-        });
-    }
-
-    audio.onloadedmetadata = function(){
-
-        const tempo = document.getElementById("time_" + id);
-
-        if(tempo){
-            tempo.innerText = formatTime(audio.duration);
+          mensagens.scrollTop = mensagens.scrollHeight;
+        } catch (erro) {
+          console.error("Erro:", erro);
         }
-    };
+      }
 
-    audio.ontimeupdate = function(){
+      carregarHistoricoBanco();
 
-        const tempo = document.getElementById("time_" + id);
+      function formatTime(segundos) {
+        if (isNaN(segundos) || segundos < 0) return "00:00";
 
-        if(!tempo) return;
+        const min = Math.floor(segundos / 60);
+        const sec = Math.floor(segundos % 60);
 
-        const restante = Math.max(
-            0,
-            audio.duration - audio.currentTime
+        return (
+          String(min).padStart(2, "0") + ":" + String(sec).padStart(2, "0")
         );
+      }
 
-        tempo.innerText = formatTime(restante);
-    };
+      function toggleAudio(id, botao) {
+        const audio = document.getElementById(id);
 
-    audio.onpause = function(){
+        if (!audio) return;
 
-        botao.innerHTML = "▶";
+        const waves = botao.closest(".audio-bubble").querySelectorAll(".wave");
 
-        waves.forEach(w=>{
-            w.classList.remove('playing');
-        });
-    };
+        if (audio.paused) {
+          document.querySelectorAll(".audio-bubble audio").forEach((a) => {
+            if (a !== audio) {
+              a.pause();
+              a.currentTime = 0;
 
-    audio.onplay = function(){
+              const bubble = a.closest(".audio-bubble");
 
-        botao.innerHTML = "❚❚";
+              if (bubble) {
+                const btn = bubble.querySelector(".play-btn");
 
-        waves.forEach(w=>{
-            w.classList.add('playing');
-        });
-    };
+                if (btn) {
+                  btn.innerHTML = "▶";
+                }
 
-    audio.onended = function(){
+                bubble.querySelectorAll(".wave").forEach((w) => {
+                  w.classList.remove("playing");
+                });
 
-        botao.innerHTML = "▶";
+                const spanTempo = bubble.querySelector(".audio-time");
 
-        waves.forEach(w=>{
-            w.classList.remove('playing');
-        });
+                if (spanTempo && !isNaN(a.duration)) {
+                  spanTempo.innerText = formatTime(a.duration);
+                }
+              }
+            }
+          });
 
-        audio.currentTime = 0;
+          audio.play();
 
-        const tempo = document.getElementById("time_" + id);
+          botao.innerHTML = "❚❚";
 
-        if(tempo){
-            tempo.innerText = formatTime(audio.duration);
+          waves.forEach((w) => {
+            w.classList.add("playing");
+          });
+        } else {
+          audio.pause();
+
+          botao.innerHTML = "▶";
+
+          waves.forEach((w) => {
+            w.classList.remove("playing");
+          });
         }
-    };
-}
 
+        audio.onloadedmetadata = function () {
+          const tempo = document.getElementById("time_" + id);
 
-</script>
-</body>
+          if (tempo) {
+            tempo.innerText = formatTime(audio.duration);
+          }
+        };
+
+        audio.ontimeupdate = function () {
+          const tempo = document.getElementById("time_" + id);
+
+          if (!tempo) return;
+
+          const restante = Math.max(0, audio.duration - audio.currentTime);
+
+          tempo.innerText = formatTime(restante);
+        };
+
+        audio.onpause = function () {
+          botao.innerHTML = "▶";
+
+          waves.forEach((w) => {
+            w.classList.remove("playing");
+          });
+        };
+
+        audio.onplay = function () {
+          botao.innerHTML = "❚❚";
+
+          waves.forEach((w) => {
+            w.classList.add("playing");
+          });
+        };
+
+        audio.onended = function () {
+          botao.innerHTML = "▶";
+
+          waves.forEach((w) => {
+            w.classList.remove("playing");
+          });
+
+          audio.currentTime = 0;
+
+          const tempo = document.getElementById("time_" + id);
+
+          if (tempo) {
+            tempo.innerText = formatTime(audio.duration);
+          }
+        };
+      }
+    </script>
+  </body>
 </html>
